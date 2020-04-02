@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="cebf6e3d-f29d-4c0f-88bb-8928298efd30" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../pki-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../pki-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pki-service/src/main/java/rs/ac/uns/ftn/pkiservice/PkiServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/../pki-service/src/main/java/rs/ac/uns/ftn/pkiservice/PkiServiceApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pki-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../pki-service/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pki-service/src/test/java/rs/ac/uns/ftn/pkiservice/PkiServiceApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/../pki-service/src/test/java/rs/ac/uns/ftn/pkiservice/PkiServiceApplicationTests.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="IgnoredFileRootStore">
+    <option name="generatedRoots">
+      <set>
+        <option value="$PROJECT_DIR$/.idea" />
+      </set>
+    </option>
+  </component>
+  <component name="ProjectId" id="1ZzpqE9baXgEVk47Bypt4bVleIh" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.0" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="cebf6e3d-f29d-4c0f-88bb-8928298efd30" name="Default Changelist" comment="" />
+      <created>1585851965163</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1585851965163</updated>
+      <workItem from="1585851966944" duration="387000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="278" y="58" width="800" height="677" key="#Project_Structure" timestamp="1585851986483">
+      <screen x="0" y="27" width="1366" height="741" />
+    </state>
+    <state x="278" y="58" width="800" height="677" key="#Project_Structure/0.27.1366.741@0.27.1366.741" timestamp="1585851986483" />
+    <state x="0" y="27" width="710" height="741" key="find.popup" timestamp="1585852013536">
+      <screen x="0" y="27" width="1366" height="741" />
+    </state>
+    <state x="0" y="27" width="710" height="741" key="find.popup/0.27.1366.741@0.27.1366.741" timestamp="1585852013536" />
+  </component>
+</project>
