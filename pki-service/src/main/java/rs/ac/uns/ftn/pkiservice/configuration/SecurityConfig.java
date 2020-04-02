@@ -20,6 +20,7 @@ import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import rs.ac.uns.ftn.pkiservice.constants.Constants;
 
 @KeycloakConfiguration
 public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter
@@ -66,8 +67,7 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter
         super.configure(http);
         http
                 .authorizeRequests()
-                .antMatchers("api/*").hasRole("USER")
-                .antMatchers("/admin*").hasRole("ADMIN")
+                .antMatchers("/api/**").hasRole(Constants.ADMIN_ROLE)
                 .anyRequest().authenticated();
     }
 }
