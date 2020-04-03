@@ -3,8 +3,6 @@ package rs.ac.uns.ftn.pkiservice.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.pkiservice.exception.exceptions.ApiRequestException;
-import rs.ac.uns.ftn.pkiservice.models.CertificateRevocationItem;
-import rs.ac.uns.ftn.pkiservice.models.CertificateRevocationList;
 import rs.ac.uns.ftn.pkiservice.repository.CertificateRevocationListRepository;
 import rs.ac.uns.ftn.pkiservice.service.CertificateRevocationListService;
 
@@ -29,19 +27,19 @@ public class CertificateRevocationListServiceImpl implements CertificateRevocati
             throw new ApiRequestException("This certification is already revoked.");
         }
 
-        CertificateRevocationItem cri = new CertificateRevocationItem(certificationId, new Date());
-        List<CertificateRevocationList> result = crlRepository.findAll();
-        CertificateRevocationList crl = null;
-
-        if (result.isEmpty()) {
-            crl = new CertificateRevocationList();
-            crl.setRevokedCertifications(new ArrayList<>());
-        } else {
-            // @HACK: We know that only 1 CRL exists in the database
-            crl = result.get(0);
-        }
-
-        crl.getRevokedCertifications().add(cri);
-        crlRepository.save(crl);
+//        CertificateRevocationItem cri = new CertificateRevocationItem(certificationId, new Date());
+//        List<CertificateRevocationList> result = crlRepository.findAll();
+//        CertificateRevocationList crl = null;
+//
+//        if (result.isEmpty()) {
+//            crl = new CertificateRevocationList();
+//            crl.setRevokedCertifications(new ArrayList<>());
+//        } else {
+//            // @HACK: We know that only 1 CRL exists in the database
+//            crl = result.get(0);
+//        }
+//
+//        crl.getRevokedCertifications().add(cri);
+//        crlRepository.save(crl);
     }
 }
