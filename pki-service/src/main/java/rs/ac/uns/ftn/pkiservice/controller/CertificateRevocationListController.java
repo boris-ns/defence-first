@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.ac.uns.ftn.pkiservice.service.CertificateRevocationListService;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping(value = "/api/crl")
 public class CertificateRevocationListController {
@@ -14,7 +16,8 @@ public class CertificateRevocationListController {
     private CertificateRevocationListService crlService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Boolean> checkIsRevoked(@PathVariable String id) {
+    public ResponseEntity<Boolean> checkIsRevoked(@PathVariable String id, Principal p) {
+        System.out.println(p.getName());
         return new ResponseEntity<>(crlService.checkIsRevoked(id), HttpStatus.OK);
     }
 

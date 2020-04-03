@@ -11,9 +11,14 @@ const keycloakConfig: KeycloakConfig = {
   clientId: 'defencefirst-web'
 };
 
+const PKIServiceConfig = {
+  url : 'http://localhost:8081/api'
+};
+
 export const environment = {
   production: false,
   keycloakConfig,
+  PKIServiceConfig
 };
 
 /*

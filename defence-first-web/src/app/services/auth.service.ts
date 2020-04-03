@@ -1,6 +1,7 @@
 import { ROLE_ADMIN, ROLE_OPERATOR } from './../config/user-roles';
 import { Injectable } from '@angular/core';
 import { KeycloakService } from 'keycloak-angular';
+import { HOME_PATH } from '../config/router-paths';
 
 @Injectable({
   providedIn: 'root'
@@ -20,5 +21,9 @@ export class AuthService {
 
   isUserOperator(): boolean {
     return this.getUserRoles().includes(ROLE_OPERATOR);
+  }
+
+  logOut() {
+    this.keycloakService.logout(HOME_PATH);
   }
 }
