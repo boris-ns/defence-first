@@ -12,8 +12,8 @@ export class HomeComponent implements OnInit {
 
   name: string;
 
-  constructor(private keycloakAngular: KeycloakService
-    ,private pkiService : PkiServiceService) {
+  constructor(private keycloakAngular: KeycloakService,
+              private pkiService: PkiServiceService) {
   }
 
   ngOnInit() {
@@ -22,12 +22,23 @@ export class HomeComponent implements OnInit {
   }
 
   getSertificates() {
-    this.pkiService.checkCrlList(1).subscribe(res => {
-      console.log(res);
-    },
-    (err: HttpErrorResponse) => {
-      console.log(err.message);
-    });
+    this.pkiService.getCertificatByAlias('df.pki.root').subscribe(
+      res => {
+        console.log(res);
+      }
+    );
+    // this.pkiService.generateCertificat().subscribe(
+    //   res => {
+    //     console.log(res);
+    //   }
+    // );
+
+    // this.pkiService.checkCrlList(1).subscribe(res => {
+    //   console.log(res);
+    // },
+    // (err: HttpErrorResponse) => {
+    //   console.log(err.message);
+    // });
   }
 
   logOut() {
