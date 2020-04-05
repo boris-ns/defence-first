@@ -5,6 +5,7 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import rs.ac.uns.ftn.pkiservice.configuration.MyKeyStore;
+import rs.ac.uns.ftn.pkiservice.exception.exceptions.ResourceNotFoundException;
 import rs.ac.uns.ftn.pkiservice.models.IssuerData;
 import rs.ac.uns.ftn.pkiservice.repository.KeyStoreRepository;
 
@@ -34,12 +35,17 @@ public class KeyStoreRepositoryImpl implements KeyStoreRepository {
     }
 
     @Override
-    public Certificate readCertificate(String alias) throws KeyStoreException {
+    public Certificate readCertificate(String alias) {
         KeyStore ks = myKeyStore.getKeystore();
 
-        if (ks.isKeyEntry(alias)) {
-            Certificate cert = ks.getCertificate(alias);
-            return cert;
+        try {
+            if (ks.isKeyEntry(alias)) {
+                Certificate cert = ks.getCertificate(alias);
+                return cert;
+            }
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+            throw new ResourceNotFoundException("Certificate doesn't exist");
         }
         return null;
     }

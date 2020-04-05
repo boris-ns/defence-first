@@ -2,7 +2,6 @@ package rs.ac.uns.ftn.pkiservice.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.ac.uns.ftn.pkiservice.service.CertificateService;
@@ -42,7 +41,9 @@ public class CertificateController {
     public ResponseEntity<String> generate() throws CertificateException, UnrecoverableKeyException,
             NoSuchAlgorithmException,KeyStoreException, SignatureException, NoSuchProviderException,
             InvalidKeyException, IOException {
-        X509Certificate certificate = certificateService.generateCertificate();
+
+        // @TODO: Proslediti tip sertifikata servisnoj metodi
+        X509Certificate certificate = certificateService.generateCertificate(null);
         System.out.println(certificate.getSubjectX500Principal().getName());
         return new ResponseEntity<>(null, HttpStatus.OK);
     }

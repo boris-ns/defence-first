@@ -11,27 +11,19 @@ import rs.ac.uns.ftn.pkiservice.configuration.MyKeyStore;
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
 import rs.ac.uns.ftn.pkiservice.models.IssuerData;
 import rs.ac.uns.ftn.pkiservice.models.SubjectData;
-import rs.ac.uns.ftn.pkiservice.repository.CertificateRepository;
 import rs.ac.uns.ftn.pkiservice.repository.KeyStoreRepository;
 import rs.ac.uns.ftn.pkiservice.service.CertificateGeneratorService;
 import rs.ac.uns.ftn.pkiservice.service.CertificateService;
 import rs.ac.uns.ftn.pkiservice.service.KeyPairGeneratorService;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @Service
 public class CertificateServiceImpl implements CertificateService {
-
-    @Autowired
-    private CertificateRepository certificateRepository;
 
     @Autowired
     private CertificateGeneratorService certificateGenerator;
@@ -43,16 +35,7 @@ public class CertificateServiceImpl implements CertificateService {
     private KeyStoreRepository keyStoreRepository;
 
     @Override
-    public X509Certificate findById(String id) {
-//        Certificate certificate = certificateRepository.findById(id)
-//                .orElseThrow(() -> new ResourceNotFoundException("Certificate doesn't exist."));
-
-        return null;
-    }
-
-    @Override
-    public X509Certificate findCertificateByAlias(String alias) throws NoSuchAlgorithmException, CertificateException,
-            NoSuchProviderException, KeyStoreException, IOException {
+    public X509Certificate findCertificateByAlias(String alias) {
         return (X509Certificate) keyStoreRepository.readCertificate(alias);
     }
 
@@ -61,10 +44,9 @@ public class CertificateServiceImpl implements CertificateService {
         return  keyStoreRepository.loadIssuer(alias);
     }
 
-    //@TODO: he he
     @Override
-    public X509Certificate getCertificateBySerialNumber(BigInteger certificateSerialNumber) {
-        return null;
+    public Certificate getCertificateByAlias(String alias) {
+        return keyStoreRepository.readCertificate(alias);
     }
 
     /*
@@ -102,8 +84,14 @@ public class CertificateServiceImpl implements CertificateService {
         //Moguce je proveriti da li je digitalan potpis sertifikata ispravan, upotrebom javnog kljuca izdavaoca
         cert.verify(findCertificateByAlias("df.pki.root").getPublicKey());
         System.out.println("\nValidacija uspesna :)");
-        // nisam sigurna ciji privatni kljuc treba ovde da idee
-        keyStoreRepository.write("novi.alias", keyPairSuject.getPrivate(), MyKeyStore.PASSWORD, cert);
+
+        if (!certType.equals(Constants.CERT_TYPE.LEAF_CERT)) {
+            keyStoreRepository.write(cert.getSerialNumber().toString(), keyPairSuject.getPrivate(), MyKeyStore.PASSWORD, cert);
+        }
+        else {
+            keyStoreRepository.write(cert.getSerialNumber().toString(), null, MyKeyStore.PASSWORD, cert);
+        }
+
         return cert;
     }
 
@@ -127,8 +115,6 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     private SubjectData generateSubjectData(KeyPair keyPairSubject) {
-        //Serijski broj sertifikata
-        String sn = "2";
         //klasa X500NameBuilder pravi X500Name objekat koji predstavlja podatke o vlasniku
         X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
         builder.addRDN(BCStyle.CN, "Goran Sladic");
@@ -138,7 +124,8 @@ public class CertificateServiceImpl implements CertificateService {
         builder.addRDN(BCStyle.OU, "Katedra za informatiku");
         builder.addRDN(BCStyle.C, "RS");
         builder.addRDN(BCStyle.E, "sladicg@uns.ac.rs");
-        //UID (USER ID) je ID korisnika
+
+        // @TODO: UID (USER ID) je ID korisnika. Kog korisnika ?
         builder.addRDN(BCStyle.UID, "123456");
         X500Name name = builder.build();
 
