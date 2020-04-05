@@ -13,6 +13,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import rs.ac.uns.ftn.pkiservice.constants.Constants;
 import rs.ac.uns.ftn.pkiservice.models.IssuerData;
 import rs.ac.uns.ftn.pkiservice.models.SubjectData;
 import rs.ac.uns.ftn.pkiservice.service.CertificateGeneratorService;
@@ -52,9 +53,14 @@ public class MyKeyStore {
                 keyStore.load(null, PASSWORD);
                 KeyPair kp = keyPairGeneratorService.generateKeyPair();
                 X500NameBuilder builder = generateName();
-                IssuerData issuerData = generateIssuerData(kp.getPrivate(), builder);
-                SubjectData subjectData = generateSubjectData(kp.getPublic(), builder);
-                Certificate certificate = certificateGeneratorService.generateCertificate(subjectData, issuerData);
+
+                IssuerData issuerData = certificateGeneratorService.generateIssuerData(kp.getPrivate(), builder.build());
+                SubjectData subjectData = certificateGeneratorService.generateSubjectData
+                        (kp.getPublic(), builder.build(), Constants.CERT_TYPE.ROOT_CERT);
+
+                Certificate certificate = certificateGeneratorService.generateCertificate
+                            (subjectData, issuerData,Constants.CERT_TYPE.ROOT_CERT);
+
                 keyStore.setKeyEntry("df.pki.root", kp.getPrivate(), PASSWORD, new Certificate[]{certificate});
                 keyStore.store(new FileOutputStream(FILE_PATH), PASSWORD);
             }
@@ -85,31 +91,6 @@ public class MyKeyStore {
         //UID (USER ID) je ID korisnika
         builder.addRDN(BCStyle.UID, "123456");
         return builder;
-    }
-    private IssuerData generateIssuerData(PrivateKey issuerKey, X500NameBuilder builder) {
-        return new IssuerData(issuerKey, builder.build());
-    }
-
-    private SubjectData generateSubjectData(PublicKey publicKey, X500NameBuilder builder) {
-        try {
-            //Datumi od kad do kad vazi sertifikat
-            SimpleDateFormat iso8601Formater = new SimpleDateFormat("yyyy-MM-dd");
-            Date startDate = iso8601Formater.parse("2017-12-31");
-            Date endDate = iso8601Formater.parse("2022-12-31");
-            //Serijski broj sertifikata
-            String sn="1";
-            //klasa X500NameBuilder pravi X500Name objekat koji predstavlja podatke o vlasniku
-
-            //Kreiraju se podaci za sertifikat, sto ukljucuje:
-            // - javni kljuc koji se vezuje za sertifikat
-            // - podatke o vlasniku
-            // - serijski broj sertifikata
-            // - od kada do kada vazi sertifikat
-            return new SubjectData(publicKey, builder.build(), sn, startDate, endDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
 }

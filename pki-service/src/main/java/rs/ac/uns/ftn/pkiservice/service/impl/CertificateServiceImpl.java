@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.pkiservice.service.impl;
 
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import rs.ac.uns.ftn.pkiservice.configuration.MyKeyStore;
+import rs.ac.uns.ftn.pkiservice.constants.Constants;
 import rs.ac.uns.ftn.pkiservice.models.IssuerData;
 import rs.ac.uns.ftn.pkiservice.models.SubjectData;
 import rs.ac.uns.ftn.pkiservice.repository.CertificateRepository;
@@ -65,10 +67,16 @@ public class CertificateServiceImpl implements CertificateService {
         return null;
     }
 
+    /*
+    * tip sertifikata koji pravimo kako bi se dodale odgovarajuce ekstenzije
+    * dodati ostale parametre
+    * */
+
     @Override
-    public X509Certificate generateCertificate() throws CertificateException, UnrecoverableKeyException,
-            NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException, IOException, SignatureException,
-            InvalidKeyException {
+    public X509Certificate generateCertificate(Constants.CERT_TYPE certType)
+            throws CertificateException, UnrecoverableKeyException,
+                NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException, IOException, SignatureException,
+                InvalidKeyException {
 
         //admin unosi podatke
 
@@ -80,7 +88,7 @@ public class CertificateServiceImpl implements CertificateService {
         IssuerData issuerData = findIssuerByAlias("df.pki.root");
 
         //Generise se sertifikat za subjekta, potpisan od strane issuer-a
-        X509Certificate cert = certificateGenerator.generateCertificate(subjectData, issuerData);
+        X509Certificate cert = certificateGenerator.generateCertificate(subjectData, issuerData, certType);
 
         System.out.println("\n===== Podaci o izdavacu sertifikata =====");
         System.out.println(cert.getIssuerX500Principal().getName());
@@ -112,43 +120,29 @@ public class CertificateServiceImpl implements CertificateService {
         //UID (USER ID) je ID korisnika
         builder.addRDN(BCStyle.UID, "654321");
 
+        return certificateGenerator.generateIssuerData(issuerKey, builder.build());
         //Kreiraju se podaci za issuer-a, sto u ovom slucaju ukljucuje:
         // - privatni kljuc koji ce se koristiti da potpise sertifikat koji se izdaje
         // - podatke o vlasniku sertifikata koji izdaje nov sertifikat
-        return new IssuerData(issuerKey, builder.build());
     }
 
     private SubjectData generateSubjectData(KeyPair keyPairSubject) {
-        try {
+        //Serijski broj sertifikata
+        String sn = "2";
+        //klasa X500NameBuilder pravi X500Name objekat koji predstavlja podatke o vlasniku
+        X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
+        builder.addRDN(BCStyle.CN, "Goran Sladic");
+        builder.addRDN(BCStyle.SURNAME, "Sladic");
+        builder.addRDN(BCStyle.GIVENNAME, "Goran");
+        builder.addRDN(BCStyle.O, "UNS-FTN");
+        builder.addRDN(BCStyle.OU, "Katedra za informatiku");
+        builder.addRDN(BCStyle.C, "RS");
+        builder.addRDN(BCStyle.E, "sladicg@uns.ac.rs");
+        //UID (USER ID) je ID korisnika
+        builder.addRDN(BCStyle.UID, "123456");
+        X500Name name = builder.build();
 
-            //Datumi od kad do kad vazi sertifikat
-            SimpleDateFormat iso8601Formater = new SimpleDateFormat("yyyy-MM-dd");
-            Date startDate = iso8601Formater.parse("2017-12-31");
-            Date endDate = iso8601Formater.parse("2022-12-31");
-
-            //Serijski broj sertifikata
-            String sn = "1";
-            //klasa X500NameBuilder pravi X500Name objekat koji predstavlja podatke o vlasniku
-            X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
-            builder.addRDN(BCStyle.CN, "Goran Sladic");
-            builder.addRDN(BCStyle.SURNAME, "Sladic");
-            builder.addRDN(BCStyle.GIVENNAME, "Goran");
-            builder.addRDN(BCStyle.O, "UNS-FTN");
-            builder.addRDN(BCStyle.OU, "Katedra za informatiku");
-            builder.addRDN(BCStyle.C, "RS");
-            builder.addRDN(BCStyle.E, "sladicg@uns.ac.rs");
-            //UID (USER ID) je ID korisnika
-            builder.addRDN(BCStyle.UID, "123456");
-
-            //Kreiraju se podaci za sertifikat, sto ukljucuje:
-            // - javni kljuc koji se vezuje za sertifikat
-            // - podatke o vlasniku
-            // - serijski broj sertifikata
-            // - od kada do kada vazi sertifikat
-            return new SubjectData(keyPairSubject.getPublic(), builder.build(), sn, startDate, endDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return  certificateGenerator.generateSubjectData
+                (keyPairSubject.getPublic(),name,Constants.CERT_TYPE.LEAF_CERT);
     }
 }
