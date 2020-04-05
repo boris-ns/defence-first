@@ -1,28 +1,36 @@
 import { Component, OnInit } from '@angular/core';
 import { KeycloakService } from 'keycloak-angular';
 import { PkiServiceService } from 'src/app/services/pki-service.service';
-import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 import { CERTIFICATES_PATH, ADD_CERTIFICATES_PATH } from 'src/app/config/router-paths';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  selector: 'app-menu',
+  templateUrl: './menu.component.html',
+  styleUrls: ['./menu.component.css']
 })
-export class HomeComponent implements OnInit {
+export class MenuComponent implements OnInit {
 
-  name: string;
+  admin: boolean;
 
-  constructor(private pkiService: PkiServiceService,
-              private authService: AuthService) {
+  constructor(private keycloakAngular: KeycloakService,
+              private pkiService: PkiServiceService,
+              private authService: AuthService,
+              private router: Router) {
   }
 
   ngOnInit() {
-    this.name = this.authService.getUsername();
+    this.admin = this.authService.isUserAdmin();
   }
 
+  certificates() {
+    this.router.navigate([CERTIFICATES_PATH]);
+  }
+
+  addCertificates() {
+    this.router.navigate([ADD_CERTIFICATES_PATH]);
+  }
 
   getSertificates() {
     this.pkiService.getCertificatByAlias('df.pki.root').subscribe(
@@ -42,6 +50,10 @@ export class HomeComponent implements OnInit {
     // (err: HttpErrorResponse) => {
     //   console.log(err.message);
     // });
+  }
+
+  logOut() {
+    this.keycloakAngular.logout();
   }
 
 }

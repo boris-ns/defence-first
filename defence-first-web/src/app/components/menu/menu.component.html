@@ -1,0 +1,12 @@
+<mat-toolbar color="primary" class="navbar">
+    <div>
+        DEFENCE FIRST
+    </div>
+    <div>
+        <button mat-button color="accent" (click)="logOut()">LogOut</button>
+    </div>
+</mat-toolbar>
+<mat-toolbar color="accent">
+    <button mat-button *ngIf="admin" (click)="certificates()" color="primary">Certificates</button>
+    <button mat-button *ngIf="admin" (click)="addCertificates()" color="primary">Add certificate</button>
+</mat-toolbar>

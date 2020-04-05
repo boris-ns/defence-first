@@ -13,6 +13,8 @@ import { NotAuthorizedComponent } from './components/error-pages/not-authorized/
 import { NotFoundComponent } from './components/error-pages/not-found/not-found.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from './material/material.module';
+import { PkiModule } from './pki/pki.module';
+import { MenuComponent } from './components/menu/menu.component';
 
 
 @NgModule({
@@ -20,7 +22,8 @@ import { MaterialModule } from './material/material.module';
     AppComponent,
     HomeComponent,
     NotAuthorizedComponent,
-    NotFoundComponent
+    NotFoundComponent,
+    MenuComponent
   ],
   imports: [
     BrowserModule,
@@ -30,7 +33,8 @@ import { MaterialModule } from './material/material.module';
     ReactiveFormsModule,
     KeycloakAngularModule,
     BrowserAnimationsModule,
-    MaterialModule
+    MaterialModule,
+    PkiModule
   ],
   providers: [
     {
