@@ -21,6 +21,8 @@ import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CertificateServiceImpl implements CertificateService {
@@ -33,6 +35,13 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Autowired
     private KeyStoreRepository keyStoreRepository;
+
+    // @TODO: Implementirati ovo
+    @Override
+    public List<X509Certificate> findAll() {
+        Certificate[] certificates = keyStoreRepository.readAll();
+        return null;
+    }
 
     @Override
     public X509Certificate findCertificateByAlias(String alias) {

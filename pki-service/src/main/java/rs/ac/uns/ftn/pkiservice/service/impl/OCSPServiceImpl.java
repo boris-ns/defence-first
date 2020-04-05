@@ -73,6 +73,8 @@ public class OCSPServiceImpl implements OCSPService {
     *   CertificateID revokedID ---> treba kad povlacimo sertifikate da imamo ovakve u bazi
     * */
 
+    // @TODO: Da li se ovo uopste ovako radi ?
+
     @Override
     public OCSPResp generateOCSPResponse(OCSPReq request, PrivateKey responderKey, PublicKey pubKey)
             throws OCSPException, OperatorCreationException {
@@ -102,6 +104,8 @@ public class OCSPServiceImpl implements OCSPService {
             } else {
                 try {
                     // @TODO: proverava samo datume a nzm sta bi moglo jos
+                    // @TODO: Dodati proveru da li je sertifikat revoked
+
                     cert.checkValidity();
                     respBuilder.addResponse(req.getCertID(), CertificateStatus.GOOD);
                 }

@@ -8,8 +8,11 @@ import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 public interface CertificateService {
+
+    List<X509Certificate> findAll();
 
     X509Certificate findCertificateByAlias(String alias);
 

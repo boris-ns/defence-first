@@ -13,6 +13,8 @@ public interface KeyStoreRepository {
 
     Certificate readCertificate(String alias);
 
+    Certificate[] readAll();
+
     PrivateKey readPrivateKey(String alias, String pass) throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException;
 
     void write(String alias, PrivateKey privateKey, char[] password, Certificate certificate) throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException;
