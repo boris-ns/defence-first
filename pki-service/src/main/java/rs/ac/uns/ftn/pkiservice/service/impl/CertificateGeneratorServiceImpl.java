@@ -19,6 +19,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.UUID;
 
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
@@ -108,24 +109,23 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
 
     public SubjectData generateSubjectData(PublicKey publicKey, X500Name name, Constants.CERT_TYPE certType) {
 
-        Calendar calendar_later = Calendar.getInstance();
-        calendar_later.setTime(new Date());
+        Calendar calendarLater = Calendar.getInstance();
+        calendarLater.setTime(new Date());
 
         if(certType.equals(Constants.CERT_TYPE.ROOT_CERT)) {
-            calendar_later.add(Calendar.YEAR, Constants.ROOT_CERT_DURATION);
+            calendarLater.add(Calendar.YEAR, Constants.ROOT_CERT_DURATION);
         }
         else if(certType.equals((Constants.CERT_TYPE.INTERMEDIATE_CERT))) {
-            calendar_later.add(Calendar.YEAR, Constants.INTERMEDIATE_CERT_DURATION);
+            calendarLater.add(Calendar.YEAR, Constants.INTERMEDIATE_CERT_DURATION);
         }
         else {
-            calendar_later.add(Calendar.YEAR, Constants.LEAF_CERT_DURATION);
+            calendarLater.add(Calendar.YEAR, Constants.LEAF_CERT_DURATION);
         }
-        //Datumi od kad do kad vazi sertifika
-        Date startDate = new  Date();
-        Date endDate = calendar_later.getTime();
-        //Serijski broj sertifikata
-        //@TODO Treba SREDITI Da gleda koji moze da dodeli sn
-        String sn="1";
+
+        Date startDate = new Date();
+        Date endDate = calendarLater.getTime();
+        String serialNumber = UUID.randomUUID().toString();
+
         //klasa X500NameBuilder pravi X500Name objekat koji predstavlja podatke o vlasniku
 
         //Kreiraju se podaci za sertifikat, sto ukljucuje:
@@ -133,7 +133,7 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
         // - podatke o vlasniku
         // - serijski broj sertifikata
         // - od kada do kada vazi sertifikat
-        return new SubjectData(publicKey, name, sn, startDate, endDate);
+        return new SubjectData(publicKey, name, serialNumber, startDate, endDate);
     }
 
 }

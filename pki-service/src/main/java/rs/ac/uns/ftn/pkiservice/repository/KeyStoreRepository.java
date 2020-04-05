@@ -11,7 +11,9 @@ public interface KeyStoreRepository {
 
     IssuerData loadIssuer(String alias) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException;
 
-    Certificate readCertificate(String alias) throws NoSuchProviderException, KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException;
+    Certificate readCertificate(String alias);
+
+    Certificate[] readAll();
 
     PrivateKey readPrivateKey(String alias, String pass) throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException;
 

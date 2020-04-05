@@ -15,12 +15,12 @@ import java.security.cert.X509Certificate;
 public interface OCSPService {
 
     // @TODO prebaciti ovu metodu na SCIEM Agente jer ce oni da prave zahteve i na SCIEM centar
-    public OCSPReq generateOCSPRequest(X509Certificate issuerCert, BigInteger serialNumber) throws OCSPException, OperatorCreationException, CertificateEncodingException, IOException;
+    OCSPReq generateOCSPRequest(X509Certificate issuerCert, BigInteger serialNumber) throws OCSPException, OperatorCreationException, CertificateEncodingException, IOException;
 
-    public OCSPResp generateOCSPResponse
-            (OCSPReq request, PrivateKey responderKey, PublicKey pubKey)
+    OCSPResp generateOCSPResponse (OCSPReq request, PrivateKey responderKey, PublicKey pubKey)
             throws OCSPException, OperatorCreationException;
 
-    public Boolean addCertficateToOCSP(BigInteger serialNumber);
+    boolean addCertificateToOCSP(String serialNumber);
 
+    boolean isCertificateRevoked(String serialNumber);
 }

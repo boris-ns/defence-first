@@ -4,17 +4,17 @@ import rs.ac.uns.ftn.pkiservice.constants.Constants;
 import rs.ac.uns.ftn.pkiservice.models.IssuerData;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.security.*;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 public interface CertificateService {
 
-    X509Certificate findById(String id);
+    List<X509Certificate> findAll();
 
-    X509Certificate findCertificateByAlias(String alias) throws NoSuchAlgorithmException, CertificateException,
-            NoSuchProviderException, KeyStoreException, IOException, UnrecoverableKeyException;
+    X509Certificate findCertificateByAlias(String alias);
 
     IssuerData findIssuerByAlias(String alias) throws NoSuchAlgorithmException, CertificateException,
             NoSuchProviderException, KeyStoreException, IOException, UnrecoverableKeyException;
@@ -24,5 +24,5 @@ public interface CertificateService {
                 NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException, IOException, SignatureException,
                 InvalidKeyException;
 
-    X509Certificate getCertificateBySerialNumber(BigInteger certificateSerialNumber);
+    Certificate getCertificateByAlias(String alias);
 }

@@ -5,6 +5,8 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import rs.ac.uns.ftn.pkiservice.configuration.MyKeyStore;
+import rs.ac.uns.ftn.pkiservice.exception.exceptions.ApiRequestException;
+import rs.ac.uns.ftn.pkiservice.exception.exceptions.ResourceNotFoundException;
 import rs.ac.uns.ftn.pkiservice.models.IssuerData;
 import rs.ac.uns.ftn.pkiservice.repository.KeyStoreRepository;
 
@@ -34,14 +36,35 @@ public class KeyStoreRepositoryImpl implements KeyStoreRepository {
     }
 
     @Override
-    public Certificate readCertificate(String alias) throws KeyStoreException {
+    public Certificate readCertificate(String alias) {
         KeyStore ks = myKeyStore.getKeystore();
 
-        if (ks.isKeyEntry(alias)) {
-            Certificate cert = ks.getCertificate(alias);
-            return cert;
+        try {
+            if (ks.isKeyEntry(alias)) {
+                Certificate cert = ks.getCertificate(alias);
+                return cert;
+            }
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+            throw new ResourceNotFoundException("Certificate doesn't exist");
         }
         return null;
+    }
+
+    // @TODO: Implementirati ovo
+    @Override
+    public Certificate[] readAll() {
+        KeyStore ks = myKeyStore.getKeystore();
+
+        try {
+            // @TODO: Ovde bi trebalo uzeti chain od root sertifikata
+            // proveriti onda da li ce elementi tog chaina imati i svoje chain elemente
+            // ili ce se morati rekurzivno proci kroz sve sertifikate da bi se pokupili
+            // svi elementi lanca
+            return ks.getCertificateChain("root");
+        } catch (KeyStoreException e) {
+            throw new ApiRequestException("Error while loading keystore");
+        }
     }
 
     @Override

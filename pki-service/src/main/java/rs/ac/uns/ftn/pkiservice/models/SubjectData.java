@@ -12,8 +12,8 @@ public class SubjectData {
     private String serialNumber;
     private Date startDate;
     private Date endDate;
-    public SubjectData() {
 
+    public SubjectData() {
     }
 
     public SubjectData(PublicKey publicKey, X500Name x500name, String serialNumber, Date startDate, Date endDate) {
