@@ -16,6 +16,7 @@ import rs.ac.uns.ftn.pkiservice.service.CertificateService;
 import rs.ac.uns.ftn.pkiservice.service.KeyPairGeneratorService;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -56,6 +57,12 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public IssuerData findIssuerByAlias(String alias) throws NoSuchAlgorithmException, CertificateException, NoSuchProviderException, KeyStoreException, IOException, UnrecoverableKeyException {
         return  keyStoreRepository.loadIssuer(alias);
+    }
+
+    //@TODO: he he
+    @Override
+    public X509Certificate getCertificateBySerialNumber(BigInteger certificateSerialNumber) {
+        return null;
     }
 
     @Override

@@ -59,6 +59,15 @@
 			<artifactId>keycloak-spring-boot-2-starter</artifactId>
 			<version>4.0.0.Final</version>
 		</dependency>
+
+<!--		&lt;!&ndash; https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on &ndash;&gt;-->
+<!--		<dependency>-->
+<!--			<groupId>org.bouncycastle</groupId>-->
+<!--			<artifactId>bcprov-jdk15on</artifactId>-->
+<!--			<version>1.64</version>-->
+<!--		</dependency>-->
+
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
