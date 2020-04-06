@@ -1,3 +1,17 @@
-.navbar {
-    justify-content: space-between;
+button {
+    width: 100%;
+    text-align: left;
+}
+mat-toolbar-row {
+    margin: 0px;
+    padding: 0px;
+}
+table, tr, td {
+    width: 100%;
+    padding: 0px;
+    margin: 0px;
+}
+
+span {
+    margin: 10px;
 }

@@ -1,14 +1,10 @@
 import { AdminAuthorizationGuard } from './guards/admin-authorization.guard';
-import { OperatorAuthorizationGuard } from './guards/operator-authorization.guard';
 import { NotAuthorizedComponent } from './components/error-pages/not-authorized/not-authorized.component';
-import { NOT_FOUND, NOT_AUTHORIZED, HOME_PATH, CERTIFICATES_PATH, ADD_CERTIFICATES_PATH } from './config/router-paths';
+import { NOT_FOUND, NOT_AUTHORIZED, HOME_PATH, CERTIFICATES_PATH } from './config/router-paths';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { NotFoundComponent } from './components/error-pages/not-found/not-found.component';
 import { HomeComponent } from './components/home/home.component';
-import { CertificatesComponent } from './pki/certificates/certificates.component';
-import { AddCertificateComponent } from './pki/add-certificate/add-certificate.component';
-
 
 // !!! Guards !!!
 // canActivate: [OperatorAuthorizationGuard],
@@ -21,15 +17,6 @@ const routes: Routes = [
     component: HomeComponent
   },
   {
-    path: CERTIFICATES_PATH,
-    component: CertificatesComponent
-  },
-  {
-    path: ADD_CERTIFICATES_PATH,
-    component: AddCertificateComponent
-  },
-
-  {
     path: NOT_FOUND,
     component: NotFoundComponent
   },
@@ -39,8 +26,13 @@ const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: HOME_PATH,
     pathMatch: 'full'
+  },
+  {
+    path: CERTIFICATES_PATH,
+    loadChildren: () => import('./pki/pki.module').then(m => m.PkiModule),
+    canActivate: [AdminAuthorizationGuard]
   },
   // This must be last!
   {

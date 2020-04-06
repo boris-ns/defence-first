@@ -1,12 +1,16 @@
-<mat-toolbar color="primary" class="navbar">
-    <div>
-        DEFENCE FIRST
-    </div>
-    <div>
-        <button mat-button color="accent" (click)="logOut()">LogOut</button>
-    </div>
-</mat-toolbar>
-<mat-toolbar color="accent">
-    <button mat-button *ngIf="admin" (click)="certificates()" color="primary">Certificates</button>
-    <button mat-button *ngIf="admin" (click)="addCertificates()" color="primary">Add certificate</button>
+<mat-toolbar color="primary">
+    <mat-toolbar-row>
+        <span>DEFENCE FIRST</span>
+    </mat-toolbar-row>
+    <mat-toolbar-row *ngIf="admin">
+        <table>
+            <tr><td><button mat-button (click)="certificates()" color="accent">Certificates</button></td></tr>
+            <tr><td><button mat-button (click)="addCertificates()" color="accent">Add certificate</button></td></tr>
+        </table>
+    </mat-toolbar-row>
+    <mat-toolbar-row>
+        <table>
+            <tr><td><button mat-button (click)="logOut()" color="accent">LogOut</button></td></tr>
+        </table>
+    </mat-toolbar-row>
 </mat-toolbar>

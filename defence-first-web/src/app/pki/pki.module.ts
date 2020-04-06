@@ -1,14 +1,18 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AddCertificateComponent } from './add-certificate/add-certificate.component';
-import { CertificatesComponent } from './certificates/certificates.component';
 
+import { PkiRoutingModule } from './pki-routing.module';
+import { CertificatesComponent } from './certificates/certificates.component';
+import { AddCertificateComponent } from './add-certificate/add-certificate.component';
 
 
 @NgModule({
-  declarations: [AddCertificateComponent, CertificatesComponent],
+  declarations: [
+    CertificatesComponent,
+    AddCertificateComponent],
   imports: [
-    CommonModule
+    CommonModule,
+    PkiRoutingModule
   ]
 })
 export class PkiModule { }
