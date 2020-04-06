@@ -30,11 +30,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static rs.ac.uns.ftn.pkiservice.constants.Constants.*;
+
 @Configuration
 public class MyKeyStore {
-
-    public static String FILE_PATH = "myKeystore.jks";
-    public static char[] PASSWORD = "123456".toCharArray();
 
     @Autowired
     private CertificateGeneratorService certificateGeneratorService;
@@ -46,11 +45,11 @@ public class MyKeyStore {
     public KeyStore getKeystore(){
         try {
             KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
-            File f = new File(FILE_PATH);
+            File f = new File(KEYSTORE_FILE_PATH);
             if (f.exists()){
-                keyStore.load(new FileInputStream(f), PASSWORD);
+                keyStore.load(new FileInputStream(f), KEYSTORE_PASSWORD);
             }else {
-                keyStore.load(null, PASSWORD);
+                keyStore.load(null, KEYSTORE_PASSWORD);
                 KeyPair kp = keyPairGeneratorService.generateKeyPair();
                 X500NameBuilder builder = generateName();
 
@@ -61,8 +60,8 @@ public class MyKeyStore {
                 Certificate certificate = certificateGeneratorService.generateCertificate
                             (subjectData, issuerData,Constants.CERT_TYPE.ROOT_CERT);
 
-                keyStore.setKeyEntry("df.pki.root", kp.getPrivate(), PASSWORD, new Certificate[]{certificate});
-                keyStore.store(new FileOutputStream(FILE_PATH), PASSWORD);
+                keyStore.setKeyEntry(ROOT_ALIAS, kp.getPrivate(), KEYSTORE_PASSWORD, new Certificate[]{certificate});
+                keyStore.store(new FileOutputStream(KEYSTORE_FILE_PATH), KEYSTORE_PASSWORD);
             }
             return keyStore;
         } catch (NoSuchAlgorithmException e) {

@@ -19,7 +19,11 @@ import { MatButtonModule,
   MatTabsModule,
   MatDialogModule,
   MatProgressSpinnerModule,
-  MatRadioModule } from '@angular/material';
+  MatRadioModule,
+  MatTableModule,
+  MatTableDataSource
+ } from '@angular/material';
+import { CdkTableModule } from '@angular/cdk/table';
 
 @NgModule({
   imports: [
@@ -42,7 +46,8 @@ import { MatButtonModule,
     MatTabsModule,
     MatDialogModule,
     MatProgressSpinnerModule,
-    MatRadioModule
+    MatRadioModule,
+    MatTableModule
   ],
   exports: [
     MatButtonModule,
@@ -64,7 +69,8 @@ import { MatButtonModule,
     MatTabsModule,
     MatDialogModule,
     MatProgressSpinnerModule,
-    MatRadioModule
+    MatRadioModule,
+    MatTableModule
   ]
 })
 export class MaterialModule { }

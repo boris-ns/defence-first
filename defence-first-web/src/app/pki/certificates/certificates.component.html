@@ -1,1 +1,18 @@
-<p>certificates works!</p>
+<h1>Certificates</h1>
+<table mat-table class="mat-elevation-z8">
+    <tr class="header">
+        <th mat-header-cell>Serial Number</th>
+        <th mat-header-cell>Subject data</th>
+        <th mat-header-cell>Issuer data</th>
+        <th mat-header-cell>From date</th>
+        <th mat-header-cell>To date</th>
+    </tr>
+
+    <tr *ngFor="let c of certificates">
+        <td mat-cell>{{c.serialNumber}}</td>
+        <td mat-cell>{{c.subjectData}}</td>
+        <td mat-cell>{{c.issuerData}}</td>
+        <td mat-cell>{{c.notBefore | date: 'dd/MM/yyyy'}}</td>
+        <td mat-cell>{{c.notAfter | date: 'dd/MM/yyyy'}}</td>
+    </tr>
+  </table>

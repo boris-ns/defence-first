@@ -15,6 +15,12 @@ import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.List;
+
+import static rs.ac.uns.ftn.pkiservice.constants.Constants.*;
 
 @Repository
 public class KeyStoreRepositoryImpl implements KeyStoreRepository {
@@ -29,7 +35,7 @@ public class KeyStoreRepositoryImpl implements KeyStoreRepository {
         //Iscitava se sertifikat koji ima dati alias
         Certificate cert = keyStore.getCertificate(alias);
         //Iscitava se privatni kljuc vezan za javni kljuc koji se nalazi na sertifikatu sa datim aliasom
-        PrivateKey privKey = (PrivateKey) keyStore.getKey(alias, MyKeyStore.PASSWORD);
+        PrivateKey privKey = (PrivateKey) keyStore.getKey(alias, KEYSTORE_PASSWORD);
 
         X500Name issuerName = new JcaX509CertificateHolder((X509Certificate) cert).getSubject();
         return new IssuerData(privKey, issuerName);
@@ -51,17 +57,16 @@ public class KeyStoreRepositoryImpl implements KeyStoreRepository {
         return null;
     }
 
-    // @TODO: Implementirati ovo
     @Override
-    public Certificate[] readAll() {
+    public List<Certificate> readAll() {
         KeyStore ks = myKeyStore.getKeystore();
-
         try {
-            // @TODO: Ovde bi trebalo uzeti chain od root sertifikata
-            // proveriti onda da li ce elementi tog chaina imati i svoje chain elemente
-            // ili ce se morati rekurzivno proci kroz sve sertifikate da bi se pokupili
-            // svi elementi lanca
-            return ks.getCertificateChain("root");
+            List<Certificate> certificates = new ArrayList<>();
+            Enumeration<String> aliases = ks.aliases();
+            while (aliases.hasMoreElements()) {
+                certificates.add(readCertificate(aliases.nextElement()));
+            }
+            return certificates;
         } catch (KeyStoreException e) {
             throw new ApiRequestException("Error while loading keystore");
         }
@@ -88,6 +93,6 @@ public class KeyStoreRepositoryImpl implements KeyStoreRepository {
 
     @Override
     public void saveKeyStore() throws IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException {
-        myKeyStore.getKeystore().store(new FileOutputStream(MyKeyStore.FILE_PATH),  MyKeyStore.PASSWORD);
+        myKeyStore.getKeystore().store(new FileOutputStream(KEYSTORE_FILE_PATH), KEYSTORE_PASSWORD);
     }
 }
