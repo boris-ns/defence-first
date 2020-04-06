@@ -37,14 +37,16 @@ public class CertificateController {
     }
 
     // @TODO: treba da bude post i da mu se proslede informacije o subjektu
-    @GetMapping(path = "/generate")
-    public ResponseEntity<String> generate() throws CertificateException, UnrecoverableKeyException,
+    @PostMapping(path = "/generate")
+    public ResponseEntity<String> generate(@RequestBody String csr) throws CertificateException, UnrecoverableKeyException,
             NoSuchAlgorithmException,KeyStoreException, SignatureException, NoSuchProviderException,
             InvalidKeyException, IOException {
 
         // @TODO: Proslediti tip sertifikata servisnoj metodi
-        X509Certificate certificate = certificateService.generateCertificate(null);
-        System.out.println(certificate.getSubjectX500Principal().getName());
-        return new ResponseEntity<>(null, HttpStatus.OK);
+//        X509Certificate certificate = certificateService.generateCertificate(null);
+//        System.out.println(certificate.getSubjectX500Principal().getName());
+//        return new ResponseEntity<>(null, HttpStatus.OK);
+        System.out.println(csr);
+        return new ResponseEntity<>("DUSAN SERTIFIKAT MAJMUN :D", HttpStatus.OK);
     }
 }
