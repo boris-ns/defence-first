@@ -6,6 +6,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import rs.ac.uns.ftn.siemagent.service.CertificateService;
 
+import java.io.IOException;
+
 @SpringBootApplication
 public class SiemAgentApplication implements CommandLineRunner {
 
@@ -17,7 +19,7 @@ public class SiemAgentApplication implements CommandLineRunner {
 	}
 
 	@Override
-	public void run(String... args) {
+	public void run(String... args) throws IOException {
 		String csr = certificateService.buildCertificateRequest();
 	}
 }

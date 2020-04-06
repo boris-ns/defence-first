@@ -34,9 +34,11 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter
         SimpleAuthorityMapper grantedAuthorityMapper = new SimpleAuthorityMapper();
         grantedAuthorityMapper.setPrefix("ROLE_");
 
-        KeycloakAuthenticationProvider keycloakAuthenticationProviderr = keycloakAuthenticationProvider();
-        keycloakAuthenticationProviderr.setGrantedAuthoritiesMapper(grantedAuthorityMapper);
-        auth.authenticationProvider(keycloakAuthenticationProvider());
+        KeycloakAuthenticationProvider keycloakAuthenticationProvider = keycloakAuthenticationProvider();
+        keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(grantedAuthorityMapper);
+        auth.authenticationProvider(keycloakAuthenticationProvider);
+//        auth.authenticationProvider(keycloakAuthenticationProvider());
+
     }
 
     /**
@@ -66,11 +68,10 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter
     protected void configure(HttpSecurity http) throws Exception
     {
         super.configure(http);
-        http
+        http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("*").permitAll().and()
+                .antMatchers("*").permitAll();
 //                .antMatchers("/api/*").hasRole(Constants.ADMIN_ROLE)
 //                .anyRequest().authenticated().and()
-                .csrf().disable();
     }
 }
