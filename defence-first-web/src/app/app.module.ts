@@ -11,6 +11,9 @@ import { keycloakInitializer } from './utils/app-init';
 import { HomeComponent } from './components/home/home.component';
 import { NotAuthorizedComponent } from './components/error-pages/not-authorized/not-authorized.component';
 import { NotFoundComponent } from './components/error-pages/not-found/not-found.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MaterialModule } from './material/material.module';
+import { MenuComponent } from './components/menu/menu.component';
 
 
 @NgModule({
@@ -18,7 +21,8 @@ import { NotFoundComponent } from './components/error-pages/not-found/not-found.
     AppComponent,
     HomeComponent,
     NotAuthorizedComponent,
-    NotFoundComponent
+    NotFoundComponent,
+    MenuComponent
   ],
   imports: [
     BrowserModule,
@@ -27,6 +31,8 @@ import { NotFoundComponent } from './components/error-pages/not-found/not-found.
     FormsModule,
     ReactiveFormsModule,
     KeycloakAngularModule,
+    BrowserAnimationsModule,
+    MaterialModule
   ],
   providers: [
     {

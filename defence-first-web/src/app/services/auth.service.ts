@@ -11,6 +11,9 @@ export class AuthService {
   constructor(private keycloakService: KeycloakService) {
   }
 
+  getUsername(): string {
+    return this.keycloakService.getUsername();
+  }
   getUserRoles(): string[] {
     return this.keycloakService.getUserRoles();
   }

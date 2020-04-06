@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { KeycloakService } from 'keycloak-angular';
 import { PkiServiceService } from 'src/app/services/pki-service.service';
-import { HttpErrorResponse } from '@angular/common/http';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -12,14 +11,14 @@ export class HomeComponent implements OnInit {
 
   name: string;
 
-  constructor(private keycloakAngular: KeycloakService,
-              private pkiService: PkiServiceService) {
+  constructor(private pkiService: PkiServiceService,
+              private authService: AuthService) {
   }
 
   ngOnInit() {
-    const userDetails = this.keycloakAngular.getKeycloakInstance().tokenParsed;
-    this.name = userDetails['name'];
+    this.name = this.authService.getUsername();
   }
+
 
   getSertificates() {
     this.pkiService.getCertificatByAlias('df.pki.root').subscribe(
@@ -39,10 +38,6 @@ export class HomeComponent implements OnInit {
     // (err: HttpErrorResponse) => {
     //   console.log(err.message);
     // });
-  }
-
-  logOut() {
-    this.keycloakAngular.logout();
   }
 
 }
