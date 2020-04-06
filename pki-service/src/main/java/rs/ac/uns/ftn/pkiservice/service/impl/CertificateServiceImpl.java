@@ -21,8 +21,11 @@ import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static rs.ac.uns.ftn.pkiservice.constants.Constants.KEYSTORE_PASSWORD;
+import static rs.ac.uns.ftn.pkiservice.constants.Constants.ROOT_ALIAS;
 
 @Service
 public class CertificateServiceImpl implements CertificateService {
@@ -36,11 +39,10 @@ public class CertificateServiceImpl implements CertificateService {
     @Autowired
     private KeyStoreRepository keyStoreRepository;
 
-    // @TODO: Implementirati ovo
     @Override
     public List<X509Certificate> findAll() {
-        Certificate[] certificates = keyStoreRepository.readAll();
-        return null;
+        List<Certificate> certificateList = keyStoreRepository.readAll();
+        return certificateList.stream().map(X509Certificate.class::cast).collect(Collectors.toList());
     }
 
     @Override
@@ -74,9 +76,9 @@ public class CertificateServiceImpl implements CertificateService {
         KeyPair keyPairSuject = keyPairGeneratorService.generateKeyPair();
         SubjectData subjectData = generateSubjectData(keyPairSuject);
         //treba da se dobavi na osnovu onoga sto unese admin
-        System.out.println(findCertificateByAlias("df.pki.root"));
-        System.out.println(findIssuerByAlias("df.pki.root").getX500name());
-        IssuerData issuerData = findIssuerByAlias("df.pki.root");
+        System.out.println(findCertificateByAlias(ROOT_ALIAS));
+        System.out.println(findIssuerByAlias(ROOT_ALIAS).getX500name());
+        IssuerData issuerData = findIssuerByAlias(ROOT_ALIAS);
 
         //Generise se sertifikat za subjekta, potpisan od strane issuer-a
         X509Certificate cert = certificateGenerator.generateCertificate(subjectData, issuerData, certType);
@@ -91,14 +93,14 @@ public class CertificateServiceImpl implements CertificateService {
         System.out.println("-------------------------------------------------------");
 
         //Moguce je proveriti da li je digitalan potpis sertifikata ispravan, upotrebom javnog kljuca izdavaoca
-        cert.verify(findCertificateByAlias("df.pki.root").getPublicKey());
+        cert.verify(findCertificateByAlias(ROOT_ALIAS).getPublicKey());
         System.out.println("\nValidacija uspesna :)");
 
         if (!certType.equals(Constants.CERT_TYPE.LEAF_CERT)) {
-            keyStoreRepository.write(cert.getSerialNumber().toString(), keyPairSuject.getPrivate(), MyKeyStore.PASSWORD, cert);
+            keyStoreRepository.write(cert.getSerialNumber().toString(), keyPairSuject.getPrivate(), KEYSTORE_PASSWORD, cert);
         }
         else {
-            keyStoreRepository.write(cert.getSerialNumber().toString(), null, MyKeyStore.PASSWORD, cert);
+            keyStoreRepository.write(cert.getSerialNumber().toString(), null, KEYSTORE_PASSWORD, cert);
         }
 
         return cert;

@@ -6,6 +6,8 @@ import java.io.*;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.util.Collection;
+import java.util.List;
 
 public interface KeyStoreRepository {
 
@@ -13,7 +15,7 @@ public interface KeyStoreRepository {
 
     Certificate readCertificate(String alias);
 
-    Certificate[] readAll();
+    List<Certificate> readAll();
 
     PrivateKey readPrivateKey(String alias, String pass) throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException;
 
