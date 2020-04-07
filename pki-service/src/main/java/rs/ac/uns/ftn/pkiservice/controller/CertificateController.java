@@ -90,17 +90,9 @@ public class CertificateController {
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
-    // @TODO: da ga doda u lanac, za sad ga samo cuva ovako
     @PostMapping(path = "/generate")
     public ResponseEntity generate(@RequestBody String csr) throws IOException, OperatorCreationException, PKCSException {
         csrService.addRequest(csr);
-//        X509Certificate newCert = certificateGeneratorService.parseCertificateRequest(csr);
-//        certificateService.writeCertificateToKeyStore(newCert, Constants.CERT_TYPE.LEAF_CERT, null);
-//
-//        StringWriter sw = new StringWriter();
-//        JcaPEMWriter pm = new JcaPEMWriter(sw);
-//        pm.writeObject(newCert);
-//        pm.close();
         return ResponseEntity.ok().build();
     }
 }

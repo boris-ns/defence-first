@@ -26,13 +26,13 @@ public class CertificateSigningRequestController {
     }
 
     @PutMapping("/approve/{id}")
-    public ResponseEntity approveRequest(@PathVariable Long id) {
+    public ResponseEntity approveRequest(@PathVariable Long id) throws Exception{
         csrService.changeStatus(id, CSRStatus.APPROVED);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/decline/{id}")
-    public ResponseEntity declineRequest(@PathVariable Long id) {
+    public ResponseEntity declineRequest(@PathVariable Long id) throws Exception{
         csrService.changeStatus(id, CSRStatus.DECLINED);
         return ResponseEntity.ok().build();
     }
