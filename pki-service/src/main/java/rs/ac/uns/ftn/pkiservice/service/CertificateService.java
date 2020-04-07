@@ -20,13 +20,14 @@ public interface CertificateService {
     IssuerData findIssuerByAlias(String alias) throws NoSuchAlgorithmException, CertificateException,
             KeyStoreException, IOException, UnrecoverableKeyException;
 
-    X509Certificate generateCertificate(Constants.CERT_TYPE certType)
-            throws CertificateException, UnrecoverableKeyException,
-                NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException, IOException, SignatureException,
-                InvalidKeyException;
+    X509Certificate generateCertificateIntermediate(String subjectName, String issuerAlias) throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, IOException;
 
     Certificate getCertificateByAlias(String alias);
 
+    Certificate[] getCertificateChainByAlias(String alias);
+
     void writeCertificateToKeyStore(X509Certificate cert, Constants.CERT_TYPE certType, PrivateKey pk)
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
+
+    List<X509Certificate> findAllRequests();
 }

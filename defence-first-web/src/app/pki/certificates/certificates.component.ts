@@ -10,6 +10,7 @@ import { SimpleCertificate } from 'src/app/models/simple-certificate.model';
 export class CertificatesComponent implements OnInit {
 
   certificates: SimpleCertificate[];
+  displayedColumns: string[] = ['serialNumber', 'subjectData', 'issuerData', 'notBefore', 'notAfter'];
 
   constructor(
     private pkiService: PkiServiceService

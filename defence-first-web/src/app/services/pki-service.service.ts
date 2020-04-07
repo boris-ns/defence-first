@@ -20,12 +20,20 @@ export class PkiServiceService {
     return this.http.get(this.urlCertificates + '/all');
   }
 
+  getCertificatesRequests() {
+    return this.http.get(this.urlCertificates + '/requests');
+  }
+
   checkCrlList( id: number) {
     return this.http.get(this.urlOCSP + '/' + id);
   }
 
   generateCertificat() {
     return this.http.get(this.urlCertificates + '/generate');
+  }
+
+  generateCertificatIntermediate(certificate: any) {
+    return this.http.post(this.urlCertificates + '/generate/intermediate', certificate);
   }
 
   getCertificatByAlias(alias: string) {

@@ -7,6 +7,7 @@ import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.thymeleaf.util.ArrayUtils;
 import rs.ac.uns.ftn.pkiservice.configuration.MyKeyStore;
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
 import rs.ac.uns.ftn.pkiservice.models.IssuerData;
@@ -51,7 +52,8 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public IssuerData findIssuerByAlias(String alias) throws NoSuchAlgorithmException, CertificateException, KeyStoreException, IOException, UnrecoverableKeyException {
+    public IssuerData findIssuerByAlias(String alias) throws NoSuchAlgorithmException, CertificateException,
+            KeyStoreException, IOException, UnrecoverableKeyException {
         return  keyStoreRepository.loadIssuer(alias);
     }
 
@@ -60,49 +62,50 @@ public class CertificateServiceImpl implements CertificateService {
         return keyStoreRepository.readCertificate(alias);
     }
 
+    @Override
+    public Certificate[] getCertificateChainByAlias(String alias) {
+        return keyStoreRepository.readCertificateChain(alias);
+    }
+
     /*
     * tip sertifikata koji pravimo kako bi se dodale odgovarajuce ekstenzije
     * dodati ostale parametre
     * */
 
     @Override
-    public X509Certificate generateCertificate(Constants.CERT_TYPE certType)
-            throws CertificateException, UnrecoverableKeyException,
-                NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException, IOException, SignatureException,
-                InvalidKeyException {
-
-        //admin unosi podatke
-
+    public X509Certificate generateCertificateIntermediate(String subjectName, String issuerAlias)
+            throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException,
+            IOException {
         KeyPair keyPairSuject = keyPairGeneratorService.generateKeyPair();
-        SubjectData subjectData = generateSubjectData(keyPairSuject);
-        //treba da se dobavi na osnovu onoga sto unese admin
-        System.out.println(findCertificateByAlias(ROOT_ALIAS));
-        System.out.println(findIssuerByAlias(ROOT_ALIAS).getX500name());
-        IssuerData issuerData = findIssuerByAlias(ROOT_ALIAS);
+        //promeniti kreiranje X500Name na osnovu subject name
+        X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
+        builder.addRDN(BCStyle.CN, "Nikola Luburic");
+        builder.addRDN(BCStyle.SURNAME, "Luburic");
+        builder.addRDN(BCStyle.GIVENNAME, "Nikola");
+        builder.addRDN(BCStyle.O, "UNS-FTN");
+        builder.addRDN(BCStyle.OU, "Katedra za informatiku");
+        builder.addRDN(BCStyle.C, "RS");
+        builder.addRDN(BCStyle.E, "nikola.luburic@uns.ac.rs");
+        //UID (USER ID) je ID korisnika
+        builder.addRDN(BCStyle.UID, "654321");
+        SubjectData subjectData = certificateGenerator.generateSubjectData(keyPairSuject.getPublic(), builder.build(),
+                Constants.CERT_TYPE.INTERMEDIATE_CERT);
+        IssuerData issuerData = findIssuerByAlias(issuerAlias);
+        Certificate[] certificatesChainIssuer = getCertificateChainByAlias(issuerAlias);
 
         //Generise se sertifikat za subjekta, potpisan od strane issuer-a
-        X509Certificate cert = certificateGenerator.generateCertificate(subjectData, issuerData, certType);
+        X509Certificate cert = certificateGenerator.generateCertificate(subjectData, issuerData,
+                Constants.CERT_TYPE.INTERMEDIATE_CERT);
 
-        System.out.println("\n===== Podaci o izdavacu sertifikata =====");
-        System.out.println(cert.getIssuerX500Principal().getName());
-        System.out.println("\n===== Podaci o vlasniku sertifikata =====");
-        System.out.println(cert.getSubjectX500Principal().getName());
-        System.out.println("\n===== Sertifikat =====");
-        System.out.println("-------------------------------------------------------");
-        System.out.println(cert);
-        System.out.println("-------------------------------------------------------");
-
-        //Moguce je proveriti da li je digitalan potpis sertifikata ispravan, upotrebom javnog kljuca izdavaoca
-        cert.verify(findCertificateByAlias(ROOT_ALIAS).getPublicKey());
-        System.out.println("\nValidacija uspesna :)");
-
-        if (!certType.equals(Constants.CERT_TYPE.LEAF_CERT)) {
-            keyStoreRepository.write(cert.getSerialNumber().toString(), keyPairSuject.getPrivate(), KEYSTORE_PASSWORD, cert);
-        }
-        else {
-            keyStoreRepository.write(cert.getSerialNumber().toString(), null, KEYSTORE_PASSWORD, cert);
+        int size = certificatesChainIssuer.length;
+        Certificate[] certificatesChain = new Certificate[size + 1];
+        certificatesChain[0] = cert;
+        for (int i = 0; i < size; i++) {
+            certificatesChain[i + 1] = certificatesChainIssuer[i];
         }
 
+
+        keyStoreRepository.writeKeyEntry(cert.getSerialNumber().toString(), keyPairSuject.getPrivate(), certificatesChain);
         return cert;
     }
 
@@ -111,11 +114,17 @@ public class CertificateServiceImpl implements CertificateService {
     public void writeCertificateToKeyStore(X509Certificate cert, Constants.CERT_TYPE certType, PrivateKey pk)
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
         if (!certType.equals(Constants.CERT_TYPE.LEAF_CERT)) {
-            keyStoreRepository.write(cert.getSerialNumber().toString(), pk, KEYSTORE_PASSWORD, cert);
+            keyStoreRepository.writeKeyEntry(cert.getSerialNumber().toString(), pk, new Certificate[]{cert});
         }
         else {
-            keyStoreRepository.write(cert.getSerialNumber().toString(), null, KEYSTORE_PASSWORD, cert);
+            keyStoreRepository.writeKeyEntry(cert.getSerialNumber().toString(), null, new Certificate[]{cert});
         }
+    }
+
+    /*TODO: impelmentirati da se svi zahtevi za sertifikate prikazu*/
+    @Override
+    public List<X509Certificate> findAllRequests() {
+        return null;
     }
 
     private IssuerData generateIssuerData(PrivateKey issuerKey) {
