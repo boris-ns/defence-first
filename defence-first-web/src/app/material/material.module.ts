@@ -23,7 +23,6 @@ import { MatButtonModule,
   MatTableModule,
   MatTableDataSource
  } from '@angular/material';
-import { CdkTableModule } from '@angular/cdk/table';
 
 @NgModule({
   imports: [

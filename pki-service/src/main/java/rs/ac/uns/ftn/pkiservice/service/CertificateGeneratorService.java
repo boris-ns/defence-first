@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
 
 public interface CertificateGeneratorService {
 
@@ -27,4 +28,6 @@ public interface CertificateGeneratorService {
     X509Certificate parseCertificateRequest(String csr) throws IOException, OperatorCreationException, PKCSException, CryptoException, CRMFException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException;
 
     PublicKey toPublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo) throws CRMFException;
+
+    X500Name generateName(HashMap<String, String> subjectName);
 }

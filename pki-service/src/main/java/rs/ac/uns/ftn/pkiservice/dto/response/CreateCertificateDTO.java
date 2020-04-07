@@ -1,11 +1,13 @@
 package rs.ac.uns.ftn.pkiservice.dto.response;
 
+import java.util.HashMap;
+
 public class CreateCertificateDTO {
 
-    private String subjectName;
+    private HashMap<String, String> subjectName;
     private String issuerAlias;
 
-    public CreateCertificateDTO(String subjectName, String issuerAlias) {
+    public CreateCertificateDTO(HashMap<String, String> subjectName, String issuerAlias) {
         this.subjectName = subjectName;
         this.issuerAlias = issuerAlias;
     }
@@ -13,11 +15,11 @@ public class CreateCertificateDTO {
     public CreateCertificateDTO() {
     }
 
-    public String getSubjectName() {
+    public HashMap<String, String> getSubjectName() {
         return subjectName;
     }
 
-    public void setSubjectName(String subjectName) {
+    public void setSubjectName(HashMap<String, String> subjectName) {
         this.subjectName = subjectName;
     }
 

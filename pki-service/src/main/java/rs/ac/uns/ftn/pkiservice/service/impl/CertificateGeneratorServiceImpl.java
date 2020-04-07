@@ -4,6 +4,8 @@ import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.X500NameBuilder;
+import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.CertIOException;
@@ -216,10 +218,17 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
         }
     }
 
-
-
-
-
+    @Override
+    public X500Name generateName(HashMap<String, String> subjectName) {
+        X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
+        builder.addRDN(BCStyle.C, subjectName.get("c"));
+        builder.addRDN(BCStyle.ST, subjectName.get("st"));
+        builder.addRDN(BCStyle.L, subjectName.get("l"));
+        builder.addRDN(BCStyle.O, subjectName.get("o"));
+        builder.addRDN(BCStyle.OU, subjectName.get("ou"));
+        builder.addRDN(BCStyle.CN, subjectName.get("cn"));
+        return builder.build();
+    }
 
 
 }

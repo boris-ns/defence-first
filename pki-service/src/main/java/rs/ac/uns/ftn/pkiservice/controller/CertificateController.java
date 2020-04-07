@@ -87,9 +87,9 @@ public class CertificateController {
     @PostMapping(path = "/generate/intermediate")
     public ResponseEntity<String> generateIntermediate(@RequestBody CreateCertificateDTO certificateDTO) throws
             UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
-        certificateService.generateCertificateIntermediate("", certificateDTO.getIssuerAlias());
-
-        return new ResponseEntity<>(null, HttpStatus.OK);
+        X509Certificate certificate = certificateService.generateCertificateIntermediate(
+                certificateDTO.getSubjectName(), certificateDTO.getIssuerAlias());
+        return new ResponseEntity<>(certificate.getSerialNumber().toString(), HttpStatus.OK);
     }
 
     // @TODO: da ga doda u lanac, za sad ga samo cuva ovako
