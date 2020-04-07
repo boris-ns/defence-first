@@ -18,7 +18,7 @@ public interface CertificateService {
     X509Certificate findCertificateByAlias(String alias);
 
     IssuerData findIssuerByAlias(String alias) throws NoSuchAlgorithmException, CertificateException,
-            NoSuchProviderException, KeyStoreException, IOException, UnrecoverableKeyException;
+            KeyStoreException, IOException, UnrecoverableKeyException;
 
     X509Certificate generateCertificate(Constants.CERT_TYPE certType)
             throws CertificateException, UnrecoverableKeyException,

@@ -51,7 +51,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public IssuerData findIssuerByAlias(String alias) throws NoSuchAlgorithmException, CertificateException, NoSuchProviderException, KeyStoreException, IOException, UnrecoverableKeyException {
+    public IssuerData findIssuerByAlias(String alias) throws NoSuchAlgorithmException, CertificateException, KeyStoreException, IOException, UnrecoverableKeyException {
         return  keyStoreRepository.loadIssuer(alias);
     }
 
@@ -111,10 +111,10 @@ public class CertificateServiceImpl implements CertificateService {
     public void writeCertificateToKeyStore(X509Certificate cert, Constants.CERT_TYPE certType, PrivateKey pk)
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
         if (!certType.equals(Constants.CERT_TYPE.LEAF_CERT)) {
-            keyStoreRepository.write(cert.getSerialNumber().toString(), pk, MyKeyStore.PASSWORD, cert);
+            keyStoreRepository.write(cert.getSerialNumber().toString(), pk, KEYSTORE_PASSWORD, cert);
         }
         else {
-            keyStoreRepository.write(cert.getSerialNumber().toString(), null, MyKeyStore.PASSWORD, cert);
+            keyStoreRepository.write(cert.getSerialNumber().toString(), null, KEYSTORE_PASSWORD, cert);
         }
     }
 
