@@ -44,6 +44,7 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import rs.ac.uns.ftn.pkiservice.service.CertificateService;
 import rs.ac.uns.ftn.pkiservice.service.KeyPairGeneratorService;
 
 @Service
@@ -56,7 +57,7 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
     private KeyPairGeneratorService keyPairGeneratorService;
 
     @Autowired
-    private KeyStoreRepository keyStoreRepository;
+    private CertificateService certificateService;
 
     @Override
     public X509Certificate generateCertificate(SubjectData subjectData, IssuerData issuerData, Constants.CERT_TYPE type) {
@@ -179,7 +180,7 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
 
 
 
-        IssuerData issuerData= keyStoreRepository.loadIssuer(issuerId);
+        IssuerData issuerData= certificateService.findIssuerByAlias(issuerId);
         PublicKey pk = toPublicKey(certReq.getSubjectPublicKeyInfo());
         SubjectData subData = this.generateSubjectData(pk, certReq.getSubject(), Constants.CERT_TYPE.LEAF_CERT);
 
