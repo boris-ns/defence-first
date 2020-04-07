@@ -106,6 +106,17 @@ public class CertificateServiceImpl implements CertificateService {
         return cert;
     }
 
+    //@TODO: resiti OVDE KAD NIJE LEAF sert za privatni kljuc da se ne prosledjuje Null
+    @Override
+    public void writeCertificateToKeyStore(X509Certificate cert, Constants.CERT_TYPE certType, PrivateKey pk)
+            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+        if (!certType.equals(Constants.CERT_TYPE.LEAF_CERT)) {
+            keyStoreRepository.write(cert.getSerialNumber().toString(), pk, MyKeyStore.PASSWORD, cert);
+        }
+        else {
+            keyStoreRepository.write(cert.getSerialNumber().toString(), null, MyKeyStore.PASSWORD, cert);
+        }
+    }
 
     private IssuerData generateIssuerData(PrivateKey issuerKey) {
         X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);

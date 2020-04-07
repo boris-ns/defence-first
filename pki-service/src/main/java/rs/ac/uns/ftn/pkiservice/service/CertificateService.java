@@ -2,6 +2,7 @@ package rs.ac.uns.ftn.pkiservice.service;
 
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
 import rs.ac.uns.ftn.pkiservice.models.IssuerData;
+import rs.ac.uns.ftn.pkiservice.models.SubjectData;
 
 import java.io.IOException;
 import java.security.*;
@@ -25,4 +26,7 @@ public interface CertificateService {
                 InvalidKeyException;
 
     Certificate getCertificateByAlias(String alias);
+
+    void writeCertificateToKeyStore(X509Certificate cert, Constants.CERT_TYPE certType, PrivateKey pk)
+            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
 }

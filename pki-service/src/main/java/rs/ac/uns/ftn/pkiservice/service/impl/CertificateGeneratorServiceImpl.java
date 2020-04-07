@@ -1,25 +1,41 @@
 package rs.ac.uns.ftn.pkiservice.service.impl;
 
+import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.pkcs.Attribute;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.CertIOException;
+import org.bouncycastle.cert.crmf.CRMFException;
+import org.bouncycastle.crypto.CryptoException;
+import org.bouncycastle.jcajce.util.JcaJceHelper;
+import org.bouncycastle.openssl.PEMException;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.operator.ContentVerifierProvider;
+import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.PKCSException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.pkiservice.configuration.CertificateBuilder;
+import rs.ac.uns.ftn.pkiservice.configuration.MyKeyStore;
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
 import rs.ac.uns.ftn.pkiservice.models.IssuerData;
 import rs.ac.uns.ftn.pkiservice.models.SubjectData;
+import rs.ac.uns.ftn.pkiservice.repository.KeyStoreRepository;
 import rs.ac.uns.ftn.pkiservice.service.CertificateGeneratorService;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.math.BigInteger;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.UUID;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.*;
 
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
@@ -30,8 +46,6 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import rs.ac.uns.ftn.pkiservice.service.KeyPairGeneratorService;
 
-import javax.security.auth.x500.X500Principal;
-
 @Service
 public class CertificateGeneratorServiceImpl implements CertificateGeneratorService {
 
@@ -41,6 +55,8 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
     @Autowired
     private KeyPairGeneratorService keyPairGeneratorService;
 
+    @Autowired
+    private KeyStoreRepository keyStoreRepository;
 
     @Override
     public X509Certificate generateCertificate(SubjectData subjectData, IssuerData issuerData, Constants.CERT_TYPE type) {
@@ -124,7 +140,8 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
 
         Date startDate = new Date();
         Date endDate = calendarLater.getTime();
-        String serialNumber = UUID.randomUUID().toString();
+//        String serialNumber = UUID.randomUUID().toString();
+        String serialNumber = String.valueOf(System.currentTimeMillis());
 
         //klasa X500NameBuilder pravi X500Name objekat koji predstavlja podatke o vlasniku
 
@@ -135,5 +152,73 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
         // - od kada do kada vazi sertifikat
         return new SubjectData(publicKey, name, serialNumber, startDate, endDate);
     }
+
+
+    @Override
+    public X509Certificate parseCertificateRequest(String csr) throws IOException, OperatorCreationException, PKCSException, CryptoException, CRMFException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException {
+        PEMParser pm = new PEMParser(new StringReader(csr));
+        PKCS10CertificationRequest certReq = (PKCS10CertificationRequest) pm.readObject();
+        ContentVerifierProvider prov = new JcaContentVerifierProviderBuilder().build(certReq.getSubjectPublicKeyInfo());
+
+        if (!certReq.isSignatureValid(prov))
+        {
+            System.out.println("nevalidan zahtev za sertifikat");
+            throw new CryptoException("nevalidan zahtev za sertifikat");
+        }
+        //@TODO: SACUVATI u PEM formatu  kako bi admin kasnije mogao da ga odobri ili odbije
+        //@TODO: za sad se ODMA KREIRA SERTIFIKAT samo da probamo
+
+        String issuerId = null;
+        Attribute[] attributes = certReq.getAttributes(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest);
+        for (Attribute attribute : attributes) {
+            for (ASN1Encodable value : attribute.getAttributeValues()) {
+                DEROctetString oo = (DEROctetString) ((DERTaggedObject) ((DERSequence)value).getObjectAt(0)).getObject();
+                issuerId = new String(oo.getOctets());
+            }
+        }
+
+
+
+        IssuerData issuerData= keyStoreRepository.loadIssuer(issuerId);
+        PublicKey pk = toPublicKey(certReq.getSubjectPublicKeyInfo());
+        SubjectData subData = this.generateSubjectData(pk, certReq.getSubject(), Constants.CERT_TYPE.LEAF_CERT);
+
+        X509Certificate newCert = generateCertificate(subData,issuerData, Constants.CERT_TYPE.LEAF_CERT);
+        return newCert;
+    }
+
+
+
+    @Override
+    public PublicKey toPublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo)
+            throws CRMFException
+    {
+        Map KEY_ALG_NAMES = new HashMap();
+        KEY_ALG_NAMES.put(PKCSObjectIdentifiers.rsaEncryption, "RSA");
+        KEY_ALG_NAMES.put(X9ObjectIdentifiers.id_dsa, "DSA");
+        KeyFactory keyFactory = null;
+
+        try
+        {
+            X509EncodedKeySpec xspec = new X509EncodedKeySpec(subjectPublicKeyInfo.getEncoded());
+            AlgorithmIdentifier keyAlg = subjectPublicKeyInfo.getAlgorithm();
+
+            String algName = (String)KEY_ALG_NAMES.get(keyAlg.getAlgorithm());
+            if(algName != null) {
+                keyFactory = KeyFactory.getInstance(algName);
+            }
+            return keyFactory.generatePublic(xspec);
+        }
+        catch (Exception e)
+        {
+            throw new CRMFException("invalid key: " + e.getMessage(), e);
+        }
+    }
+
+
+
+
+
+
 
 }

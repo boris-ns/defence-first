@@ -15,12 +15,14 @@ import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Enumeration;
+import java.util.concurrent.ExecutionException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.List;
 
 import static rs.ac.uns.ftn.pkiservice.constants.Constants.*;
+
 
 @Repository
 public class KeyStoreRepositoryImpl implements KeyStoreRepository {
@@ -44,17 +46,19 @@ public class KeyStoreRepositoryImpl implements KeyStoreRepository {
     @Override
     public Certificate readCertificate(String alias) {
         KeyStore ks = myKeyStore.getKeystore();
-
+        Certificate cert = null;
         try {
             if (ks.isKeyEntry(alias)) {
-                Certificate cert = ks.getCertificate(alias);
-                return cert;
+                cert = ks.getCertificate(alias);
+            }
+            if (ks.isCertificateEntry(alias)) {
+                cert = ks.getCertificate(alias);
             }
         } catch (KeyStoreException e) {
             e.printStackTrace();
             throw new ResourceNotFoundException("Certificate doesn't exist");
         }
-        return null;
+        return cert;
     }
 
     @Override
@@ -87,7 +91,11 @@ public class KeyStoreRepositoryImpl implements KeyStoreRepository {
     @Override
     public void write(String alias, PrivateKey privateKey, char[] password, Certificate certificate) throws
             KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
-        myKeyStore.getKeystore().setKeyEntry(alias, privateKey, password, new Certificate[] {certificate});
+        if(privateKey != null) {
+            myKeyStore.getKeystore().setKeyEntry(alias, privateKey, password, new Certificate[]{certificate});
+        }else {
+            myKeyStore.getKeystore().setCertificateEntry(alias, certificate);
+        }
         saveKeyStore();
     }
 

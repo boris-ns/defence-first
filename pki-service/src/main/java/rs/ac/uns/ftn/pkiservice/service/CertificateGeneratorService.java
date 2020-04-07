@@ -1,14 +1,19 @@
 package rs.ac.uns.ftn.pkiservice.service;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.X500NameBuilder;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.cert.crmf.CRMFException;
+import org.bouncycastle.crypto.CryptoException;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.PKCSException;
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
 import rs.ac.uns.ftn.pkiservice.models.IssuerData;
 import rs.ac.uns.ftn.pkiservice.models.SubjectData;
 
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.io.IOException;
+import java.security.*;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 public interface CertificateGeneratorService {
@@ -19,5 +24,7 @@ public interface CertificateGeneratorService {
 
     SubjectData generateSubjectData(PublicKey publicKey, X500Name name, Constants.CERT_TYPE certType);
 
+    X509Certificate parseCertificateRequest(String csr) throws IOException, OperatorCreationException, PKCSException, CryptoException, CRMFException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException;
 
+    PublicKey toPublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo) throws CRMFException;
 }
