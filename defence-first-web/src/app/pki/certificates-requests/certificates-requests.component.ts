@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { PkiServiceService } from 'src/app/services/pki-service.service';
 import { CertificateRequest } from 'src/app/models/certificate-request.model';
-import { request } from 'http';
 
 @Component({
   selector: 'app-certificates-requests',
