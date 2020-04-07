@@ -55,10 +55,23 @@ public class KeyStoreRepositoryImpl implements KeyStoreRepository {
                 cert = ks.getCertificate(alias);
             }
         } catch (KeyStoreException e) {
-            e.printStackTrace();
             throw new ResourceNotFoundException("Certificate doesn't exist");
         }
         return cert;
+    }
+
+    @Override
+    public Certificate[] readCertificateChain(String alias) {
+        KeyStore ks = myKeyStore.getKeystore();
+        Certificate[] certificates = null;
+        try {
+            if (ks.isKeyEntry(alias)) {
+                certificates = ks.getCertificateChain(alias);
+            }
+        } catch (KeyStoreException e) {
+            throw new ResourceNotFoundException("Certificate doesn't exist");
+        }
+        return certificates;
     }
 
     @Override
@@ -89,13 +102,16 @@ public class KeyStoreRepositoryImpl implements KeyStoreRepository {
     }
 
     @Override
-    public void write(String alias, PrivateKey privateKey, char[] password, Certificate certificate) throws
+    public void writeKeyEntry(String alias, PrivateKey privateKey, Certificate[] certificates) throws
             KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
-        if(privateKey != null) {
-            myKeyStore.getKeystore().setKeyEntry(alias, privateKey, password, new Certificate[]{certificate});
-        }else {
-            myKeyStore.getKeystore().setCertificateEntry(alias, certificate);
-        }
+        myKeyStore.getKeystore().setKeyEntry(alias, privateKey, KEYSTORE_PASSWORD, certificates);
+        saveKeyStore();
+    }
+
+    @Override
+    public void writeCertificateEntry(String alias, Certificate certificate) throws
+            KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
+        myKeyStore.getKeystore().setCertificateEntry(alias, certificate);
         saveKeyStore();
     }
 

@@ -15,11 +15,18 @@ public interface KeyStoreRepository {
 
     Certificate readCertificate(String alias);
 
+    Certificate[] readCertificateChain(String alias);
+
     List<Certificate> readAll();
 
     PrivateKey readPrivateKey(String alias, String pass) throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException;
 
-    void write(String alias, PrivateKey privateKey, char[] password, Certificate certificate) throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException;
+    void writeKeyEntry(String alias, PrivateKey privateKey, Certificate[] certificates) throws
+            KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException;
+
+    void writeCertificateEntry(String alias, Certificate certificate) throws
+            KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException;
 
     void saveKeyStore() throws IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException;
+
 }

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { PkiServiceService } from 'src/app/services/pki-service.service';
 
 @Component({
   selector: 'app-add-certificate',
@@ -7,9 +8,16 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AddCertificateComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private pkiService: PkiServiceService
+  ) { }
 
   ngOnInit() {
+    this.pkiService.generateCertificatIntermediate({subjectData:"aa", issuerAlias: 'df.pki.root'}).subscribe(
+      data => {
+        console.log(data);
+      }
+    )
   }
 
 }

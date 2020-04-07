@@ -32,6 +32,10 @@ export class PkiServiceService {
     return this.http.get(this.urlCertificates + '/generate');
   }
 
+  generateCertificatIntermediate(certificate: any) {
+    return this.http.post(this.urlCertificates + '/generate/intermediate', certificate);
+  }
+
   getCertificatByAlias(alias: string) {
     return this.http.get(this.urlCertificates + '/alias/' + alias);
   }
