@@ -20,6 +20,10 @@ export class PkiServiceService {
     return this.http.get(this.urlCertificates + '/all');
   }
 
+  getCertificatesRequests() {
+    return this.http.get(this.urlCertificates + '/requests');
+  }
+
   checkCrlList( id: number) {
     return this.http.get(this.urlOCSP + '/' + id);
   }

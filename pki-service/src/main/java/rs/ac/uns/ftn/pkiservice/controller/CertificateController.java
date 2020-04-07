@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
+import rs.ac.uns.ftn.pkiservice.dto.response.CertificateRequestDTO;
 import rs.ac.uns.ftn.pkiservice.models.SubjectData;
 import rs.ac.uns.ftn.pkiservice.service.CertificateGeneratorService;
 import rs.ac.uns.ftn.pkiservice.dto.response.SimpleCertificateDTO;
@@ -68,6 +69,17 @@ public class CertificateController {
         pm.writeObject(certificate);
         pm.close();
         return new ResponseEntity<>(sw.toString(), HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/requests")
+    public ResponseEntity<List<CertificateRequestDTO>> findAllRequests() {
+        //Todo: zameni ti kasnije, kad se implementiram metoda findAllRequests
+//        List<X509Certificate> certificateList = certificateService.findAllRequests();
+        List<X509Certificate> certificateList = certificateService.findAll();
+        List<CertificateRequestDTO> certificateDTOS = certificateList.stream()
+                .map(x -> CertificateMapper.toCertificateRequestDTO(x))
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(certificateDTOS, HttpStatus.OK);
     }
 
     // @TODO: da ga doda u lanac, za sad ga samo cuva ovako

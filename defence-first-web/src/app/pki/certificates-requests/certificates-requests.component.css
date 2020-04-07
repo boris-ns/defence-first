@@ -1,0 +1,12 @@
+h1 {
+    margin: 20px;
+}
+
+table {
+    width: 98%;
+    margin: 1%;
+}
+
+tr:not(.header):hover {
+    background: #EEEEEE;
+}

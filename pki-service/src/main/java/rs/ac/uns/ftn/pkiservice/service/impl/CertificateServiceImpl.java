@@ -118,6 +118,12 @@ public class CertificateServiceImpl implements CertificateService {
         }
     }
 
+    /*TODO: impelmentirati da se svi zahtevi za sertifikate prikazu*/
+    @Override
+    public List<X509Certificate> findAllRequests() {
+        return null;
+    }
+
     private IssuerData generateIssuerData(PrivateKey issuerKey) {
         X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
         builder.addRDN(BCStyle.CN, "Nikola Luburic");

@@ -29,4 +29,6 @@ public interface CertificateService {
 
     void writeCertificateToKeyStore(X509Certificate cert, Constants.CERT_TYPE certType, PrivateKey pk)
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
+
+    List<X509Certificate> findAllRequests();
 }

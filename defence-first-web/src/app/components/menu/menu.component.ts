@@ -3,7 +3,7 @@ import { KeycloakService } from 'keycloak-angular';
 import { PkiServiceService } from 'src/app/services/pki-service.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
-import { CERTIFICATES_PATH, ADD_PATH } from 'src/app/config/router-paths';
+import { CERTIFICATES_PATH, ADD_PATH, REQUEST_PATH } from 'src/app/config/router-paths';
 
 @Component({
   selector: 'app-menu',
@@ -26,6 +26,10 @@ export class MenuComponent implements OnInit {
 
   certificates() {
     this.router.navigate([CERTIFICATES_PATH]);
+  }
+
+  certificatesRequests() {
+    this.router.navigate([CERTIFICATES_PATH, REQUEST_PATH]);
   }
 
   addCertificates() {
