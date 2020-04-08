@@ -124,7 +124,7 @@ public class CertificateServiceImpl implements CertificateService {
             keyStoreRepository.writeKeyEntry(cert.getSerialNumber().toString(), pk, new Certificate[]{cert});
         }
         else {
-            keyStoreRepository.writeKeyEntry(cert.getSerialNumber().toString(), null, new Certificate[]{cert});
+            keyStoreRepository.writeCertificateEntry(cert.getSerialNumber().toString(), cert);
         }
     }
 
