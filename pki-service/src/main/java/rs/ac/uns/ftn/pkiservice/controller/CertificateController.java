@@ -45,11 +45,7 @@ public class CertificateController {
 
     @GetMapping(path = "/all")
     public ResponseEntity<List<SimpleCertificateDTO>> findAll() {
-        List<X509Certificate> certificateList = certificateService.findAll();
-        List<SimpleCertificateDTO> certificateDTOS = certificateList.stream()
-                .map(x -> CertificateMapper.toSimpleCertificateDTO(x))
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(certificateDTOS, HttpStatus.OK);
+        return new ResponseEntity<>(certificateService.findAllDto(), HttpStatus.OK);
     }
 
     @GetMapping(path = "/all/intermediate")
@@ -81,17 +77,6 @@ public class CertificateController {
         pm.writeObject(certificate);
         pm.close();
         return new ResponseEntity<>(sw.toString(), HttpStatus.OK);
-    }
-
-    @GetMapping(path = "/requests")
-    public ResponseEntity<List<CertificateRequestDTO>> findAllRequests() {
-        //Todo: zameni ti kasnije, kad se implementiram metoda findAllRequests
-//        List<X509Certificate> certificateList = certificateService.findAllRequests();
-        List<X509Certificate> certificateList = certificateService.findAll();
-        List<CertificateRequestDTO> certificateDTOS = certificateList.stream()
-                .map(x -> CertificateMapper.toCertificateRequestDTO(x))
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(certificateDTOS, HttpStatus.OK);
     }
 
     @PostMapping(path = "/generate/intermediate")

@@ -133,12 +133,6 @@ public class KeyStoreRepositoryImpl implements KeyStoreRepository {
         saveKeyStore();
     }
 
-    @Override
-    public void writeCertificateEntry(String alias, Certificate certificate) throws
-            KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
-        myKeyStore.getKeystore().setCertificateEntry(alias, certificate);
-        saveKeyStore();
-    }
 
     @Override
     public void saveKeyStore() throws IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException {

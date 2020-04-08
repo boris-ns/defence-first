@@ -6,7 +6,6 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -29,7 +28,9 @@ import rs.ac.uns.ftn.pkiservice.service.CertificateSigningRequestService;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.security.KeyStore;
 import java.security.PublicKey;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
@@ -93,7 +94,7 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
     }
 
     @Override
-    public X509Certificate parseCertificateRequest(String csr) throws Exception {
+    public X509Certificate saveCertificateRequest(String csr) throws Exception {
 
         PKCS10CertificationRequest certReq = isValidSigned(csr);
         Map<String, String> attributes = parseCsrAttributes(certReq);
@@ -102,6 +103,10 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
         PublicKey pk = certificateGeneratorService.toPublicKey(certReq.getSubjectPublicKeyInfo());
         SubjectData subData = certificateGeneratorService.generateSubjectData(pk, certReq.getSubject(), Constants.CERT_TYPE.LEAF_CERT);
         X509Certificate newCert = certificateGeneratorService.generateCertificate(subData,issuerData, Constants.CERT_TYPE.LEAF_CERT);
+        Certificate[] certificates = certificateService.createChain(attributes.get("issuerId"), newCert);
+        // stavljeno da se cuva sa pk od issuera u sustini taj kljuc nam ne sluzi ni za st, ali mora neki da se prosledi
+        certificateService.writeCertificateToKeyStore(newCert.getSerialNumber().toString(), certificates,
+                issuerData.getPrivateKey());
         return newCert;
     }
 
@@ -118,8 +123,7 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
         csrRepository.save(csr);
 
         if (toStatus.equals(CSRStatus.APPROVED)) {
-            X509Certificate newCert = parseCertificateRequest(csr.getCsr());
-            certificateService.writeCertificateToKeyStore(newCert, Constants.CERT_TYPE.LEAF_CERT, null);
+            saveCertificateRequest(csr.getCsr());
         }
     }
 }

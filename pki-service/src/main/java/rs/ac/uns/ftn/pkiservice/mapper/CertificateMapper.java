@@ -1,18 +1,11 @@
 package rs.ac.uns.ftn.pkiservice.mapper;
 
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import rs.ac.uns.ftn.pkiservice.dto.response.CertificateIssuerDTO;
 import rs.ac.uns.ftn.pkiservice.dto.response.CertificateRequestDTO;
 import rs.ac.uns.ftn.pkiservice.dto.response.SimpleCertificateDTO;
 
 import javax.security.auth.x500.X500PrivateCredential;
-import javax.xml.bind.DatatypeConverter;
-import java.nio.charset.StandardCharsets;
-import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
-import java.util.List;
-import java.util.Set;
 
 public class CertificateMapper {
 

@@ -1,6 +1,7 @@
 package rs.ac.uns.ftn.pkiservice.service;
 
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
+import rs.ac.uns.ftn.pkiservice.dto.response.SimpleCertificateDTO;
 import rs.ac.uns.ftn.pkiservice.models.IssuerData;
 
 import javax.security.auth.x500.X500PrivateCredential;
@@ -16,6 +17,8 @@ public interface CertificateService {
 
     List<X509Certificate> findAll();
 
+    List<SimpleCertificateDTO> findAllDto();
+
     List<X500PrivateCredential> findAllRootAndIntermediate();
 
     X509Certificate findCertificateByAlias(String alias);
@@ -29,8 +32,8 @@ public interface CertificateService {
 
     Certificate[] getCertificateChainByAlias(String alias);
 
-    void writeCertificateToKeyStore(X509Certificate cert, Constants.CERT_TYPE certType, PrivateKey pk)
-            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
+    Certificate[] createChain(String issuerAlias, Certificate certificate);
 
-    List<X509Certificate> findAllRequests();
+    void writeCertificateToKeyStore(String alias, Certificate[] certificates, PrivateKey pk)
+            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
 }
