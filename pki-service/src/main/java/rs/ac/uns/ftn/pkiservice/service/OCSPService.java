@@ -7,15 +7,14 @@ import org.bouncycastle.operator.OperatorCreationException;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 public interface OCSPService {
     
     OCSPResp generateOCSPResponse (OCSPReq request)
-            throws OCSPException, OperatorCreationException;
+            throws OCSPException, OperatorCreationException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException;
 
     boolean addCertificateToOCSP(String serialNumber);
 

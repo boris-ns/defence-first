@@ -2,6 +2,7 @@ package rs.ac.uns.ftn.siemagent;
 
 import org.bouncycastle.asn1.ocsp.OCSPRequest;
 import org.bouncycastle.cert.ocsp.OCSPReq;
+import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -28,9 +29,12 @@ public class SiemAgentApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
+
+		//@TODO moguce da spojimo u jednu metodu al ovakav proces treba da bude...
 		X509Certificate certificate = certificateService.getCertificateBySerialNumber("1586209092785");
 		OCSPReq request = ocspService.generateOCSPRequest(certificate);
-		String response = ocspService.sendOCSPRequest(request);
+		OCSPResp response = ocspService.sendOCSPRequest(request);
+		boolean val = ocspService.processOCSPResponse(request,response);
 
 
 //		String csr = certificateService.buildCertificateRequest();
