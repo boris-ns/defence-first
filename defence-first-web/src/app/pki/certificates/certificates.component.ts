@@ -10,13 +10,17 @@ import { SimpleCertificate } from 'src/app/models/simple-certificate.model';
 export class CertificatesComponent implements OnInit {
 
   certificates: SimpleCertificate[];
-  displayedColumns: string[] = ['serialNumber', 'subjectData', 'issuerData', 'notBefore', 'notAfter'];
+  displayedColumns: string[] = ['serialNumber', 'subjectData', 'issuerData', 'notBefore', 'notAfter', 'revoke'];
 
   constructor(
     private pkiService: PkiServiceService
   ) { }
 
   ngOnInit() {
+    this.getCertificates();
+  }
+
+  private getCertificates() {
     this.pkiService.getCertificates().subscribe(
       (data: SimpleCertificate[]) => {
         this.certificates = data;
@@ -24,4 +28,11 @@ export class CertificatesComponent implements OnInit {
     );
   }
 
+  onClickRevoke(certificate: SimpleCertificate) {
+    this.pkiService.revokeCertificate(certificate.serialNumber).subscribe(data => {
+      this.getCertificates();
+    }, error => {
+      console.log(error);
+    });
+  }
 }
