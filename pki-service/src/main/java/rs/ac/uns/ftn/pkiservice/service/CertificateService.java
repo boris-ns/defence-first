@@ -1,6 +1,7 @@
 package rs.ac.uns.ftn.pkiservice.service;
 
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
+import rs.ac.uns.ftn.pkiservice.dto.response.SimpleCertificateDTO;
 import rs.ac.uns.ftn.pkiservice.models.IssuerData;
 
 import javax.security.auth.x500.X500PrivateCredential;
@@ -15,6 +16,8 @@ import java.util.List;
 public interface CertificateService {
 
     List<X509Certificate> findAll();
+
+    List<SimpleCertificateDTO> findAllDto();
 
     List<X500PrivateCredential> findAllRootAndIntermediate();
 

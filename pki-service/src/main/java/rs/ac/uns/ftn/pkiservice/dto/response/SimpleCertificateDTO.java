@@ -1,6 +1,7 @@
 package rs.ac.uns.ftn.pkiservice.dto.response;
 
 import java.math.BigInteger;
+import java.security.cert.X509Certificate;
 import java.util.Date;
 
 public class SimpleCertificateDTO {
@@ -10,16 +11,27 @@ public class SimpleCertificateDTO {
     private BigInteger serialNumber;
     private Date notBefore;
     private Date notAfter;
+    private boolean revoked;
 
     public SimpleCertificateDTO() {
     }
 
-    public SimpleCertificateDTO(String subjectData, String issuerData, BigInteger serialNumber, Date notBefore, Date notAfter) {
+    public SimpleCertificateDTO(String subjectData, String issuerData, BigInteger serialNumber,
+                                Date notBefore, Date notAfter) {
         this.subjectData = subjectData;
         this.issuerData = issuerData;
         this.serialNumber = serialNumber;
         this.notBefore = notBefore;
         this.notAfter = notAfter;
+    }
+
+    public SimpleCertificateDTO(X509Certificate certificate, boolean revoked) {
+        this.subjectData = certificate.getSubjectX500Principal().toString();
+        this.issuerData = certificate.getIssuerX500Principal().toString();
+        this.serialNumber = certificate.getSerialNumber();
+        this.notBefore = certificate.getNotBefore();
+        this.notAfter = certificate.getNotAfter();
+        this.revoked = revoked;
     }
 
     public String getSubjectData() {
@@ -60,5 +72,13 @@ public class SimpleCertificateDTO {
 
     public void setNotAfter(Date notAfter) {
         this.notAfter = notAfter;
+    }
+
+    public boolean isRevoked() {
+        return revoked;
+    }
+
+    public void setRevoked(boolean revoked) {
+        this.revoked = revoked;
     }
 }

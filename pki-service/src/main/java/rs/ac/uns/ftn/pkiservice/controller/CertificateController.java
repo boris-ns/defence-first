@@ -45,11 +45,7 @@ public class CertificateController {
 
     @GetMapping(path = "/all")
     public ResponseEntity<List<SimpleCertificateDTO>> findAll() {
-        List<X509Certificate> certificateList = certificateService.findAll();
-        List<SimpleCertificateDTO> certificateDTOS = certificateList.stream()
-                .map(x -> CertificateMapper.toSimpleCertificateDTO(x))
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(certificateDTOS, HttpStatus.OK);
+        return new ResponseEntity<>(certificateService.findAllDto(), HttpStatus.OK);
     }
 
     @GetMapping(path = "/all/intermediate")
