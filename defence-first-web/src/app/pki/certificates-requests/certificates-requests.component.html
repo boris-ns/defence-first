@@ -1,19 +1,33 @@
 <h1>Certificates requests</h1>
 <table mat-table [dataSource]="certificates" class="mat-elevation-z8">
 
-    <ng-container matColumnDef="subjectData">
-        <th mat-header-cell *matHeaderCellDef> Subject data </th>
-        <td mat-cell *matCellDef="let element"> {{element.subjectData}} </td>
+    <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let element"> {{element.id}} </td>
     </ng-container>
 
-    <!-- <ng-container matColumnDef="issuerData">
-        <th mat-header-cell *matHeaderCellDef> Issuer Number </th>
-        <td mat-cell *matCellDef="let element"> {{element.issuerData}} </td>
-    </ng-container> -->
-  
-    <ng-container matColumnDef="view">
+    <ng-container matColumnDef="subjectName">
+        <th mat-header-cell *matHeaderCellDef> Subject name </th>
+        <td mat-cell *matCellDef="let element"> {{element.subjectName}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="issuerName">
+        <th mat-header-cell *matHeaderCellDef> Issuer name </th>
+        <td mat-cell *matCellDef="let element"> {{element.issuerName}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="approve">
         <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let element"><button mat-flat-button color="primary" (click)='view(element)'>View</button></td>
+        <td mat-cell *matCellDef="let element">
+            <button mat-flat-button color="primary" (click)='approveRequest(element)'>Approve</button>
+        </td>
+    </ng-container>
+    
+    <ng-container matColumnDef="decline">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element">
+            <button mat-flat-button (click)='declineRequest(element)'>Decline</button>
+        </td>
     </ng-container>
     
     <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="header"></tr>

@@ -10,9 +10,11 @@ export class PkiServiceService {
 
   private urlOCSP: string;
   private urlCertificates: string;
+  private urlCSR: string;
 
   constructor(private http: HttpClient) {
     this.urlOCSP = environment.PKIServiceConfig.url + '/ocsp';
+    this.urlCSR = environment.PKIServiceConfig.url + '/csr';
     this.urlCertificates = environment.PKIServiceConfig.url + '/certificates';
   }
 
@@ -25,7 +27,15 @@ export class PkiServiceService {
   }
 
   getCertificatesRequests() {
-    return this.http.get(this.urlCertificates + '/requests');
+    return this.http.get(this.urlCSR);
+  }
+
+  approveCertificateRequest(id: number) {
+    return this.http.put(`${this.urlCSR}/approve/${id}`, {});
+  }
+
+  declineCertificateRequest(id: number) {
+    return this.http.put(`${this.urlCSR}/decline/${id}`, {});
   }
 
   checkCrlList( id: number) {
