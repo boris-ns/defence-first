@@ -7,6 +7,17 @@ table {
     margin: 1%;
 }
 
-tr:not(.header):hover {
+tr:not(.header):not(.warning):hover {
     background: #EEEEEE;
+}
+
+.warning {
+    background: #FF5722;
+}
+.warning:hover {
+    background: #FFCCBC;
+}
+
+mat-checkbox {
+    margin: 20px;
 }
