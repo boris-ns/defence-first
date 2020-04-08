@@ -6,6 +6,7 @@ import { CertificatesComponent } from './certificates/certificates.component';
 import { AddCertificateComponent } from './add-certificate/add-certificate.component';
 import { CertificatesRequestsComponent } from './certificates-requests/certificates-requests.component';
 import { MaterialModule } from '../material/material.module';
+import { FormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -16,6 +17,7 @@ import { MaterialModule } from '../material/material.module';
   imports: [
     CommonModule,
     PkiRoutingModule,
+    FormsModule,
     MaterialModule
   ]
 })

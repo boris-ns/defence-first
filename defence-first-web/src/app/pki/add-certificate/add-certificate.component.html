@@ -1,1 +1,40 @@
-<p>add-certificate works!</p>
+<h1>Add intermediate certificate</h1>
+<form #addCertificateForm="ngForm" (ngSubmit)="onSubmit()" class="form-container" novalidate>
+    <h3>Subject name</h3>
+    <mat-form-field>
+        <mat-select id="country" #country [(ngModel)]="certificate.subjectName.c" name="countr3y" placeholder="Country" required>
+            <mat-option *ngFor="let c of countries" value="{{c.alpha2}}">
+                {{c.country_name_en}}
+            </mat-option>
+        </mat-select>
+      <mat-error *ngIf="country.invalid && (country.dirty || country.touched)">Country is required</mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput id="state" type="text" required #state='ngModel' [(ngModel)]="certificate.subjectName.st" name="state" placeholder="State">
+      <mat-error *ngIf="state.invalid && (state.dirty || state.touched)">State is required</mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput id="locality" type="text" required #locality='ngModel' [(ngModel)]="certificate.subjectName.l" name="locality" placeholder="Locality">
+      <mat-error *ngIf="locality.invalid && (locality.dirty || locality.touched)">Locality is required</mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput id="organization" type="text" required #organization='ngModel' [(ngModel)]="certificate.subjectName.o" name="organization" placeholder="Organization">
+      <mat-error *ngIf="organization.invalid && (organization.dirty || organization.touched)">Organization is required</mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput id="organizational" type="text" required #organizational='ngModel' [(ngModel)]="certificate.subjectName.ou" name="organizational" placeholder="Organizational unit">
+      <mat-error *ngIf="organizational.invalid && (organizational.dirty || organizational.touched)">Organizational unit is required</mat-error>
+    </mat-form-field>
+    <mat-form-field>
+        <input matInput id="name" type="text" required #name='ngModel' [(ngModel)]="certificate.subjectName.cn" name="name" placeholder="Common name">
+        <mat-error *ngIf="name.invalid && (name.dirty || name.touched)">Common name is required</mat-error>
+    </mat-form-field>
+    <h3>Issuer alias</h3>
+    <mat-form-field>
+        <mat-select id="alias" #alias [(ngModel)]="certificate.issuerAlias" name="alias" placeholder="Issuer alias" required>
+            <mat-option *ngFor="let i of issuers" value="{{i.alias}}">{{i.name}}</mat-option>
+        </mat-select>
+    <mat-error *ngIf="alias.invalid && (alias.dirty || alias.touched)">Issuer alias is required</mat-error>
+    </mat-form-field>
+    <button mat-raised-button type="submit" color="primary" id="add" [disabled]="addCertificateForm.invalid">Generate</button> 
+</form>

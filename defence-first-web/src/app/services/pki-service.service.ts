@@ -22,6 +22,10 @@ export class PkiServiceService {
     return this.http.get(this.urlCertificates + '/all');
   }
 
+  getIssuer() {
+    return this.http.get(this.urlCertificates + '/all/intermediate');
+  }
+
   getCertificatesRequests() {
     return this.http.get(this.urlCSR);
   }

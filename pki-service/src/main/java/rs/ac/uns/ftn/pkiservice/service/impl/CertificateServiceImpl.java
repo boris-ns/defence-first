@@ -7,8 +7,6 @@ import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import org.thymeleaf.util.ArrayUtils;
-import rs.ac.uns.ftn.pkiservice.configuration.MyKeyStore;
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
 import rs.ac.uns.ftn.pkiservice.models.IssuerData;
 import rs.ac.uns.ftn.pkiservice.models.SubjectData;
@@ -17,16 +15,15 @@ import rs.ac.uns.ftn.pkiservice.service.CertificateGeneratorService;
 import rs.ac.uns.ftn.pkiservice.service.CertificateService;
 import rs.ac.uns.ftn.pkiservice.service.KeyPairGeneratorService;
 
+import javax.security.auth.x500.X500PrivateCredential;
 import java.io.IOException;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static rs.ac.uns.ftn.pkiservice.constants.Constants.KEYSTORE_PASSWORD;
-import static rs.ac.uns.ftn.pkiservice.constants.Constants.ROOT_ALIAS;
 
 @Service
 public class CertificateServiceImpl implements CertificateService {
@@ -44,6 +41,11 @@ public class CertificateServiceImpl implements CertificateService {
     public List<X509Certificate> findAll() {
         List<Certificate> certificateList = keyStoreRepository.readAll();
         return certificateList.stream().map(X509Certificate.class::cast).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<X500PrivateCredential> findAllRootAndIntermediate() {
+        return keyStoreRepository.readCertificateAndAliasForRootAndIntermediate();
     }
 
     @Override
@@ -73,22 +75,12 @@ public class CertificateServiceImpl implements CertificateService {
     * */
 
     @Override
-    public X509Certificate generateCertificateIntermediate(String subjectName, String issuerAlias)
+    public X509Certificate generateCertificateIntermediate(HashMap<String, String> subjectName, String issuerAlias)
             throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException,
             IOException {
         KeyPair keyPairSuject = keyPairGeneratorService.generateKeyPair();
-        //promeniti kreiranje X500Name na osnovu subject name
-        X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
-        builder.addRDN(BCStyle.CN, "Nikola Luburic");
-        builder.addRDN(BCStyle.SURNAME, "Luburic");
-        builder.addRDN(BCStyle.GIVENNAME, "Nikola");
-        builder.addRDN(BCStyle.O, "UNS-FTN");
-        builder.addRDN(BCStyle.OU, "Katedra za informatiku");
-        builder.addRDN(BCStyle.C, "RS");
-        builder.addRDN(BCStyle.E, "nikola.luburic@uns.ac.rs");
-        //UID (USER ID) je ID korisnika
-        builder.addRDN(BCStyle.UID, "654321");
-        SubjectData subjectData = certificateGenerator.generateSubjectData(keyPairSuject.getPublic(), builder.build(),
+        X500Name name = certificateGenerator.generateName(subjectName);
+        SubjectData subjectData = certificateGenerator.generateSubjectData(keyPairSuject.getPublic(), name,
                 Constants.CERT_TYPE.INTERMEDIATE_CERT);
         IssuerData issuerData = findIssuerByAlias(issuerAlias);
 
@@ -109,7 +101,6 @@ public class CertificateServiceImpl implements CertificateService {
         for (int i = 0; i < size; i++) {
             certificatesChain[i + 1] = certificatesChainIssuer[i];
         }
-
 
         keyStoreRepository.writeKeyEntry(cert.getSerialNumber().toString(), keyPairSuject.getPrivate(), certificatesChain);
         return cert;
@@ -134,40 +125,4 @@ public class CertificateServiceImpl implements CertificateService {
         return null;
     }
 
-    private IssuerData generateIssuerData(PrivateKey issuerKey) {
-        X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
-        builder.addRDN(BCStyle.CN, "Nikola Luburic");
-        builder.addRDN(BCStyle.SURNAME, "Luburic");
-        builder.addRDN(BCStyle.GIVENNAME, "Nikola");
-        builder.addRDN(BCStyle.O, "UNS-FTN");
-        builder.addRDN(BCStyle.OU, "Katedra za informatiku");
-        builder.addRDN(BCStyle.C, "RS");
-        builder.addRDN(BCStyle.E, "nikola.luburic@uns.ac.rs");
-        //UID (USER ID) je ID korisnika
-        builder.addRDN(BCStyle.UID, "654321");
-
-        return certificateGenerator.generateIssuerData(issuerKey, builder.build());
-        //Kreiraju se podaci za issuer-a, sto u ovom slucaju ukljucuje:
-        // - privatni kljuc koji ce se koristiti da potpise sertifikat koji se izdaje
-        // - podatke o vlasniku sertifikata koji izdaje nov sertifikat
-    }
-
-    private SubjectData generateSubjectData(KeyPair keyPairSubject) {
-        //klasa X500NameBuilder pravi X500Name objekat koji predstavlja podatke o vlasniku
-        X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
-        builder.addRDN(BCStyle.CN, "Goran Sladic");
-        builder.addRDN(BCStyle.SURNAME, "Sladic");
-        builder.addRDN(BCStyle.GIVENNAME, "Goran");
-        builder.addRDN(BCStyle.O, "UNS-FTN");
-        builder.addRDN(BCStyle.OU, "Katedra za informatiku");
-        builder.addRDN(BCStyle.C, "RS");
-        builder.addRDN(BCStyle.E, "sladicg@uns.ac.rs");
-
-        // @TODO: UID (USER ID) je ID korisnika. Kog korisnika ?
-        builder.addRDN(BCStyle.UID, "123456");
-        X500Name name = builder.build();
-
-        return  certificateGenerator.generateSubjectData
-                (keyPairSubject.getPublic(),name,Constants.CERT_TYPE.LEAF_CERT);
-    }
 }
