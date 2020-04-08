@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import rs.ac.uns.ftn.siemagent.config.AgentConfiguration;
 import rs.ac.uns.ftn.siemagent.dto.response.TokenDTO;
@@ -108,7 +109,14 @@ public class CertificateServiceImpl implements CertificateService {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "bearer " + token.getAccesss_token());
         HttpEntity<String> entityReq = new HttpEntity<>(csr, headers);
-        ResponseEntity<String> certificate = restTemplate.exchange(createCertificateURL, HttpMethod.POST, entityReq, String.class);
+        ResponseEntity<String> certificate = null;
+
+        try {
+            certificate = restTemplate.exchange(createCertificateURL, HttpMethod.POST, entityReq, String.class);
+        } catch (HttpClientErrorException e) {
+            System.out.println("[ERROR] You are not allowed to make CSR request");
+            return null;
+        }
 
         // Ovo znaci da je istekao token, pa cemo refreshovati token
         // i opet poslati zahtev
