@@ -1,8 +1,6 @@
 package rs.ac.uns.ftn.pkiservice.service.impl;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.X500NameBuilder;
-import org.bouncycastle.asn1.x500.style.BCStyle;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -101,39 +99,32 @@ public class CertificateServiceImpl implements CertificateService {
                 Constants.CERT_TYPE.INTERMEDIATE_CERT);
         IssuerData issuerData = findIssuerByAlias(issuerAlias);
 
-
-
-
-        // @TODO: da ga doda u lanac, DA IMAMO METODU ZA TO da PRONADJE LANAC I DA GA SACUVA
-
-        Certificate[] certificatesChainIssuer = getCertificateChainByAlias(issuerAlias);
-
         //Generise se sertifikat za subjekta, potpisan od strane issuer-a
         X509Certificate cert = certificateGenerator.generateCertificate(subjectData, issuerData,
                 Constants.CERT_TYPE.INTERMEDIATE_CERT);
 
-        int size = certificatesChainIssuer.length;
-        Certificate[] certificatesChain = new Certificate[size + 1];
-        certificatesChain[0] = cert;
-        for (int i = 0; i < size; i++) {
-            certificatesChain[i + 1] = certificatesChainIssuer[i];
-        }
-
+        Certificate[] certificatesChain = createChain(issuerAlias, cert);
         keyStoreRepository.writeKeyEntry(cert.getSerialNumber().toString(), keyPairSuject.getPrivate(), certificatesChain);
         return cert;
     }
 
-    //@TODO: i DA CUVA LANAC
-    //@TODO: resiti OVDE KAD NIJE LEAF sert za privatni kljuc da se ne prosledjuje Null
     @Override
-    public void writeCertificateToKeyStore(X509Certificate cert, Constants.CERT_TYPE certType, PrivateKey pk)
+    public Certificate[] createChain(String issuerAlias, Certificate certificate){
+        Certificate[] certificatesChainIssuer = getCertificateChainByAlias(issuerAlias);
+
+        int size = certificatesChainIssuer.length;
+        Certificate[] certificatesChain = new Certificate[size + 1];
+        certificatesChain[0] = certificate;
+        for (int i = 0; i < size; i++) {
+            certificatesChain[i + 1] = certificatesChainIssuer[i];
+        }
+        return certificatesChain;
+    }
+
+    @Override
+    public void writeCertificateToKeyStore(String alias, Certificate[] certificates, PrivateKey pk)
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
-        if (!certType.equals(Constants.CERT_TYPE.LEAF_CERT)) {
-            keyStoreRepository.writeKeyEntry(cert.getSerialNumber().toString(), pk, new Certificate[]{cert});
-        }
-        else {
-            keyStoreRepository.writeCertificateEntry(cert.getSerialNumber().toString(), cert);
-        }
+        keyStoreRepository.writeKeyEntry(alias, pk, certificates);
     }
 
 }
