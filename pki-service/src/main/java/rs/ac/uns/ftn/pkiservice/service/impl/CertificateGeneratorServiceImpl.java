@@ -60,6 +60,7 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
 
             // dodavanje EKSTENZIJA u zavisnosti od TIPA sertifikata
             if(type.equals(Constants.CERT_TYPE.LEAF_CERT)) {
+//                certGen.addExtension(Extension.authorityInfoAccess, false, new AuthorityInformationAccess());
 //                certGen.addExtension(X509Extensions.AuthorityKeyIdentifier, false, new AuthorityKeyIdentifierStructure(caCert));
 //                certGen.addExtension(X509Extensions.SubjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(entityKey));
 //                certGen.addExtension(X509Extensions.BasicConstraints, true, new BasicConstraints(false));
