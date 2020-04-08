@@ -11,9 +11,10 @@ import { Router } from '@angular/router';
 })
 export class AddCertificateComponent implements OnInit {
 
-  certificate: CertificateCreate = new CertificateCreate( new Name('', '', '', '', '', ''), 'df.pki.root');
+  certificate: CertificateCreate = new CertificateCreate( new Name('', '', '', '', '', ''), '');
   countries: object[];
   aliases: string[];
+  issuers: object[];
 
   constructor(
     private pkiService: PkiServiceService,
@@ -23,12 +24,16 @@ export class AddCertificateComponent implements OnInit {
   ngOnInit() {
     const countriesQuery = require('countries-code');
     this.countries = countriesQuery.allCountriesList();
+    this.pkiService.getIssuer().subscribe(
+      (data: object[]) => {
+        this.issuers = data;
+      }
+    );
   }
 
   onSubmit() {
     this.pkiService.generateCertificatIntermediate(this.certificate).subscribe(
       data => {
-        console.log(data);
         this.router.navigate([CERTIFICATES_PATH]);
       }
     );

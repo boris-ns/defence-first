@@ -1,6 +1,8 @@
 package rs.ac.uns.ftn.pkiservice.repository.impl;
 
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -10,10 +12,12 @@ import rs.ac.uns.ftn.pkiservice.exception.exceptions.ResourceNotFoundException;
 import rs.ac.uns.ftn.pkiservice.models.IssuerData;
 import rs.ac.uns.ftn.pkiservice.repository.KeyStoreRepository;
 
+import javax.security.auth.x500.X500PrivateCredential;
 import java.io.*;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.concurrent.ExecutionException;
@@ -90,12 +94,33 @@ public class KeyStoreRepositoryImpl implements KeyStoreRepository {
     }
 
     @Override
-    public PrivateKey readPrivateKey(String alias, String pass) throws KeyStoreException, UnrecoverableKeyException,
+    public List<X500PrivateCredential> readCertificateAndAliasForRootAndIntermediate() {
+        KeyStore ks = myKeyStore.getKeystore();
+        try {
+            List<X500PrivateCredential> credentials = new ArrayList<>();
+            Enumeration<String> aliases = ks.aliases();
+            String alias;
+            while (aliases.hasMoreElements()) {
+                alias = aliases.nextElement();
+                X509Certificate c = (X509Certificate) readCertificate(alias);
+                boolean[] keyusage = c.getKeyUsage();
+                if(keyusage!= null && keyusage[5] && keyusage[6]) {
+                    credentials.add(new X500PrivateCredential(c, readPrivateKey(alias) ,alias));
+                }
+            }
+            return credentials;
+        } catch (KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException e) {
+            throw new ApiRequestException("Error while loading keystore");
+        }
+    }
+
+    @Override
+    public PrivateKey readPrivateKey(String alias) throws KeyStoreException, UnrecoverableKeyException,
             NoSuchAlgorithmException {
         KeyStore ks = myKeyStore.getKeystore();
 
         if (ks.isKeyEntry(alias)) {
-            PrivateKey pk = (PrivateKey) ks.getKey(alias, pass.toCharArray());
+            PrivateKey pk = (PrivateKey) ks.getKey(alias, KEYSTORE_PASSWORD);
             return pk;
         }
         return null;

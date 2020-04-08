@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
+import rs.ac.uns.ftn.pkiservice.dto.response.CertificateIssuerDTO;
 import rs.ac.uns.ftn.pkiservice.dto.response.CertificateRequestDTO;
 import rs.ac.uns.ftn.pkiservice.dto.response.CreateCertificateDTO;
 import rs.ac.uns.ftn.pkiservice.models.SubjectData;
@@ -22,6 +23,7 @@ import rs.ac.uns.ftn.pkiservice.dto.response.SimpleCertificateDTO;
 import rs.ac.uns.ftn.pkiservice.mapper.CertificateMapper;
 import rs.ac.uns.ftn.pkiservice.service.CertificateService;
 
+import javax.security.auth.x500.X500PrivateCredential;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.security.*;
@@ -47,6 +49,15 @@ public class CertificateController {
         List<X509Certificate> certificateList = certificateService.findAll();
         List<SimpleCertificateDTO> certificateDTOS = certificateList.stream()
                 .map(x -> CertificateMapper.toSimpleCertificateDTO(x))
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(certificateDTOS, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/all/intermediate")
+    public ResponseEntity<List<CertificateIssuerDTO>> findAllRootAndIntermediate() {
+        List<X500PrivateCredential> credentialList = certificateService.findAllRootAndIntermediate();
+        List<CertificateIssuerDTO> certificateDTOS = credentialList.stream()
+                .map(x -> CertificateMapper.toCertificateIssuerDTO(x))
                 .collect(Collectors.toList());
         return new ResponseEntity<>(certificateDTOS, HttpStatus.OK);
     }

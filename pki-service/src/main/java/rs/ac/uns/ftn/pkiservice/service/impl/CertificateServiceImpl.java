@@ -15,6 +15,7 @@ import rs.ac.uns.ftn.pkiservice.service.CertificateGeneratorService;
 import rs.ac.uns.ftn.pkiservice.service.CertificateService;
 import rs.ac.uns.ftn.pkiservice.service.KeyPairGeneratorService;
 
+import javax.security.auth.x500.X500PrivateCredential;
 import java.io.IOException;
 import java.security.*;
 import java.security.cert.Certificate;
@@ -40,6 +41,11 @@ public class CertificateServiceImpl implements CertificateService {
     public List<X509Certificate> findAll() {
         List<Certificate> certificateList = keyStoreRepository.readAll();
         return certificateList.stream().map(X509Certificate.class::cast).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<X500PrivateCredential> findAllRootAndIntermediate() {
+        return keyStoreRepository.readCertificateAndAliasForRootAndIntermediate();
     }
 
     @Override

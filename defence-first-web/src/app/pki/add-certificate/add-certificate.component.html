@@ -32,9 +32,9 @@
     <h3>Issuer alias</h3>
     <mat-form-field>
         <mat-select id="alias" #alias [(ngModel)]="certificate.issuerAlias" name="alias" placeholder="Issuer alias" required>
-            <mat-option *ngFor="let a of aliases" value="a">{{a}}</mat-option>
+            <mat-option *ngFor="let i of issuers" value="{{i.alias}}">{{i.name}}</mat-option>
         </mat-select>
     <mat-error *ngIf="alias.invalid && (alias.dirty || alias.touched)">Issuer alias is required</mat-error>
     </mat-form-field>
-    <button mat-raised-button type="submit" color="accent" id="add" [disabled]="addCertificateForm.invalid">Generate</button> 
+    <button mat-raised-button type="submit" color="primary" id="add" [disabled]="addCertificateForm.invalid">Generate</button> 
 </form>
