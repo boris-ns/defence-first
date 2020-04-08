@@ -1,14 +1,7 @@
 package rs.ac.uns.ftn.siemagent.service.impl;
 
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.X500NameBuilder;
-import org.bouncycastle.asn1.x500.style.BCStyle;
-import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.x509.*;
-import org.bouncycastle.cert.X509ExtensionUtils;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -16,17 +9,17 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
-import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import rs.ac.uns.ftn.siemagent.config.AgentConfiguration;
+import rs.ac.uns.ftn.siemagent.dto.response.TokenDTO;
 import rs.ac.uns.ftn.siemagent.repository.Keystore;
+import rs.ac.uns.ftn.siemagent.service.AuthService;
 import rs.ac.uns.ftn.siemagent.service.CertificateService;
 import rs.ac.uns.ftn.siemagent.service.KeyPairGeneratorService;
-
 
 import javax.security.auth.x500.X500Principal;
 import java.io.IOException;
@@ -52,8 +45,11 @@ public class CertificateServiceImpl implements CertificateService {
     @Autowired
     private Keystore keystore;
 
+    @Autowired
+    private AuthService authService;
+
     @Override
-    public String buildCertificateRequest() throws IOException {
+    public String buildCertificateRequest(TokenDTO token) throws IOException {
         KeyPair pair = keyPairGeneratorService.generateKeyPair();
 
         X500Principal principal = buildSertificateSubjetPrincipal();
@@ -101,10 +97,29 @@ public class CertificateServiceImpl implements CertificateService {
         System.out.println(pair.getPublic());
         System.out.println(stringWriter.toString());
 
-        String certificate = this.sendRequestForCertificate(stringWriter.toString());
+        String certificate = this.sendRequestForCertificate(stringWriter.toString(), token);
         // @TODO upisati sertifikat i povezati ga sa napravljenim privatenim kljucem
 
         return stringWriter.toString();
+    }
+
+    private String sendRequestForCertificate(String csr, TokenDTO token) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "bearer " + token.getAccesss_token());
+        HttpEntity<String> entityReq = new HttpEntity<>(csr, headers);
+        ResponseEntity<String> certificate = restTemplate.exchange(createCertificateURL, HttpMethod.POST, entityReq, String.class);
+
+        // Ovo znaci da je istekao token, pa cemo refreshovati token
+        // i opet poslati zahtev
+        // @TODO: Nije testirano
+        if (certificate.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+            token = authService.refreshToken(token.getRefresh_token());
+            headers.set("Authorization", "bearer " + token.getAccesss_token());
+            certificate = restTemplate.exchange(createCertificateURL, HttpMethod.POST, entityReq, String.class);
+        }
+
+        return certificate.getBody();
     }
 
     @Override
@@ -127,12 +142,6 @@ public class CertificateServiceImpl implements CertificateService {
 //        // @TODO: UID ovo da bude MAC adresa ili tako nesto?
 //        builder.addRDN(BCStyle.UID, "123456");
 //        return name;
-    }
-
-    private String sendRequestForCertificate(String csr) {
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> certificate = restTemplate.postForEntity(createCertificateURL, csr, String.class);
-        return certificate.getBody();
     }
 
 }
