@@ -155,40 +155,6 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
     }
 
 
-    @Override
-    public X509Certificate parseCertificateRequest(String csr) throws IOException, OperatorCreationException, PKCSException, CryptoException, CRMFException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException {
-        PEMParser pm = new PEMParser(new StringReader(csr));
-        PKCS10CertificationRequest certReq = (PKCS10CertificationRequest) pm.readObject();
-        ContentVerifierProvider prov = new JcaContentVerifierProviderBuilder().build(certReq.getSubjectPublicKeyInfo());
-
-        if (!certReq.isSignatureValid(prov))
-        {
-            System.out.println("nevalidan zahtev za sertifikat");
-            throw new CryptoException("nevalidan zahtev za sertifikat");
-        }
-        //@TODO: SACUVATI u PEM formatu  kako bi admin kasnije mogao da ga odobri ili odbije
-        //@TODO: za sad se ODMA KREIRA SERTIFIKAT samo da probamo
-
-        String issuerId = null;
-        Attribute[] attributes = certReq.getAttributes(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest);
-        for (Attribute attribute : attributes) {
-            for (ASN1Encodable value : attribute.getAttributeValues()) {
-                DEROctetString oo = (DEROctetString) ((DERTaggedObject) ((DERSequence)value).getObjectAt(0)).getObject();
-                issuerId = new String(oo.getOctets());
-            }
-        }
-
-
-
-        IssuerData issuerData= certificateService.findIssuerByAlias(issuerId);
-        PublicKey pk = toPublicKey(certReq.getSubjectPublicKeyInfo());
-        SubjectData subData = this.generateSubjectData(pk, certReq.getSubject(), Constants.CERT_TYPE.LEAF_CERT);
-
-        X509Certificate newCert = generateCertificate(subData,issuerData, Constants.CERT_TYPE.LEAF_CERT);
-        return newCert;
-    }
-
-
 
     @Override
     public PublicKey toPublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo)

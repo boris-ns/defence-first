@@ -10,21 +10,36 @@ import { CertificateRequest } from 'src/app/models/certificate-request.model';
 export class CertificatesRequestsComponent implements OnInit {
 
   certificates: CertificateRequest[];
-  displayedColumns: string[] = ['subjectData', 'view'];
+  displayedColumns: string[] = ['id', 'subjectName', 'issuerName', 'approve', 'decline'];
 
   constructor(
     private pkiService: PkiServiceService
   ) { }
 
   ngOnInit() {
-    this.pkiService.getCertificatesRequests().subscribe(
-      (data: CertificateRequest[]) => {
+    this.getAllRequests();
+  }
+
+  private getAllRequests() {
+    this.pkiService.getCertificatesRequests().subscribe((data: CertificateRequest[]) => {
         this.certificates = data;
       }
     );
   }
 
-  view(certificate: CertificateRequest) {
-    console.log(certificate);
+  approveRequest(request: CertificateRequest) {
+    this.pkiService.approveCertificateRequest(request.id).subscribe(data => {
+      this.getAllRequests();
+    }, error => {
+      console.log(error);
+    });
+  }
+
+  declineRequest(request: CertificateRequest) {
+    this.pkiService.declineCertificateRequest(request.id).subscribe(data => {
+      this.getAllRequests();
+    }, error => {
+      console.log(error);
+    });
   }
 }

@@ -24,7 +24,5 @@ public interface CertificateGeneratorService {
 
     SubjectData generateSubjectData(PublicKey publicKey, X500Name name, Constants.CERT_TYPE certType);
 
-    X509Certificate parseCertificateRequest(String csr) throws IOException, OperatorCreationException, PKCSException, CryptoException, CRMFException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException;
-
     PublicKey toPublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo) throws CRMFException;
 }

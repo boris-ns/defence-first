@@ -99,6 +99,7 @@ public class CertificateServiceImpl implements CertificateService {
         }
 
         System.out.println(pair.getPublic());
+        System.out.println(stringWriter.toString());
 
         String certificate = this.sendRequestForCertificate(stringWriter.toString());
         // @TODO upisati sertifikat i povezati ga sa napravljenim privatenim kljucem

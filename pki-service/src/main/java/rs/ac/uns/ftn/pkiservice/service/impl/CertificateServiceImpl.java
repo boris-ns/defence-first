@@ -91,6 +91,12 @@ public class CertificateServiceImpl implements CertificateService {
         SubjectData subjectData = certificateGenerator.generateSubjectData(keyPairSuject.getPublic(), builder.build(),
                 Constants.CERT_TYPE.INTERMEDIATE_CERT);
         IssuerData issuerData = findIssuerByAlias(issuerAlias);
+
+
+
+
+        // @TODO: da ga doda u lanac, DA IMAMO METODU ZA TO da PRONADJE LANAC I DA GA SACUVA
+
         Certificate[] certificatesChainIssuer = getCertificateChainByAlias(issuerAlias);
 
         //Generise se sertifikat za subjekta, potpisan od strane issuer-a
@@ -109,6 +115,7 @@ public class CertificateServiceImpl implements CertificateService {
         return cert;
     }
 
+    //@TODO: i DA CUVA LANAC
     //@TODO: resiti OVDE KAD NIJE LEAF sert za privatni kljuc da se ne prosledjuje Null
     @Override
     public void writeCertificateToKeyStore(X509Certificate cert, Constants.CERT_TYPE certType, PrivateKey pk)
@@ -117,7 +124,7 @@ public class CertificateServiceImpl implements CertificateService {
             keyStoreRepository.writeKeyEntry(cert.getSerialNumber().toString(), pk, new Certificate[]{cert});
         }
         else {
-            keyStoreRepository.writeKeyEntry(cert.getSerialNumber().toString(), null, new Certificate[]{cert});
+            keyStoreRepository.writeCertificateEntry(cert.getSerialNumber().toString(), cert);
         }
     }
 
