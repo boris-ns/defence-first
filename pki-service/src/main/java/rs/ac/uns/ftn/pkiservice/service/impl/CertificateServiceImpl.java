@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
+import rs.ac.uns.ftn.pkiservice.dto.response.SimpleCertificateDTO;
 import rs.ac.uns.ftn.pkiservice.models.IssuerData;
 import rs.ac.uns.ftn.pkiservice.models.SubjectData;
 import rs.ac.uns.ftn.pkiservice.repository.KeyStoreRepository;
+import rs.ac.uns.ftn.pkiservice.repository.RevokedCertificateRepository;
 import rs.ac.uns.ftn.pkiservice.service.CertificateGeneratorService;
 import rs.ac.uns.ftn.pkiservice.service.CertificateService;
 import rs.ac.uns.ftn.pkiservice.service.KeyPairGeneratorService;
@@ -37,10 +39,25 @@ public class CertificateServiceImpl implements CertificateService {
     @Autowired
     private KeyStoreRepository keyStoreRepository;
 
+    @Autowired
+    private RevokedCertificateRepository ocspRepository;
+
     @Override
     public List<X509Certificate> findAll() {
         List<Certificate> certificateList = keyStoreRepository.readAll();
         return certificateList.stream().map(X509Certificate.class::cast).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SimpleCertificateDTO> findAllDto() {
+        List<X509Certificate> certificates = this.findAll();
+
+        return certificates.stream()
+                .map(cert -> {
+                    boolean revoked = ocspRepository.findBySerialNumber(cert.getSerialNumber().toString()).isPresent();
+                    return new SimpleCertificateDTO(cert, revoked);
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -117,12 +134,6 @@ public class CertificateServiceImpl implements CertificateService {
         else {
             keyStoreRepository.writeCertificateEntry(cert.getSerialNumber().toString(), cert);
         }
-    }
-
-    /*TODO: impelmentirati da se svi zahtevi za sertifikate prikazu*/
-    @Override
-    public List<X509Certificate> findAllRequests() {
-        return null;
     }
 
 }
