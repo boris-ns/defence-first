@@ -29,8 +29,8 @@ public interface CertificateService {
 
     Certificate[] getCertificateChainByAlias(String alias);
 
-    void writeCertificateToKeyStore(X509Certificate cert, Constants.CERT_TYPE certType, PrivateKey pk)
-            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
+    Certificate[] createChain(String issuerAlias, Certificate certificate);
 
-    List<X509Certificate> findAllRequests();
+    void writeCertificateToKeyStore(String alias, Certificate[] certificates, PrivateKey pk)
+            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
 }

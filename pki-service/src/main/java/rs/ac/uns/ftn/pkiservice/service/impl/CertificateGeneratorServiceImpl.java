@@ -1,7 +1,5 @@
 package rs.ac.uns.ftn.pkiservice.service.impl;
 
-import org.bouncycastle.asn1.*;
-import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
@@ -10,29 +8,16 @@ import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.crmf.CRMFException;
-import org.bouncycastle.crypto.CryptoException;
-import org.bouncycastle.jcajce.util.JcaJceHelper;
-import org.bouncycastle.openssl.PEMException;
-import org.bouncycastle.openssl.PEMParser;
-import org.bouncycastle.operator.ContentVerifierProvider;
-import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.bouncycastle.pkcs.PKCSException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.pkiservice.configuration.CertificateBuilder;
-import rs.ac.uns.ftn.pkiservice.configuration.MyKeyStore;
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
 import rs.ac.uns.ftn.pkiservice.models.IssuerData;
 import rs.ac.uns.ftn.pkiservice.models.SubjectData;
-import rs.ac.uns.ftn.pkiservice.repository.KeyStoreRepository;
 import rs.ac.uns.ftn.pkiservice.service.CertificateGeneratorService;
 
-import java.io.IOException;
-import java.io.StringReader;
 import java.math.BigInteger;
 import java.security.*;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -46,20 +31,12 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import rs.ac.uns.ftn.pkiservice.service.CertificateService;
-import rs.ac.uns.ftn.pkiservice.service.KeyPairGeneratorService;
 
 @Service
 public class CertificateGeneratorServiceImpl implements CertificateGeneratorService {
 
     @Autowired
     private CertificateBuilder certificateBuilder;
-
-    @Autowired
-    private KeyPairGeneratorService keyPairGeneratorService;
-
-    @Autowired
-    private CertificateService certificateService;
 
     @Override
     public X509Certificate generateCertificate(SubjectData subjectData, IssuerData issuerData, Constants.CERT_TYPE type) {

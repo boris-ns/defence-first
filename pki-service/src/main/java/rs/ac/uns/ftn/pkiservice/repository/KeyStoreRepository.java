@@ -27,9 +27,6 @@ public interface KeyStoreRepository {
     void writeKeyEntry(String alias, PrivateKey privateKey, Certificate[] certificates) throws
             KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException;
 
-    void writeCertificateEntry(String alias, Certificate certificate) throws
-            KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException;
-
     void saveKeyStore() throws IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException;
 
 }
