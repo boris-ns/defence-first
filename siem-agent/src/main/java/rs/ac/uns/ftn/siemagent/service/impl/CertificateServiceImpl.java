@@ -8,30 +8,51 @@ import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509ExtensionUtils;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.openssl.PEMKeyPair;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
+import org.bouncycastle.util.io.pem.PemReader;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import rs.ac.uns.ftn.siemagent.Constants.Constants;
 import rs.ac.uns.ftn.siemagent.config.AgentConfiguration;
+import rs.ac.uns.ftn.siemagent.config.CertificateBuilder;
 import rs.ac.uns.ftn.siemagent.repository.Keystore;
 import rs.ac.uns.ftn.siemagent.service.CertificateService;
 import rs.ac.uns.ftn.siemagent.service.KeyPairGeneratorService;
 
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.x500.X500Principal;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
+import java.math.BigInteger;
 import java.security.KeyPair;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+import java.util.Date;
 import java.util.HashMap;
 
 @Service
@@ -40,8 +61,14 @@ public class CertificateServiceImpl implements CertificateService {
     @Value("${uri.pki.createCertificate}")
     private String createCertificateURL;
 
+    @Value("${uri.pki.getCertificate}")
+    private String getCertificateURL;
+
     @Value("${issuerSerialNumber}")
     private String issuerSerialNumber;
+
+    @Value("${keystore.password}")
+    private String keyStorePassword;
 
     @Autowired
     private AgentConfiguration agentConfiguration;
@@ -52,8 +79,11 @@ public class CertificateServiceImpl implements CertificateService {
     @Autowired
     private Keystore keystore;
 
+    @Autowired
+    private CertificateBuilder certificateBuilder;
+
     @Override
-    public String buildCertificateRequest() throws IOException {
+    public String buildCertificateRequest() throws Exception {
         KeyPair pair = keyPairGeneratorService.generateKeyPair();
 
         X500Principal principal = buildSertificateSubjetPrincipal();
@@ -101,9 +131,9 @@ public class CertificateServiceImpl implements CertificateService {
         System.out.println(pair.getPublic());
         System.out.println(stringWriter.toString());
 
-        String certificate = this.sendRequestForCertificate(stringWriter.toString());
-        // @TODO upisati sertifikat i povezati ga sa napravljenim privatenim kljucem
+        this.sendRequestForCertificate(stringWriter.toString());
 
+        this.saveKeyPair(pair);
         return stringWriter.toString();
     }
 
@@ -129,10 +159,56 @@ public class CertificateServiceImpl implements CertificateService {
 //        return name;
     }
 
+    @Override
+    public boolean checkSertificate(X509Certificate certificate) {
+        return false;
+    }
+
     private String sendRequestForCertificate(String csr) {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> certificate = restTemplate.postForEntity(createCertificateURL, csr, String.class);
         return certificate.getBody();
     }
+
+
+    public void saveKeyPair(KeyPair keyPair) throws Exception {
+        X509Certificate certificate =  createSertificateForKeyPair(keyPair);
+        keystore.write(Constants.KEY_PAIR_ALIAS, keyPair.getPrivate(), keyStorePassword.toCharArray(), certificate);
+
+    }
+
+
+    @Override
+    public X509Certificate getCertificateBySerialNumber(String serialNumber) throws Exception{
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> certificateStr = restTemplate.getForEntity(getCertificateURL + "/" + serialNumber, String.class);
+
+        PEMParser pemParser = new PEMParser(new StringReader(certificateStr.getBody()));
+        X509CertificateHolder certificateHolder = (X509CertificateHolder) pemParser.readObject();
+
+        JcaX509CertificateConverter certConverter = new JcaX509CertificateConverter();
+        certConverter = certConverter.setProvider("BC");
+        return certConverter.getCertificate(certificateHolder);
+    }
+
+    public X509Certificate createSertificateForKeyPair(KeyPair keyPair) throws Exception{
+        JcaContentSignerBuilder builder = certificateBuilder.getBuilder();
+        ContentSigner contentSigner = builder.build(keyPair.getPrivate());
+        X500Principal p = this.buildSertificateSubjetPrincipal();
+        X509v3CertificateBuilder certGen = new JcaX509v3CertificateBuilder(
+                p,
+                new BigInteger(String.valueOf(1)),
+                new Date(),
+                new Date(),p,
+                keyPair.getPublic());
+        JcaX509CertificateConverter certConverter = new JcaX509CertificateConverter();
+        certConverter = certConverter.setProvider("BC");
+        return certConverter.getCertificate(certGen.build(contentSigner));
+    }
+
+
+
+
+
 
 }
