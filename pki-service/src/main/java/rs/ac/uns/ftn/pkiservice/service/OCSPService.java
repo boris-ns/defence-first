@@ -13,11 +13,8 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 public interface OCSPService {
-
-    // @TODO prebaciti ovu metodu na SCIEM Agente jer ce oni da prave zahteve i na SCIEM centar
-    OCSPReq generateOCSPRequest(X509Certificate issuerCert, BigInteger serialNumber) throws OCSPException, OperatorCreationException, CertificateEncodingException, IOException;
-
-    OCSPResp generateOCSPResponse (OCSPReq request, PrivateKey responderKey, PublicKey pubKey)
+    
+    OCSPResp generateOCSPResponse (OCSPReq request)
             throws OCSPException, OperatorCreationException;
 
     boolean addCertificateToOCSP(String serialNumber);
