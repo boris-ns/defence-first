@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.pkiservice.controller;
 
+import org.apache.tomcat.jni.BIOCallback;
 import org.bouncycastle.cert.crmf.CRMFException;
 import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
@@ -24,6 +25,7 @@ import rs.ac.uns.ftn.pkiservice.service.CertificateSigningRequestService;
 import javax.security.auth.x500.X500PrivateCredential;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -59,7 +61,8 @@ public class CertificateController {
                 .collect(Collectors.toList());
         return new ResponseEntity<>(certificateDTOS, HttpStatus.OK);
     }
-    
+
+    // Todo: da li se ovo koristi?
     // @TODO: CHANGE LATER!!!!!!
     // Return DTO, not the object from database
     @GetMapping(path = "/{id}")
@@ -91,10 +94,18 @@ public class CertificateController {
         return new ResponseEntity<>(certificate.getSerialNumber().toString(), HttpStatus.OK);
     }
 
+    // Todo: mozda da se prebaci u csr kontroler?
     @PostMapping(path = "/generate")
     @PreAuthorize("hasRole('agent')")
     public ResponseEntity generate(@RequestBody String csr) throws IOException, OperatorCreationException, PKCSException {
         csrService.addRequest(csr);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping(path = "/replace/{id}")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity replace(@PathVariable String id) {
+        certificateService.replace(id);
         return ResponseEntity.ok().build();
     }
 }

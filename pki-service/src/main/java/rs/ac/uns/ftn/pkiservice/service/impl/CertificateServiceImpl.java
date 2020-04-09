@@ -17,6 +17,7 @@ import rs.ac.uns.ftn.pkiservice.service.KeyPairGeneratorService;
 
 import javax.security.auth.x500.X500PrivateCredential;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -125,6 +126,11 @@ public class CertificateServiceImpl implements CertificateService {
     public void writeCertificateToKeyStore(String alias, Certificate[] certificates, PrivateKey pk)
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
         keyStoreRepository.writeKeyEntry(alias, pk, certificates);
+    }
+
+    @Override
+    public void replace(String id) {
+
     }
 
 }
