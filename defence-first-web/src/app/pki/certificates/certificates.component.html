@@ -1,6 +1,6 @@
 <h1>Certificates</h1>
 <section class="example-section">
-    <mat-checkbox [(ngModel)]="checked" (change)="filter()">Soon-to-expire certificates</mat-checkbox>
+    <mat-checkbox color="primary" [(ngModel)]="checked" (change)="filter()">Soon-to-expire certificates</mat-checkbox>
 </section>
 <table mat-table [dataSource]="data" class="mat-elevation-z8">
     <ng-container matColumnDef="serialNumber">
@@ -35,8 +35,14 @@
             <p *ngIf="element.revoked">Revoked</p>
         </td>
     </ng-container>
+
+    <ng-container matColumnDef="replace">
+        <th mat-header-cell *matHeaderCellDef> Replace </th>
+        <td mat-cell *matCellDef="let element">
+            <button mat-flat-button color="primary" (click)="onClickReplace(element)">Replace</button>
+        </td>
+    </ng-container>
     
     <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="header"></tr>
     <tr mat-row [ngClass]="checkClass(row)" *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>
-<button mat-flat-button color="primary" (click)="cao()">Revoke</button>
