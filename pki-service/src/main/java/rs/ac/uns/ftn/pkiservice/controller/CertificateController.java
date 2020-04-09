@@ -8,6 +8,7 @@ import org.bouncycastle.pkcs.PKCSException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
@@ -44,11 +45,13 @@ public class CertificateController {
 
 
     @GetMapping(path = "/all")
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<List<SimpleCertificateDTO>> findAll() {
         return new ResponseEntity<>(certificateService.findAllDto(), HttpStatus.OK);
     }
 
     @GetMapping(path = "/all/intermediate")
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<List<CertificateIssuerDTO>> findAllRootAndIntermediate() {
         List<X500PrivateCredential> credentialList = certificateService.findAllRootAndIntermediate();
         List<CertificateIssuerDTO> certificateDTOS = credentialList.stream()
@@ -80,6 +83,7 @@ public class CertificateController {
     }
 
     @PostMapping(path = "/generate/intermediate")
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<String> generateIntermediate(@RequestBody CreateCertificateDTO certificateDTO) throws
             UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
         X509Certificate certificate = certificateService.generateCertificateIntermediate(
@@ -88,6 +92,7 @@ public class CertificateController {
     }
 
     @PostMapping(path = "/generate")
+    @PreAuthorize("hasRole('agent')")
     public ResponseEntity generate(@RequestBody String csr) throws IOException, OperatorCreationException, PKCSException {
         csrService.addRequest(csr);
         return ResponseEntity.ok().build();
