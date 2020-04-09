@@ -49,7 +49,7 @@ export class PkiServiceService {
     return this.http.post(this.urlCertificates + '/generate/intermediate', certificate);
   }
 
-  replaceCertificate(serialNumber: string, type: any) {
+  replaceCertificate(serialNumber: string) {
     return this.http.put(this.urlCertificates + '/replace/' + serialNumber, {});
   }
 

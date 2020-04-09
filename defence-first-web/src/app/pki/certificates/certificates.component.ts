@@ -59,7 +59,7 @@ export class CertificatesComponent implements OnInit {
   }
 
   cao() {
-    this.pkiService.replaceCertificate('1').subscribe(
+    this.pkiService.replaceCertificate('1586442947931').subscribe(
       data => {
         console.log(data);
       } 

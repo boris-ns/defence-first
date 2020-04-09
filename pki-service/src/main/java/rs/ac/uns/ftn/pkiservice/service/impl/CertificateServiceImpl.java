@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
 import rs.ac.uns.ftn.pkiservice.dto.response.SimpleCertificateDTO;
-import rs.ac.uns.ftn.pkiservice.exception.exceptions.ApiRequestException;
+import rs.ac.uns.ftn.pkiservice.exception.exceptions.ResourceNotFoundException;
 import rs.ac.uns.ftn.pkiservice.models.IssuerData;
 import rs.ac.uns.ftn.pkiservice.models.SubjectData;
 import rs.ac.uns.ftn.pkiservice.repository.KeyStoreRepository;
@@ -19,16 +19,12 @@ import rs.ac.uns.ftn.pkiservice.service.KeyPairGeneratorService;
 
 import javax.security.auth.x500.X500PrivateCredential;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static rs.ac.uns.ftn.pkiservice.constants.Constants.ROOT_ALIAS;
@@ -79,7 +75,7 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public IssuerData findIssuerByAlias(String alias) throws NoSuchAlgorithmException, CertificateException,
             KeyStoreException, IOException, UnrecoverableKeyException {
-        return  keyStoreRepository.loadIssuer(alias);
+        return keyStoreRepository.loadIssuer(alias);
     }
 
     @Override
@@ -93,9 +89,9 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     /*
-    * tip sertifikata koji pravimo kako bi se dodale odgovarajuce ekstenzije
-    * dodati ostale parametre
-    * */
+     * tip sertifikata koji pravimo kako bi se dodale odgovarajuce ekstenzije
+     * dodati ostale parametre
+     * */
 
     @Override
     public X509Certificate generateCertificateIntermediate(HashMap<String, String> subjectName, String issuerAlias)
@@ -117,15 +113,13 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public Certificate[] createChain(String issuerAlias, Certificate certificate){
+    public Certificate[] createChain(String issuerAlias, Certificate certificate) {
         Certificate[] certificatesChainIssuer = getCertificateChainByAlias(issuerAlias);
 
         int size = certificatesChainIssuer.length;
         Certificate[] certificatesChain = new Certificate[size + 1];
         certificatesChain[0] = certificate;
-        for (int i = 0; i < size; i++) {
-            certificatesChain[i + 1] = certificatesChainIssuer[i];
-        }
+        System.arraycopy(certificatesChainIssuer, 0, certificatesChain, 1, size);
         return certificatesChain;
     }
 
@@ -144,7 +138,7 @@ public class CertificateServiceImpl implements CertificateService {
         } else if (certificate.getKeyUsage()[5] && certificate.getKeyUsage()[6]) {
             replaceIntermediate(certificate);
         } else {
-            replaceLeaf(certificate);
+            throw new ResourceNotFoundException("Certification does not exist or can not be replaced!");
         }
     }
 
@@ -152,23 +146,47 @@ public class CertificateServiceImpl implements CertificateService {
             NoSuchAlgorithmException, KeyStoreException, IOException {
         KeyPair keyPair = keyPairGeneratorService.generateKeyPair();
         SubjectData subjectData = new SubjectData(keyPair.getPublic(),
-                new JcaX509CertificateHolder(certificate).getSubject(), certificate.getSerialNumber().toString(),
-                null,null);
+                new JcaX509CertificateHolder(certificate).getSubject(), ROOT_ALIAS, null, null);
         certificateGenerator.generateDate(subjectData, Constants.CERT_TYPE.ROOT_CERT);
         IssuerData issuerData = new IssuerData(keyPair.getPrivate(), new JcaX509CertificateHolder(certificate).getIssuer());
 
         Certificate newCertificate = certificateGenerator.generateCertificate(subjectData, issuerData,
                 Constants.CERT_TYPE.ROOT_CERT);
 
-        keyStoreRepository.writeKeyEntry(ROOT_ALIAS, keyPair.getPrivate(), new Certificate[] {newCertificate});
+        keyStoreRepository.writeKeyEntry(ROOT_ALIAS, keyPair.getPrivate(), new Certificate[]{newCertificate});
+        childReplace(issuerData, newCertificate, 1);
+    }
+
+    private void replaceIntermediate(X509Certificate certificate) throws CertificateException, NoSuchAlgorithmException,
+            KeyStoreException, IOException, UnrecoverableKeyException {
+        String alias = certificate.getSerialNumber().toString();
+        Certificate[] certificates = keyStoreRepository.readCertificateChain(alias);
+        KeyPair keyPair = keyPairGeneratorService.generateKeyPair();
+        SubjectData subjectData = new SubjectData(keyPair.getPublic(),
+                new JcaX509CertificateHolder(certificate).getSubject(), alias, null, null);
+        certificateGenerator.generateDate(subjectData, Constants.CERT_TYPE.INTERMEDIATE_CERT);
+        IssuerData issuerData = findIssuerByAlias(((X509Certificate) certificates[1]).getSerialNumber().toString());
+
+        Certificate newCertificate = certificateGenerator.generateCertificate(subjectData, issuerData,
+                Constants.CERT_TYPE.INTERMEDIATE_CERT);
+        certificates[0] = newCertificate;
+        keyStoreRepository.writeKeyEntry(alias, keyPair.getPrivate(), certificates);
+        IssuerData id = new IssuerData(keyPair.getPrivate(), subjectData.getX500name());
+        childReplace(id, newCertificate, certificates.length);
+    }
+
+    private void childReplace(IssuerData issuerData, Certificate newCertificate, int size) throws
+            CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, IOException {
+        String alias = ((X509Certificate) newCertificate).getSerialNumber().toString();
         List<Certificate[]> listChain = keyStoreRepository.listChain();
-        for (Certificate[] chain: listChain) {
-            if (chain.length == 2) {
+        for (Certificate[] chain : listChain) {
+            if (chain.length == size + 1 &&
+                    ((X509Certificate) chain[chain.length - size]).getSerialNumber().toString().equals(alias)) {
                 X509Certificate cert = (X509Certificate) chain[0];
                 SubjectData sd = new SubjectData(cert.getPublicKey(), new JcaX509CertificateHolder(cert).getSubject(),
                         cert.getSerialNumber().toString(), cert.getNotBefore(), cert.getNotAfter());
                 Constants.CERT_TYPE type;
-                if(cert.getKeyUsage()[5] && cert.getKeyUsage()[6]){
+                if (cert.getKeyUsage()[5] && cert.getKeyUsage()[6]) {
                     type = Constants.CERT_TYPE.INTERMEDIATE_CERT;
                 } else {
                     type = Constants.CERT_TYPE.LEAF_CERT;
@@ -180,22 +198,17 @@ public class CertificateServiceImpl implements CertificateService {
                         keyStoreRepository.readPrivateKey(cert.getSerialNumber().toString()), chain);
             }
         }
-        for(Certificate[] chain: listChain){
-            if (chain.length > 2){;
+
+        for (Certificate[] chain : listChain) {
+            if (chain.length > size + 1 &&
+                    ((X509Certificate) chain[chain.length - size]).getSerialNumber().toString().equals(alias)) {
                 String certAlias = ((X509Certificate) chain[0]).getSerialNumber().toString();
-                String issuerAlias =  ((X509Certificate) chain[chain.length-2]).getSerialNumber().toString();
+                String issuerAlias = ((X509Certificate) chain[chain.length - (size + 1)]).getSerialNumber().toString();
                 Certificate[] chainIssuer = keyStoreRepository.readCertificateChain(issuerAlias);
-                chain[chain.length - 2] = chainIssuer[0];
-                chain[chain.length - 1] = chainIssuer[1];
+                chain[chain.length - (size + 1)] = chainIssuer[0];
+                chain[chain.length - size] = chainIssuer[1];
                 keyStoreRepository.writeKeyEntry(certAlias, keyStoreRepository.readPrivateKey(certAlias), chain);
             }
         }
     }
-
-    private void replaceIntermediate(X509Certificate certificate) {
-    }
-
-    private void replaceLeaf(X509Certificate certificate) {
-    }
-
 }
