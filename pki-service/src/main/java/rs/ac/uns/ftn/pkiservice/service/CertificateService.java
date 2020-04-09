@@ -6,6 +6,7 @@ import rs.ac.uns.ftn.pkiservice.models.IssuerData;
 
 import javax.security.auth.x500.X500PrivateCredential;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -36,4 +37,6 @@ public interface CertificateService {
 
     void writeCertificateToKeyStore(String alias, Certificate[] certificates, PrivateKey pk)
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
+
+    void replace(String id);
 }

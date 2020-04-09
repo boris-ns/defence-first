@@ -24,6 +24,7 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
 
 @KeycloakConfiguration
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter
 {
     /**
@@ -37,7 +38,6 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter
         KeycloakAuthenticationProvider keycloakAuthenticationProvider = keycloakAuthenticationProvider();
         keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(grantedAuthorityMapper);
         auth.authenticationProvider(keycloakAuthenticationProvider);
-//        auth.authenticationProvider(keycloakAuthenticationProvider());
 
     }
 
@@ -70,10 +70,6 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter
         super.configure(http);
         http.csrf().disable()
                 .authorizeRequests()
-//                .antMatchers("*").permitAll();
-                // @TODO: dodati ostale adrese i role, ko kojoj adresi sme da pristupi
-                .antMatchers("/api/certificates/generate").hasRole(Constants.AGENT_ROLE)
-                .antMatchers("/api/ocsp/*").hasRole(Constants.ADMIN_ROLE)
                 .anyRequest().authenticated().and()
                 .csrf().disable();
     }

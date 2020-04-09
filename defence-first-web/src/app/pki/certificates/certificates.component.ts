@@ -41,7 +41,7 @@ export class CertificatesComponent implements OnInit {
 
   filter() {
     if (this.checked) {
-      const date = new Date('2022-12-1');
+      const date = new Date();
       date.setMonth(date.getMonth() + 1);
       this.data = this.certificates.filter(x => date > new Date(x.notAfter));
     } else {
@@ -50,7 +50,7 @@ export class CertificatesComponent implements OnInit {
   }
 
   checkClass(row: SimpleCertificate) {
-    const date = new Date('2022-12-1');
+    const date = new Date();
     date.setMonth(date.getMonth() + 1);
     if (date > new Date(row.notAfter)) {
       return 'warning';
