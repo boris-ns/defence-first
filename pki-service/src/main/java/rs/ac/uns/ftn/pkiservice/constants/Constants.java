@@ -15,6 +15,6 @@ public class Constants {
 
     public static String KEYSTORE_FILE_PATH = "myKeystore.jks";
     public static char[] KEYSTORE_PASSWORD = "123456".toCharArray();
-    public static String ROOT_ALIAS = "df.pki.root";
+    public static String ROOT_ALIAS = "1";
 
 }

@@ -19,6 +19,7 @@ import rs.ac.uns.ftn.pkiservice.models.SubjectData;
 import rs.ac.uns.ftn.pkiservice.service.CertificateGeneratorService;
 import rs.ac.uns.ftn.pkiservice.service.KeyPairGeneratorService;
 
+import javax.persistence.criteria.Root;
 import java.io.*;
 import java.math.BigInteger;
 import java.security.*;
@@ -56,7 +57,7 @@ public class MyKeyStore {
                 IssuerData issuerData = certificateGeneratorService.generateIssuerData(kp.getPrivate(), builder.build());
                 SubjectData subjectData = certificateGeneratorService.generateSubjectData
                         (kp.getPublic(), builder.build(), Constants.CERT_TYPE.ROOT_CERT);
-
+                subjectData.setSerialNumber(ROOT_ALIAS);
                 Certificate certificate = certificateGeneratorService.generateCertificate
                             (subjectData, issuerData,Constants.CERT_TYPE.ROOT_CERT);
 
@@ -87,8 +88,6 @@ public class MyKeyStore {
         builder.addRDN(BCStyle.OU, "Katedra za informatiku");
         builder.addRDN(BCStyle.L, "Novi Sad");
         builder.addRDN(BCStyle.C, "RS");
-        //UID (USER ID) je ID korisnika
-        builder.addRDN(BCStyle.UID, "123456");
         return builder;
     }
 

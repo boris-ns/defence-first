@@ -38,5 +38,6 @@ public interface CertificateService {
     void writeCertificateToKeyStore(String alias, Certificate[] certificates, PrivateKey pk)
             throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException;
 
-    void replace(String id);
+    void replace(String alias) throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException,
+            KeyStoreException, IOException;
 }

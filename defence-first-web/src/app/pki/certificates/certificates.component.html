@@ -39,3 +39,4 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="header"></tr>
     <tr mat-row [ngClass]="checkClass(row)" *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>
+<button mat-flat-button color="primary" (click)="cao()">Revoke</button>

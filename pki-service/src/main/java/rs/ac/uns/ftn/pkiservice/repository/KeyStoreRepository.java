@@ -8,6 +8,7 @@ import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 public interface KeyStoreRepository {
@@ -19,6 +20,8 @@ public interface KeyStoreRepository {
     Certificate[] readCertificateChain(String alias);
 
     List<Certificate> readAll();
+
+    List<Certificate[]> listChain();
 
     List<X500PrivateCredential> readCertificateAndAliasForRootAndIntermediate();
 

@@ -106,24 +106,11 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
 
     public SubjectData generateSubjectData(PublicKey publicKey, X500Name name, Constants.CERT_TYPE certType) {
 
-        Calendar calendarLater = Calendar.getInstance();
-        calendarLater.setTime(new Date());
+        SubjectData subjectData = new SubjectData(publicKey, name, null, null, null);
+        generateDate(subjectData, certType);
 
-        if(certType.equals(Constants.CERT_TYPE.ROOT_CERT)) {
-            calendarLater.add(Calendar.YEAR, Constants.ROOT_CERT_DURATION);
-        }
-        else if(certType.equals((Constants.CERT_TYPE.INTERMEDIATE_CERT))) {
-            calendarLater.add(Calendar.YEAR, Constants.INTERMEDIATE_CERT_DURATION);
-        }
-        else {
-            calendarLater.add(Calendar.YEAR, Constants.LEAF_CERT_DURATION);
-        }
-
-        Date startDate = new Date();
-        Date endDate = calendarLater.getTime();
 //        String serialNumber = UUID.randomUUID().toString();
-        String serialNumber = String.valueOf(System.currentTimeMillis());
-
+        subjectData.setSerialNumber(String.valueOf(System.currentTimeMillis()));
         //klasa X500NameBuilder pravi X500Name objekat koji predstavlja podatke o vlasniku
 
         //Kreiraju se podaci za sertifikat, sto ukljucuje:
@@ -131,7 +118,7 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
         // - podatke o vlasniku
         // - serijski broj sertifikata
         // - od kada do kada vazi sertifikat
-        return new SubjectData(publicKey, name, serialNumber, startDate, endDate);
+        return subjectData;
     }
 
 
@@ -160,6 +147,25 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
         {
             throw new CRMFException("invalid key: " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public void generateDate(SubjectData subjectData, Constants.CERT_TYPE certType){
+        Calendar calendarLater = Calendar.getInstance();
+        calendarLater.setTime(new Date());
+
+        if(certType.equals(Constants.CERT_TYPE.ROOT_CERT)) {
+            calendarLater.add(Calendar.YEAR, Constants.ROOT_CERT_DURATION);
+        }
+        else if(certType.equals((Constants.CERT_TYPE.INTERMEDIATE_CERT))) {
+            calendarLater.add(Calendar.YEAR, Constants.INTERMEDIATE_CERT_DURATION);
+        }
+        else {
+            calendarLater.add(Calendar.YEAR, Constants.LEAF_CERT_DURATION);
+        }
+
+        subjectData.setStartDate(new Date());
+        subjectData.setEndDate(calendarLater.getTime());
     }
 
     @Override
