@@ -19,11 +19,8 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
-import java.util.Enumeration;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 import static rs.ac.uns.ftn.pkiservice.constants.Constants.*;
 
@@ -88,6 +85,22 @@ public class KeyStoreRepositoryImpl implements KeyStoreRepository {
                 certificates.add(readCertificate(aliases.nextElement()));
             }
             return certificates;
+        } catch (KeyStoreException e) {
+            throw new ApiRequestException("Error while loading keystore");
+        }
+    }
+
+    @Override
+    public List<Certificate[]> listChain() {
+        KeyStore ks = myKeyStore.getKeystore();
+        try {
+            List<Certificate[]> chains = new ArrayList<>();
+            Enumeration<String> aliases = ks.aliases();
+            while (aliases.hasMoreElements()) {
+                String alias = aliases.nextElement();
+                chains.add(readCertificateChain(alias));
+            }
+            return chains;
         } catch (KeyStoreException e) {
             throw new ApiRequestException("Error while loading keystore");
         }

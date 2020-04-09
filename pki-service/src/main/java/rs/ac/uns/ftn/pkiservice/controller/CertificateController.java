@@ -102,10 +102,11 @@ public class CertificateController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping(path = "/replace/{id}")
+    @PutMapping(path = "/replace/{alias}")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity replace(@PathVariable String id) {
-        certificateService.replace(id);
+    public ResponseEntity replace(@PathVariable String alias) throws
+            UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+        certificateService.replace(alias);
         return ResponseEntity.ok().build();
     }
 }

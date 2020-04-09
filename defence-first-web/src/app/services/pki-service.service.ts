@@ -57,4 +57,7 @@ export class PkiServiceService {
     return this.http.post(`${this.urlOCSP}/${serialNumber}`, {});
   }
 
+  replaceCertificate(serialNumber: number) {
+    return this.http.put(`${this.urlCertificates}/replace/${serialNumber}`, {});
+  }
 }
