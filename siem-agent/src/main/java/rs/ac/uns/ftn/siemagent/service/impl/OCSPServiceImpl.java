@@ -25,7 +25,6 @@ import rs.ac.uns.ftn.siemagent.config.CertificateBuilder;
 import rs.ac.uns.ftn.siemagent.service.CertificateService;
 import rs.ac.uns.ftn.siemagent.service.OCSPService;
 
-import java.lang.reflect.Array;
 import java.math.BigInteger;
 import rs.ac.uns.ftn.siemagent.repository.Keystore;
 

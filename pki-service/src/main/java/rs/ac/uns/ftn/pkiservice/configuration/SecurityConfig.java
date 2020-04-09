@@ -70,8 +70,11 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter
         super.configure(http);
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("*").permitAll();
-//                .antMatchers("/api/*").hasRole(Constants.ADMIN_ROLE)
-//                .anyRequest().authenticated().and()
+//                .antMatchers("*").permitAll();
+                // @TODO: dodati ostale adrese i role, ko kojoj adresi sme da pristupi
+                .antMatchers("/api/certificates/generate").hasRole(Constants.AGENT_ROLE)
+                .antMatchers("/api/ocsp/*").hasRole(Constants.ADMIN_ROLE)
+                .anyRequest().authenticated().and()
+                .csrf().disable();
     }
 }

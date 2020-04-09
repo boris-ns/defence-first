@@ -1,56 +1,41 @@
 package rs.ac.uns.ftn.siemagent.service.impl;
 
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.X500NameBuilder;
-import org.bouncycastle.asn1.x500.style.BCStyle;
-import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.X509ExtensionUtils;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
-import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
-import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
-import org.bouncycastle.util.io.pem.PemReader;
-import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
 import rs.ac.uns.ftn.siemagent.Constants.Constants;
 import rs.ac.uns.ftn.siemagent.config.AgentConfiguration;
+import rs.ac.uns.ftn.siemagent.dto.response.TokenDTO;
 import rs.ac.uns.ftn.siemagent.config.CertificateBuilder;
 import rs.ac.uns.ftn.siemagent.repository.Keystore;
+import rs.ac.uns.ftn.siemagent.service.AuthService;
 import rs.ac.uns.ftn.siemagent.service.CertificateService;
 import rs.ac.uns.ftn.siemagent.service.KeyPairGeneratorService;
 
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.x500.X500Principal;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.security.KeyPair;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.HashMap;
@@ -80,10 +65,13 @@ public class CertificateServiceImpl implements CertificateService {
     private Keystore keystore;
 
     @Autowired
+    private AuthService authService;
+
+    @Autowired
     private CertificateBuilder certificateBuilder;
 
     @Override
-    public String buildCertificateRequest() throws Exception {
+    public String buildCertificateRequest(TokenDTO token) throws Exception {
         KeyPair pair = keyPairGeneratorService.generateKeyPair();
 
         X500Principal principal = buildSertificateSubjetPrincipal();
@@ -131,10 +119,37 @@ public class CertificateServiceImpl implements CertificateService {
         System.out.println(pair.getPublic());
         System.out.println(stringWriter.toString());
 
-        this.sendRequestForCertificate(stringWriter.toString());
+        String certificate = this.sendRequestForCertificate(stringWriter.toString(), token);
+        // @TODO upisati sertifikat i povezati ga sa napravljenim privatenim kljucem
 
         this.saveKeyPair(pair);
         return stringWriter.toString();
+    }
+
+    private String sendRequestForCertificate(String csr, TokenDTO token) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "bearer " + token.getAccesss_token());
+        HttpEntity<String> entityReq = new HttpEntity<>(csr, headers);
+        ResponseEntity<String> certificate = null;
+
+        try {
+            certificate = restTemplate.exchange(createCertificateURL, HttpMethod.POST, entityReq, String.class);
+        } catch (HttpClientErrorException e) {
+            System.out.println("[ERROR] You are not allowed to make CSR request");
+            return null;
+        }
+
+        // Ovo znaci da je istekao token, pa cemo refreshovati token
+        // i opet poslati zahtev
+        // @TODO: Nije testirano
+        if (certificate.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+            token = authService.refreshToken(token.getRefresh_token());
+            headers.set("Authorization", "bearer " + token.getAccesss_token());
+            certificate = restTemplate.exchange(createCertificateURL, HttpMethod.POST, entityReq, String.class);
+        }
+
+        return certificate.getBody();
     }
 
     @Override
@@ -177,7 +192,6 @@ public class CertificateServiceImpl implements CertificateService {
 
     }
 
-
     @Override
     public X509Certificate getCertificateBySerialNumber(String serialNumber) throws Exception{
         RestTemplate restTemplate = new RestTemplate();
@@ -205,10 +219,5 @@ public class CertificateServiceImpl implements CertificateService {
         certConverter = certConverter.setProvider("BC");
         return certConverter.getCertificate(certGen.build(contentSigner));
     }
-
-
-
-
-
 
 }

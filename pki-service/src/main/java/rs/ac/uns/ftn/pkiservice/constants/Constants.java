@@ -4,7 +4,7 @@ public class Constants {
 
     public static final String ADMIN_ROLE = "admin";
     public static final String OPERATOR_ROLE = "operator";
-
+    public static final String AGENT_ROLE = "agent";
 
     public static enum CERT_TYPE {ROOT_CERT, INTERMEDIATE_CERT, LEAF_CERT};
 
