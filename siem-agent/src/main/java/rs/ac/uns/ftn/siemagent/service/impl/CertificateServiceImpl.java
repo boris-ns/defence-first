@@ -36,6 +36,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.security.KeyPair;
+import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.HashMap;
@@ -48,6 +49,9 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Value("${uri.pki.getCertificate}")
     private String getCertificateURL;
+
+    @Value("${uri.pki.renewCertificate}")
+    private String renewCertificate;
 
     @Value("${issuerSerialNumber}")
     private String issuerSerialNumber;
@@ -71,13 +75,12 @@ public class CertificateServiceImpl implements CertificateService {
     private CertificateBuilder certificateBuilder;
 
     @Override
-    public String buildCertificateRequest(TokenDTO token) throws Exception {
-        KeyPair pair = keyPairGeneratorService.generateKeyPair();
+    public String buildCertificateRequest(KeyPair certKeyPair, PrivateKey signCerPrivateKey, Boolean renewal) throws Exception {
 
         X500Principal principal = buildSertificateSubjetPrincipal();
 
         PKCS10CertificationRequestBuilder p10Builder =
-                new JcaPKCS10CertificationRequestBuilder(principal, pair.getPublic());
+                new JcaPKCS10CertificationRequestBuilder(principal, certKeyPair.getPublic());
 
         JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder("SHA256withRSA");
         ContentSigner signer = null;
@@ -87,9 +90,15 @@ public class CertificateServiceImpl implements CertificateService {
 
 
         // da prosledimo koji je SerialNumber o
+        GeneralNames subjectAltName = null;
         GeneralName issuerSNName = new GeneralName(GeneralName.dNSName, issuerSerialNumber);
-        GeneralNames subjectAltName = new GeneralNames(issuerSNName);
+        GeneralName myCertSerialNumber = new GeneralName(GeneralName.uniformResourceIdentifier, "1586209092785");
 
+        if(renewal) {
+            subjectAltName = new GeneralNames(new GeneralName[]{issuerSNName, myCertSerialNumber});
+        }else {
+            subjectAltName = new GeneralNames(new GeneralName[]{issuerSNName});
+        }
 
 //        toDer
 //        // da pretvorim id od IssuerCert u ovo sto treba za ekstenziju...
@@ -100,7 +109,7 @@ public class CertificateServiceImpl implements CertificateService {
 //                AuthorityInformationAccess.getInstance(asn1Sequence);
         p10Builder.addAttribute(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest, subjectAltName);
         try {
-            signer = csBuilder.build(pair.getPrivate());
+            signer = csBuilder.build(signCerPrivateKey);
         } catch (OperatorCreationException e) {
             e.printStackTrace();
         }
@@ -115,21 +124,22 @@ public class CertificateServiceImpl implements CertificateService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        System.out.println(pair.getPublic());
-        System.out.println(stringWriter.toString());
-
-        String certificate = this.sendRequestForCertificate(stringWriter.toString(), token);
-        // @TODO upisati sertifikat i povezati ga sa napravljenim privatenim kljucem
-
-        this.saveKeyPair(pair);
+        this.saveKeyPair(certKeyPair, renewal);
         return stringWriter.toString();
     }
 
-    private String sendRequestForCertificate(String csr, TokenDTO token) {
+    @Override
+    public String sendRequestForCertificate(TokenDTO token) throws Exception {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "bearer " + token.getAccesss_token());
+
+
+        KeyPair pair = keyPairGeneratorService.generateKeyPair();
+        PrivateKey privateKey = pair.getPrivate();
+        String csr = this.buildCertificateRequest(pair, privateKey, false);
+
+
         HttpEntity<String> entityReq = new HttpEntity<>(csr, headers);
         ResponseEntity<String> certificate = null;
 
@@ -148,9 +158,10 @@ public class CertificateServiceImpl implements CertificateService {
             headers.set("Authorization", "bearer " + token.getAccesss_token());
             certificate = restTemplate.exchange(createCertificateURL, HttpMethod.POST, entityReq, String.class);
         }
-
         return certificate.getBody();
     }
+
+
 
     @Override
     public X500Principal buildSertificateSubjetPrincipal() {
@@ -179,30 +190,84 @@ public class CertificateServiceImpl implements CertificateService {
         return false;
     }
 
-    private String sendRequestForCertificate(String csr) {
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> certificate = restTemplate.postForEntity(createCertificateURL, csr, String.class);
-        return certificate.getBody();
-    }
 
 
-    public void saveKeyPair(KeyPair keyPair) throws Exception {
+    public void saveKeyPair(KeyPair keyPair, Boolean renewal) throws Exception {
         X509Certificate certificate =  createSertificateForKeyPair(keyPair);
-        keystore.write(Constants.KEY_PAIR_ALIAS, keyPair.getPrivate(), keyStorePassword.toCharArray(), certificate);
+        if (renewal) {
+            keystore.write(Constants.RENEWAL_KEY_PAIR_ALIAS, keyPair.getPrivate(), keyStorePassword.toCharArray(), certificate);
+        }else{
+            keystore.write(Constants.KEY_PAIR_ALIAS, keyPair.getPrivate(), keyStorePassword.toCharArray(), certificate);
+        }
+
 
     }
 
     @Override
-    public X509Certificate getCertificateBySerialNumber(String serialNumber) throws Exception{
+    public X509Certificate getCertificateBySerialNumber(String serialNumber, TokenDTO token) throws Exception{
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> certificateStr = restTemplate.getForEntity(getCertificateURL + "/" + serialNumber, String.class);
 
-        PEMParser pemParser = new PEMParser(new StringReader(certificateStr.getBody()));
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "bearer " + token.getAccesss_token());
+        HttpEntity<String> entityReq = new HttpEntity<>(serialNumber, headers);
+        ResponseEntity<String> certificate = null;
+
+        try {
+            certificate = restTemplate.exchange(getCertificateURL + "/" + serialNumber, HttpMethod.POST, entityReq, String.class);
+        } catch (HttpClientErrorException e) {
+            System.out.println("[ERROR] You are not allowed to make check request");
+            return null;
+        }
+        // Ovo znaci da je istekao token, pa cemo refreshovati token
+        // i opet poslati zahtev
+        // @TODO: Nije testirano
+        if (certificate.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+            token = authService.refreshToken(token.getRefresh_token());
+            headers.set("Authorization", "bearer " + token.getAccesss_token());
+            certificate = restTemplate.exchange(getCertificateURL + "/" + serialNumber, HttpMethod.POST, entityReq, String.class);
+        }
+
+
+        PEMParser pemParser = new PEMParser(new StringReader(certificate.getBody()));
         X509CertificateHolder certificateHolder = (X509CertificateHolder) pemParser.readObject();
 
         JcaX509CertificateConverter certConverter = new JcaX509CertificateConverter();
         certConverter = certConverter.setProvider("BC");
         return certConverter.getCertificate(certificateHolder);
+    }
+
+    @Override
+    public String sendReplaceCertificateRequest(TokenDTO token) throws Exception {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "bearer " + token.getAccesss_token());
+
+
+        KeyPair pair = keyPairGeneratorService.generateKeyPair();
+        //UZIMA SE STARI KLJUC JER PKI ima stari public pa moze da proveri validnost tako..
+        PrivateKey privateKey = keystore.readPrivateKey(Constants.KEY_PAIR_ALIAS, keyStorePassword);
+        String csr = this.buildCertificateRequest(pair, privateKey, true);
+
+        HttpEntity<String> entityReq = new HttpEntity<>(csr, headers);
+        ResponseEntity<Void> certificate = null;
+
+        try {
+            certificate = restTemplate.exchange(renewCertificate, HttpMethod.POST, entityReq, Void.class);
+        } catch (HttpClientErrorException e) {
+            System.out.println(e.fillInStackTrace());
+            System.out.println("[ERROR] You are not allowed to make CSR request");
+            return null;
+        }
+
+        // Ovo znaci da je istekao token, pa cemo refreshovati token
+        // i opet poslati zahtev
+        // @TODO: Nije testirano
+        if (certificate.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+            token = authService.refreshToken(token.getRefresh_token());
+            headers.set("Authorization", "bearer " + token.getAccesss_token());
+            certificate = restTemplate.exchange(renewCertificate, HttpMethod.POST, entityReq, Void.class);
+        }
+        return null;
     }
 
     public X509Certificate createSertificateForKeyPair(KeyPair keyPair) throws Exception{
