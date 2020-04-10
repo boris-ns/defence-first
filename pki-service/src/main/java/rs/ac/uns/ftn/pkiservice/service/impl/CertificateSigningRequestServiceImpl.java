@@ -1,9 +1,6 @@
 package rs.ac.uns.ftn.pkiservice.service.impl;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERTaggedObject;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.openssl.PEMParser;
@@ -25,6 +22,7 @@ import rs.ac.uns.ftn.pkiservice.repository.CertificateSigningRequestRepository;
 import rs.ac.uns.ftn.pkiservice.service.CertificateGeneratorService;
 import rs.ac.uns.ftn.pkiservice.service.CertificateService;
 import rs.ac.uns.ftn.pkiservice.service.CertificateSigningRequestService;
+import sun.security.x509.GeneralNames;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -59,16 +57,20 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
         PEMParser pm = new PEMParser(new StringReader(csr));
         PKCS10CertificationRequest certReq = (PKCS10CertificationRequest) pm.readObject();
 
+        Map<String, String> attributes = this.parseCsrAttributes(certReq);
+
         ContentVerifierProvider prov = null;
         if (!renew) {
             prov = new JcaContentVerifierProviderBuilder().build(certReq.getSubjectPublicKeyInfo());
         }else {
-            //@TODO: Pronadji stari PublicKey i sa njim proveri potpis..
-            prov = new JcaContentVerifierProviderBuilder().build(certReq.getSubjectPublicKeyInfo());
+            //@TODO: Pronadji stari PublicKey i sa njim proveri potpis.. NECEEEE
+//            String serialNumber = attributes.get("certSerialNumber");
+//            X509Certificate certificate = certificateService.findCertificateByAlias(serialNumber);
+//            prov = new JcaContentVerifierProviderBuilder().build(certificate.getPublicKey());
         }
 
 //        if (!certReq.isSignatureValid(prov)) {
-//            throw new ApiRequestException("CSR is not valid");
+//            throw new ApiRequestException("CSR renewal is not valid");
 //        }
         return certReq;
     }
@@ -90,31 +92,38 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
         csrRepository.save(request);
     }
 
-    private Map<String, String> parseCsrAttributes(PKCS10CertificationRequest csr) {
+    private Map<String, String> parseCsrAttributes(PKCS10CertificationRequest csr) throws IOException {
         Map<String, String> result = new HashMap<>();
 
-        String issuerId = null;
+        String attrVal = null;
+        //@TODO: BOLJE CITATI KLJUCEVE
+        String[] attNames = {"issuerId", "certSerialNumber"};
 
         Attribute[] attributes = csr.getAttributes(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest);
         for (Attribute attribute : attributes) {
+            int i = 0;
             System.out.println(attribute.getAttrType());
-            for (ASN1Encodable value : attribute.getAttributeValues()) {
-                DEROctetString oo = (DEROctetString) ((DERTaggedObject) ((DERSequence)value).getObjectAt(0)).getObject();
-                issuerId = new String(oo.getOctets());
+            for (ASN1Encodable values : attribute.getAttributeValues()) {
+                for(ASN1Encodable value : (DERSequence)values) {
+                    DEROctetString oo = (DEROctetString) ((DERTaggedObject)value).getObject();
+                    attrVal = new String(oo.getOctets());
+                    result.put(attNames[i], attrVal);
+                    i++;
+                }
             }
         }
-
-        // @TODO: Dodati ostale atribute u mapu
-        result.put("issuerId", issuerId);
-
         return result;
     }
 
+    //@TODO: ARIIVITI STARI i A SACUVATI OVAJ NOVI!!!!
     @Override
     public X509Certificate saveCertificateRequest(String csr, Boolean renewal) throws Exception {
 
         PKCS10CertificationRequest certReq = isValidSigned(csr, renewal);
         Map<String, String> attributes = parseCsrAttributes(certReq);
+
+        //@TODO  UZ POMOC OVOG NACI STARI SERTIFIKAT I STAVITI GA U ARHIVU.
+        String serialNumber = attributes.get("certSerialNumber");
 
         IssuerData issuerData= certificateService.findIssuerByAlias(attributes.get("issuerId"));
         PublicKey pk = certificateGeneratorService.toPublicKey(certReq.getSubjectPublicKeyInfo());

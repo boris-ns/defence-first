@@ -44,6 +44,7 @@ public class CertificateSigningRequestController {
         return ResponseEntity.ok().build();
     }
 
+
     @PostMapping(path = "/generate")
     @PreAuthorize("hasRole('agent')")
     public ResponseEntity generate(@RequestBody String csr) throws IOException, OperatorCreationException, PKCSException {
@@ -52,7 +53,7 @@ public class CertificateSigningRequestController {
     }
 
     @PostMapping(path = "/renewal")
-//    @PreAuthorize("hasRole('agent')")
+    @PreAuthorize("hasRole('agent')")
     public ResponseEntity renewAgentCertRequest(@RequestBody String csr) throws IOException, OperatorCreationException, PKCSException {
         csrService.addRenewRequest(csr);
         return ResponseEntity.ok().build();

@@ -92,7 +92,7 @@ public class CertificateServiceImpl implements CertificateService {
         // da prosledimo koji je SerialNumber o
         GeneralNames subjectAltName = null;
         GeneralName issuerSNName = new GeneralName(GeneralName.dNSName, issuerSerialNumber);
-        GeneralName myCertSerialNumber = new GeneralName(GeneralName.uniformResourceIdentifier, "aaa");
+        GeneralName myCertSerialNumber = new GeneralName(GeneralName.uniformResourceIdentifier, "1586209092785");
 
         if(renewal) {
             subjectAltName = new GeneralNames(new GeneralName[]{issuerSNName, myCertSerialNumber});
@@ -240,8 +240,7 @@ public class CertificateServiceImpl implements CertificateService {
     public String sendReplaceCertificateRequest(TokenDTO token) throws Exception {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        //@TODO: ODKOMENTARISATI
-//        headers.set("Authorization", "bearer " + token.getAccesss_token());
+        headers.set("Authorization", "bearer " + token.getAccesss_token());
 
 
         KeyPair pair = keyPairGeneratorService.generateKeyPair();
@@ -250,11 +249,12 @@ public class CertificateServiceImpl implements CertificateService {
         String csr = this.buildCertificateRequest(pair, privateKey, true);
 
         HttpEntity<String> entityReq = new HttpEntity<>(csr, headers);
-        ResponseEntity<String> certificate = null;
+        ResponseEntity<Void> certificate = null;
 
         try {
-            certificate = restTemplate.exchange(renewCertificate, HttpMethod.POST, entityReq, String.class);
+            certificate = restTemplate.exchange(renewCertificate, HttpMethod.POST, entityReq, Void.class);
         } catch (HttpClientErrorException e) {
+            System.out.println(e.fillInStackTrace());
             System.out.println("[ERROR] You are not allowed to make CSR request");
             return null;
         }
@@ -265,9 +265,9 @@ public class CertificateServiceImpl implements CertificateService {
         if (certificate.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
             token = authService.refreshToken(token.getRefresh_token());
             headers.set("Authorization", "bearer " + token.getAccesss_token());
-            certificate = restTemplate.exchange(renewCertificate, HttpMethod.POST, entityReq, String.class);
+            certificate = restTemplate.exchange(renewCertificate, HttpMethod.POST, entityReq, Void.class);
         }
-        return certificate.getBody();
+        return null;
     }
 
     public X509Certificate createSertificateForKeyPair(KeyPair keyPair) throws Exception{
