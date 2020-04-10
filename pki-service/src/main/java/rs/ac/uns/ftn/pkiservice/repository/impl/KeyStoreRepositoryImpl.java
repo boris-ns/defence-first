@@ -1,10 +1,9 @@
 package rs.ac.uns.ftn.pkiservice.repository.impl;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import rs.ac.uns.ftn.pkiservice.configuration.MyKeyStore;
 import rs.ac.uns.ftn.pkiservice.exception.exceptions.ApiRequestException;
@@ -17,10 +16,8 @@ import java.io.*;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 
 import static rs.ac.uns.ftn.pkiservice.constants.Constants.*;
 
@@ -30,6 +27,9 @@ public class KeyStoreRepositoryImpl implements KeyStoreRepository {
 
     @Autowired
     private MyKeyStore myKeyStore;
+
+    @Autowired @Qualifier("archiveKeyStore")
+    private KeyStore archiveKeyStore;
 
     @Override
     public IssuerData loadIssuer(String alias) throws KeyStoreException, CertificateException, NoSuchAlgorithmException,
@@ -151,4 +151,17 @@ public class KeyStoreRepositoryImpl implements KeyStoreRepository {
     public void saveKeyStore() throws IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException {
         myKeyStore.getKeystore().store(new FileOutputStream(KEYSTORE_FILE_PATH), KEYSTORE_PASSWORD);
     }
+
+    @Override
+    public void writeKeyEntryToArchive(String alias, PrivateKey privateKey, Certificate[] certificates) throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException {
+        archiveKeyStore.setKeyEntry(alias, privateKey, KEYSTORE_ARCHIVE_PASSWORD, certificates);
+        archiveKeyStore.store(new FileOutputStream(KEYSTORE_ARCHIVE_FILE_PATH), KEYSTORE_ARCHIVE_PASSWORD);
+    }
+
+    @Override
+    public void deleteEntry(String alias) throws KeyStoreException {
+        myKeyStore.getKeystore().deleteEntry(alias);
+    }
+
+
 }

@@ -32,4 +32,7 @@ public interface KeyStoreRepository {
 
     void saveKeyStore() throws IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException;
 
+    void writeKeyEntryToArchive(String alias, PrivateKey privateKey, Certificate[] certificates) throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException;
+
+    void deleteEntry(String alias) throws KeyStoreException;
 }

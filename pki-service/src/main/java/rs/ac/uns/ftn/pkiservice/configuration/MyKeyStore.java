@@ -42,7 +42,7 @@ public class MyKeyStore {
     @Autowired
     private KeyPairGeneratorService keyPairGeneratorService;
 
-    @Bean
+    @Bean(name = "keyStore")
     public KeyStore getKeystore(){
         try {
             KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
@@ -63,6 +63,34 @@ public class MyKeyStore {
 
                 keyStore.setKeyEntry(ROOT_ALIAS, kp.getPrivate(), KEYSTORE_PASSWORD, new Certificate[]{certificate});
                 keyStore.store(new FileOutputStream(KEYSTORE_FILE_PATH), KEYSTORE_PASSWORD);
+            }
+            return keyStore;
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Bean(name = "archiveKeyStore")
+    public KeyStore getArchiveKeyStore() {
+        try {
+            KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
+            File f = new File(KEYSTORE_ARCHIVE_FILE_PATH);
+            if (f.exists()) {
+                keyStore.load(new FileInputStream(f), KEYSTORE_ARCHIVE_PASSWORD);
+            } else {
+                keyStore.load(null, KEYSTORE_ARCHIVE_PASSWORD);
+                keyStore.store(new FileOutputStream(KEYSTORE_ARCHIVE_FILE_PATH), KEYSTORE_PASSWORD);
             }
             return keyStore;
         } catch (NoSuchAlgorithmException e) {
