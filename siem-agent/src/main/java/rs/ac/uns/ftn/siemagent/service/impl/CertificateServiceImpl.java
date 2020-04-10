@@ -115,13 +115,7 @@ public class CertificateServiceImpl implements CertificateService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        System.out.println(pair.getPublic());
-        System.out.println(stringWriter.toString());
-
-        String certificate = this.sendRequestForCertificate(stringWriter.toString(), token);
-        // @TODO upisati sertifikat i povezati ga sa napravljenim privatenim kljucem
-
+        this.sendRequestForCertificate(stringWriter.toString(), token);
         this.saveKeyPair(pair);
         return stringWriter.toString();
     }
@@ -148,9 +142,10 @@ public class CertificateServiceImpl implements CertificateService {
             headers.set("Authorization", "bearer " + token.getAccesss_token());
             certificate = restTemplate.exchange(createCertificateURL, HttpMethod.POST, entityReq, String.class);
         }
-
         return certificate.getBody();
     }
+
+
 
     @Override
     public X500Principal buildSertificateSubjetPrincipal() {
@@ -179,11 +174,6 @@ public class CertificateServiceImpl implements CertificateService {
         return false;
     }
 
-    private String sendRequestForCertificate(String csr) {
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> certificate = restTemplate.postForEntity(createCertificateURL, csr, String.class);
-        return certificate.getBody();
-    }
 
 
     public void saveKeyPair(KeyPair keyPair) throws Exception {
@@ -193,11 +183,31 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public X509Certificate getCertificateBySerialNumber(String serialNumber) throws Exception{
+    public X509Certificate getCertificateBySerialNumber(String serialNumber, TokenDTO token) throws Exception{
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> certificateStr = restTemplate.getForEntity(getCertificateURL + "/" + serialNumber, String.class);
 
-        PEMParser pemParser = new PEMParser(new StringReader(certificateStr.getBody()));
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "bearer " + token.getAccesss_token());
+        HttpEntity<String> entityReq = new HttpEntity<>(serialNumber, headers);
+        ResponseEntity<String> certificate = null;
+
+        try {
+            certificate = restTemplate.exchange(getCertificateURL + "/" + serialNumber, HttpMethod.POST, entityReq, String.class);
+        } catch (HttpClientErrorException e) {
+            System.out.println("[ERROR] You are not allowed to make check request");
+            return null;
+        }
+        // Ovo znaci da je istekao token, pa cemo refreshovati token
+        // i opet poslati zahtev
+        // @TODO: Nije testirano
+        if (certificate.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+            token = authService.refreshToken(token.getRefresh_token());
+            headers.set("Authorization", "bearer " + token.getAccesss_token());
+            certificate = restTemplate.exchange(getCertificateURL + "/" + serialNumber, HttpMethod.POST, entityReq, String.class);
+        }
+
+
+        PEMParser pemParser = new PEMParser(new StringReader(certificate.getBody()));
         X509CertificateHolder certificateHolder = (X509CertificateHolder) pemParser.readObject();
 
         JcaX509CertificateConverter certConverter = new JcaX509CertificateConverter();

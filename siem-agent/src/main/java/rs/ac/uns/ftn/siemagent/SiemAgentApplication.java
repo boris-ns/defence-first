@@ -38,12 +38,12 @@ public class SiemAgentApplication implements CommandLineRunner {
 			return;
 		}
 
-		String csr = certificateService.buildCertificateRequest(token);
+//		String csr = certificateService.buildCertificateRequest(token);
 
 		//@TODO moguce da spojimo u jednu metodu al ovakav proces treba da bude...
-		X509Certificate certificate = certificateService.getCertificateBySerialNumber("1586209092785");
+		X509Certificate certificate = certificateService.getCertificateBySerialNumber("1586209092785", token);
 		OCSPReq request = ocspService.generateOCSPRequest(certificate);
-		OCSPResp response = ocspService.sendOCSPRequest(request);
-		boolean val = ocspService.processOCSPResponse(request,response);
+		OCSPResp response = ocspService.sendOCSPRequest(request, token);
+		boolean val = ocspService.processOCSPResponse(request,response, token);
 	}
 }

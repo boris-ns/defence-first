@@ -16,12 +16,15 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import rs.ac.uns.ftn.siemagent.Constants.Constants;
 import rs.ac.uns.ftn.siemagent.config.AgentConfiguration;
 import rs.ac.uns.ftn.siemagent.config.CertificateBuilder;
+import rs.ac.uns.ftn.siemagent.dto.response.TokenDTO;
+import rs.ac.uns.ftn.siemagent.service.AuthService;
 import rs.ac.uns.ftn.siemagent.service.CertificateService;
 import rs.ac.uns.ftn.siemagent.service.OCSPService;
 
@@ -55,6 +58,9 @@ public class OCSPServiceImpl implements OCSPService {
 
     @Autowired
     private AgentConfiguration agentConfiguration;
+
+    @Autowired
+    private AuthService authService;
 
 
     @Override
@@ -93,23 +99,43 @@ public class OCSPServiceImpl implements OCSPService {
     }
 
     @Override
-    public OCSPResp sendOCSPRequest(OCSPReq ocspReq) throws Exception{
+    public OCSPResp sendOCSPRequest(OCSPReq ocspReq, TokenDTO token) throws Exception{
 
-        byte[] ocspBytes = ocspReq.getEncoded();
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<byte[]> ocspResponse = restTemplate.postForEntity(ocspReqURL, ocspBytes, byte[].class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "bearer " + token.getAccesss_token());
+        byte[] ocspBytes = ocspReq.getEncoded();
+        HttpEntity<byte[]> entityReq = new HttpEntity<>(ocspBytes, headers);
+        ResponseEntity<byte[]> ocspResponse = null;
+
+        try {
+            ocspResponse = restTemplate.exchange(ocspReqURL, HttpMethod.POST, entityReq, byte[].class);
+        } catch (HttpClientErrorException e) {
+            System.out.println("[ERROR] You are not allowed to make CSR request");
+            return null;
+        }
+
+        // Ovo znaci da je istekao token, pa cemo refreshovati token
+        // i opet poslati zahtev
+        // @TODO: Nije testirano
+        if (ocspResponse.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+            token = authService.refreshToken(token.getRefresh_token());
+            headers.set("Authorization", "bearer " + token.getAccesss_token());
+            ocspResponse = restTemplate.exchange(ocspReqURL, HttpMethod.POST, entityReq, byte[].class);
+        }
 
         OCSPResp ocspResp = new OCSPResp(OCSPResponse.getInstance(ocspResponse.getBody()));
         return ocspResp;
     }
 
-    public boolean processOCSPResponse(OCSPReq ocspReq, OCSPResp ocspResp) throws Exception {
+    @Override
+    public boolean processOCSPResponse(OCSPReq ocspReq, OCSPResp ocspResp, TokenDTO token) throws Exception {
         if(!(ocspResp.getStatus() == OCSPRespBuilder.SUCCESSFUL)){
             throw new Exception("ocspResp now good overall");
         }
         BasicOCSPResp basicResponse = (BasicOCSPResp)ocspResp.getResponseObject();
 
-        X509Certificate rootCA = certificateService.getCertificateBySerialNumber(rootCASerialNumber);
+        X509Certificate rootCA = certificateService.getCertificateBySerialNumber(rootCASerialNumber, token);
 
         ContentVerifierProvider prov = new JcaContentVerifierProviderBuilder().build(rootCA.getPublicKey());
         boolean signatureValid = basicResponse.isSignatureValid(prov);

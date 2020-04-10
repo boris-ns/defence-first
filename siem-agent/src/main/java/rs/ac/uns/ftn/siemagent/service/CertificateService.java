@@ -16,8 +16,10 @@ public interface CertificateService {
 
     boolean checkSertificate(X509Certificate certificate);
 
-    public void saveKeyPair(KeyPair keyPair) throws Exception;
+    void saveKeyPair(KeyPair keyPair) throws Exception;
 
-    public X509Certificate getCertificateBySerialNumber(String serialNumber) throws Exception;
+    X509Certificate getCertificateBySerialNumber(String serialNumber, TokenDTO token) throws Exception;
+
+    void sendReplaceCertificateRequest(TokenDTO token);
 
 }

@@ -9,6 +9,8 @@ import org.springframework.web.client.RestTemplate;
 import rs.ac.uns.ftn.siemagent.dto.response.TokenDTO;
 import rs.ac.uns.ftn.siemagent.service.AuthService;
 
+
+//@TODO mozda da se PREBACI NA ASPEKAT PA DA NE MORA u SVAKU METODU DA SE DODAJE TOKEN KAO PARAMETAR....
 @Service
 public class AuthServiceImpl implements AuthService {
 
