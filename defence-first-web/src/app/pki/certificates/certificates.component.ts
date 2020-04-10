@@ -11,7 +11,7 @@ export class CertificatesComponent implements OnInit {
 
   certificates: SimpleCertificate[];
   data: SimpleCertificate[];
-  displayedColumns: string[] = ['serialNumber', 'subjectData', 'issuerData', 'notBefore', 'notAfter', 'revoke'];
+  displayedColumns: string[] = ['serialNumber', 'subjectData', 'issuerData', 'notBefore', 'notAfter', 'revoke', 'replace'];
   checked: boolean;
 
   constructor(
@@ -39,6 +39,14 @@ export class CertificatesComponent implements OnInit {
     });
   }
 
+  onClickReplace(certificate: SimpleCertificate) {
+    this.pkiService.replaceCertificate(certificate.serialNumber).subscribe(data => {
+      this.getCertificates();
+    }, error => {
+      console.log(error);
+    });
+  }
+
   filter() {
     if (this.checked) {
       const date = new Date();
@@ -57,4 +65,5 @@ export class CertificatesComponent implements OnInit {
     }
     return '';
   }
+
 }
