@@ -39,23 +39,12 @@ public class OCSPServiceImpl implements OCSPService {
 
     @Autowired
     private RevokedCertificateRepository revokedCertificateRepository;
-
-    /*
-    *   responderKey: privatni kljuc OCSP Servera koji odgovara --> da to bude KLJUC CA root-a?
-    *       ---> koristi se da se POTPISE ODGOVOR...
-    *   PublicKey: ovo bi trebalo da je publicKey sertifikata za koji proveravamo..
-    *   CertificateID revokedID ---> treba kad povlacimo sertifikate da imamo ovakve u bazi
-    * */
-
     /*
     * da po nekoj ektenziji ili po name pronadjem koji je request i njegov lanaca da dobavimo
     *
     * onda se proveri potpis requesta, na osnovu requestorName-a..
     *
     * */
-
-    // @TODO: Da li se ovo uopste ovako radi ?
-
     @Override
     public OCSPResp generateOCSPResponse(OCSPReq request)
             throws OCSPException, OperatorCreationException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException {

@@ -7,14 +7,16 @@ import rs.ac.uns.ftn.pkiservice.models.CertificateSigningRequest;
 import rs.ac.uns.ftn.pkiservice.models.enums.CSRStatus;
 
 import java.io.IOException;
+import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
 public interface CertificateSigningRequestService {
 
     List<CertificateSigningRequest> findAllWaitingRequests();
-    PKCS10CertificationRequest isValidSigned(String pemString) throws PKCSException, IOException, OperatorCreationException;
+    PKCS10CertificationRequest isValidSigned(String pemString, Boolean renew) throws PKCSException, IOException, OperatorCreationException;
     void addRequest(String csr) throws PKCSException, IOException, OperatorCreationException;
+    void addRenewRequest(String csr) throws PKCSException, IOException, OperatorCreationException;
     void changeStatus(Long id, CSRStatus toStatus) throws Exception;
-    X509Certificate saveCertificateRequest(String csr) throws Exception;
+    X509Certificate saveCertificateRequest(String csr, Boolean renewal) throws Exception;
 }

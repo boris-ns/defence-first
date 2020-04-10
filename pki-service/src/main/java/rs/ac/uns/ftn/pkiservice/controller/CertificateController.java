@@ -39,13 +39,6 @@ public class CertificateController {
     @Autowired
     private CertificateService certificateService;
 
-    @Autowired
-    private CertificateGeneratorService certificateGeneratorService;
-
-    @Autowired
-    private CertificateSigningRequestService csrService;
-
-
     @GetMapping(path = "/all")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<List<SimpleCertificateDTO>> findAll() {
@@ -94,13 +87,6 @@ public class CertificateController {
         return new ResponseEntity<>(certificate.getSerialNumber().toString(), HttpStatus.OK);
     }
 
-    // Todo: mozda da se prebaci u csr kontroler?
-    @PostMapping(path = "/generate")
-    @PreAuthorize("hasRole('agent')")
-    public ResponseEntity generate(@RequestBody String csr) throws IOException, OperatorCreationException, PKCSException {
-        csrService.addRequest(csr);
-        return ResponseEntity.ok().build();
-    }
 
     @PutMapping(path = "/replace/{alias}")
     @PreAuthorize("hasRole('admin')")

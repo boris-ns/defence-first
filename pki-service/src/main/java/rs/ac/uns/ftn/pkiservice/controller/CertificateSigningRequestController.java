@@ -1,5 +1,7 @@
 package rs.ac.uns.ftn.pkiservice.controller;
 
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.pkcs.PKCSException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,7 @@ import rs.ac.uns.ftn.pkiservice.models.CertificateSigningRequest;
 import rs.ac.uns.ftn.pkiservice.models.enums.CSRStatus;
 import rs.ac.uns.ftn.pkiservice.service.CertificateSigningRequestService;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -38,6 +41,21 @@ public class CertificateSigningRequestController {
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity declineRequest(@PathVariable Long id) throws Exception{
         csrService.changeStatus(id, CSRStatus.DECLINED);
+        return ResponseEntity.ok().build();
+    }
+
+
+    @PostMapping(path = "/generate")
+    @PreAuthorize("hasRole('agent')")
+    public ResponseEntity generate(@RequestBody String csr) throws IOException, OperatorCreationException, PKCSException {
+        csrService.addRequest(csr);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(path = "/renewal")
+    @PreAuthorize("hasRole('agent')")
+    public ResponseEntity renewAgentCertRequest(@RequestBody String csr) throws IOException, OperatorCreationException, PKCSException {
+        csrService.addRenewRequest(csr);
         return ResponseEntity.ok().build();
     }
 }
