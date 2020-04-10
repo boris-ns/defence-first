@@ -47,6 +47,9 @@ public class OCSPServiceImpl implements OCSPService {
     @Value("${rootCASerialNumber}")
     private String rootCASerialNumber;
 
+    @Value("${mySerialNumber}")
+    private String mySerialNumber;
+
     @Autowired
     private Keystore keyStore;
 
@@ -67,8 +70,8 @@ public class OCSPServiceImpl implements OCSPService {
     public OCSPReq generateOCSPRequest(X509Certificate certificate, TokenDTO token)
             throws Exception {
 
-        //@TODO: issuerCert is still mocked
-        X509Certificate issuerCert = certificateService.getCertificateBySerialNumber("df.pki.root", token);
+        //@TODO: issuerCert is still mocked ---> AKO DOBAVIS LANAC ne MORAS OVO RADITI
+        X509Certificate issuerCert = certificateService.getCertificateBySerialNumber("1", token);
 
         BcDigestCalculatorProvider util = new BcDigestCalculatorProvider();
 
@@ -86,12 +89,15 @@ public class OCSPServiceImpl implements OCSPService {
 
         // dobavljanje privatnog kljuca i potpisivanje requesta
         JcaContentSignerBuilder builder = certificateBuilder.getBuilder();
+
+        // @TODO: Treba resiti problem kada se renewuje sertifikat jer se tada vise ne koristi
+        // KEY_PAIR_ALIAS vec onaj drugi za renew
         PrivateKey privateKey =  keyStore.readPrivateKey(Constants.KEY_PAIR_ALIAS, keyStorePassword);
         ContentSigner contentSigner = builder.build(privateKey);
 
         X500NameBuilder nameBuilder = new X500NameBuilder();
         nameBuilder.addRDN(BCStyle.CN, agentConfiguration.getName());
-        nameBuilder.addRDN(BCStyle.UNIQUE_IDENTIFIER, certificate.getSerialNumber().toString());
+        nameBuilder.addRDN(BCStyle.UNIQUE_IDENTIFIER, mySerialNumber);
         ocspGen.setRequestorName(nameBuilder.build());
 
         OCSPReq request = ocspGen.build(contentSigner, null);

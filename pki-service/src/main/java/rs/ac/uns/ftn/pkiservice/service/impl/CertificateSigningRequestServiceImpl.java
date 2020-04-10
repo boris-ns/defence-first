@@ -74,15 +74,14 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
         if (!renew) {
             prov = new JcaContentVerifierProviderBuilder().build(certReq.getSubjectPublicKeyInfo());
         }else {
-            //@TODO: Pronadji stari PublicKey i sa njim proveri potpis.. NECEEEE
-//            String serialNumber = attributes.get("certSerialNumber");
-//            X509Certificate certificate = certificateService.findCertificateByAlias(serialNumber);
-//            prov = new JcaContentVerifierProviderBuilder().build(certificate.getPublicKey());
+            String serialNumber = attributes.get("certSerialNumber");
+            X509Certificate certificate = certificateService.findCertificateByAlias(serialNumber);
+            prov = new JcaContentVerifierProviderBuilder().build(certificate.getPublicKey());
         }
 
-//        if (!certReq.isSignatureValid(prov)) {
-//            throw new ApiRequestException("CSR renewal is not valid");
-//        }
+        if (!certReq.isSignatureValid(prov)) {
+            throw new ApiRequestException("CSR renewal is not valid");
+        }
         return certReq;
     }
 
@@ -103,17 +102,16 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
         csrRepository.save(request);
     }
 
-    private Map<String, String> parseCsrAttributes(PKCS10CertificationRequest csr) throws IOException {
+    private Map<String, String> parseCsrAttributes(PKCS10CertificationRequest csr) {
         Map<String, String> result = new HashMap<>();
 
         String attrVal = null;
-        //@TODO: BOLJE CITATI KLJUCEVE
+        //@TODO: BOLJE CITATI KLJUCEVE od GenralNames
         String[] attNames = {"issuerId", "certSerialNumber"};
 
         Attribute[] attributes = csr.getAttributes(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest);
         for (Attribute attribute : attributes) {
             int i = 0;
-            System.out.println(attribute.getAttrType());
             for (ASN1Encodable values : attribute.getAttributeValues()) {
                 for(ASN1Encodable value : (DERSequence)values) {
                     DEROctetString oo = (DEROctetString) ((DERTaggedObject)value).getObject();

@@ -23,7 +23,7 @@ public class OCSPController {
     }
 
     @PostMapping(value = "/check")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('admin') or hasRole('agent')")
     public ResponseEntity<byte[]> checkIsCertificateRevoked(@RequestBody byte[] request) throws Exception{
         OCSPReq ocspReq = new OCSPReq(request);
         OCSPResp ocspResp = ocspService.generateOCSPResponse(ocspReq);

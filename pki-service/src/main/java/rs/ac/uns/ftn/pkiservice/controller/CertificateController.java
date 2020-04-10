@@ -56,21 +56,8 @@ public class CertificateController {
         return new ResponseEntity<>(certificateDTOS, HttpStatus.OK);
     }
 
-    // Todo: da li se ovo koristi?
-    // @TODO: CHANGE LATER!!!!!!
-    // Return DTO, not the object from database
-    @GetMapping(path = "/{id}")
-    public ResponseEntity<?> findById(@PathVariable String id, Principal a) {
-        System.out.println(a.getName());
-//        Certificate certificate = certificateService.findById(id);
-        return new ResponseEntity<>(null, HttpStatus.OK);
-    }
-
     @GetMapping(path = "/alias/{alias}")
-    public ResponseEntity<String> findByAlias(@PathVariable String alias) throws CertificateException,
-            UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException,
-            IOException {
-
+    public ResponseEntity<String> findByAlias(@PathVariable String alias) throws IOException {
         X509Certificate certificate = certificateService.findCertificateByAlias(alias);
         StringWriter sw = new StringWriter();
         JcaPEMWriter pm = new JcaPEMWriter(sw);
