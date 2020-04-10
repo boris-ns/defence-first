@@ -16,6 +16,7 @@ import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
+import rs.ac.uns.ftn.pkiservice.exception.exceptions.ApiRequestException;
 import rs.ac.uns.ftn.pkiservice.exception.exceptions.ResourceNotFoundException;
 import rs.ac.uns.ftn.pkiservice.models.RevokedCertificate;
 import rs.ac.uns.ftn.pkiservice.repository.KeyStoreRepository;
@@ -59,11 +60,11 @@ public class OCSPServiceImpl implements OCSPService {
 
         X509Certificate requestMaker = (X509Certificate)
                 keyStoreRepository.readCertificate(requestorCerticateSerialNumber);
-        //@TODO: ODKOMENTARISATI KAD BUDU lepo podesini LANICU U keySToru.
-//        ContentVerifierProvider prov = new JcaContentVerifierProviderBuilder().build(requestMaker.getPublicKey());
-//        if (!request.isSignatureValid(prov)) {
-//            throw  new ApiRequestException("bed request signature ");
-//        }
+
+        ContentVerifierProvider prov = new JcaContentVerifierProviderBuilder().build(requestMaker.getPublicKey());
+        if (!request.isSignatureValid(prov)) {
+            throw  new ApiRequestException("bed request signature ");
+        }
 
 
         X509Certificate rootCaCert = (X509Certificate) keyStoreRepository.readCertificate(Constants.ROOT_ALIAS);

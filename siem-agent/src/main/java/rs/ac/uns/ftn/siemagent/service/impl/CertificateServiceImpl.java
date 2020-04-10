@@ -31,12 +31,11 @@ import rs.ac.uns.ftn.siemagent.service.CertificateService;
 import rs.ac.uns.ftn.siemagent.service.KeyPairGeneratorService;
 
 import javax.security.auth.x500.X500Principal;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.PrivateKey;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.HashMap;
@@ -92,7 +91,7 @@ public class CertificateServiceImpl implements CertificateService {
         // da prosledimo koji je SerialNumber o
         GeneralNames subjectAltName = null;
         GeneralName issuerSNName = new GeneralName(GeneralName.dNSName, issuerSerialNumber);
-        GeneralName myCertSerialNumber = new GeneralName(GeneralName.uniformResourceIdentifier, "1586543156159");
+        GeneralName myCertSerialNumber = new GeneralName(GeneralName.uniformResourceIdentifier, "1586545031627");
 
         if(renewal) {
             subjectAltName = new GeneralNames(new GeneralName[]{issuerSNName, myCertSerialNumber});
@@ -210,10 +209,10 @@ public class CertificateServiceImpl implements CertificateService {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "bearer " + token.getAccesss_token());
         HttpEntity<String> entityReq = new HttpEntity<>(serialNumber, headers);
-        ResponseEntity<String> certificate = null;
+        ResponseEntity<byte[]> certificate = null;
 
         try {
-            certificate = restTemplate.exchange(getCertificateURL + "/" + serialNumber, HttpMethod.POST, entityReq, String.class);
+            certificate = restTemplate.exchange(getCertificateURL + "/" + serialNumber, HttpMethod.GET, entityReq, byte[].class);
         } catch (HttpClientErrorException e) {
             System.out.println("[ERROR] You are not allowed to make check request");
             return null;
@@ -224,16 +223,21 @@ public class CertificateServiceImpl implements CertificateService {
         if (certificate.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
             token = authService.refreshToken(token.getRefresh_token());
             headers.set("Authorization", "bearer " + token.getAccesss_token());
-            certificate = restTemplate.exchange(getCertificateURL + "/" + serialNumber, HttpMethod.POST, entityReq, String.class);
+            certificate = restTemplate.exchange(getCertificateURL + "/" + serialNumber, HttpMethod.GET, entityReq, byte[].class);
         }
 
 
-        PEMParser pemParser = new PEMParser(new StringReader(certificate.getBody()));
-        X509CertificateHolder certificateHolder = (X509CertificateHolder) pemParser.readObject();
+//        PEMParser pemParser = new PEMParser(new StringReader(certificate.getBody()));
+//        X509CertificateHolder certificateHolder = (X509CertificateHolder) pemParser.readObject();
 
-        JcaX509CertificateConverter certConverter = new JcaX509CertificateConverter();
-        certConverter = certConverter.setProvider("BC");
-        return certConverter.getCertificate(certificateHolder);
+        CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+        InputStream in = new ByteArrayInputStream(certificate.getBody());
+        X509Certificate cert = (X509Certificate) certFactory.generateCertificate(in);
+        return cert;
+
+//        JcaX509CertificateConverter certConverter = new JcaX509CertificateConverter();
+//        certConverter = certConverter.setProvider("BC");
+//        return certConverter.getCertificate(certificateHolder);
     }
 
     @Override

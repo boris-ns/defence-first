@@ -68,7 +68,7 @@ public class OCSPServiceImpl implements OCSPService {
             throws Exception {
 
         //@TODO: issuerCert is still mocked
-        X509Certificate issuerCert = certificateService.getCertificateBySerialNumber("df.pki.root", token);
+        X509Certificate issuerCert = certificateService.getCertificateBySerialNumber("1", token);
 
         BcDigestCalculatorProvider util = new BcDigestCalculatorProvider();
 
@@ -86,6 +86,9 @@ public class OCSPServiceImpl implements OCSPService {
 
         // dobavljanje privatnog kljuca i potpisivanje requesta
         JcaContentSignerBuilder builder = certificateBuilder.getBuilder();
+
+        // @TODO: Treba resiti problem kada se renewuje sertifikat jer se tada vise ne koristi
+        // KEY_PAIR_ALIAS vec onaj drugi za renew
         PrivateKey privateKey =  keyStore.readPrivateKey(Constants.KEY_PAIR_ALIAS, keyStorePassword);
         ContentSigner contentSigner = builder.build(privateKey);
 
