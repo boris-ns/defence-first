@@ -25,9 +25,9 @@ import rs.ac.uns.ftn.pkiservice.service.CertificateService;
 import rs.ac.uns.ftn.pkiservice.service.CertificateSigningRequestService;
 import rs.ac.uns.ftn.pkiservice.service.KeyPairGeneratorService;
 
+import java.security.KeyPair;
 import java.io.IOException;
 import java.io.StringReader;
-import java.security.KeyPair;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;

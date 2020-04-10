@@ -91,6 +91,16 @@ public class KeyStoreRepositoryImpl implements KeyStoreRepository {
     }
 
     @Override
+    public List<String> readAliases() {
+        KeyStore ks = myKeyStore.getKeystore();
+        try {
+            return Collections.list(ks.aliases());
+        } catch (KeyStoreException e) {
+            throw new ApiRequestException("Error while loading keystore");
+        }
+    }
+
+    @Override
     public List<Certificate[]> listChain() {
         KeyStore ks = myKeyStore.getKeystore();
         try {
@@ -133,8 +143,7 @@ public class KeyStoreRepositoryImpl implements KeyStoreRepository {
         KeyStore ks = myKeyStore.getKeystore();
 
         if (ks.isKeyEntry(alias)) {
-            PrivateKey pk = (PrivateKey) ks.getKey(alias, KEYSTORE_PASSWORD);
-            return pk;
+            return (PrivateKey) ks.getKey(alias, KEYSTORE_PASSWORD);
         }
         return null;
     }

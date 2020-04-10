@@ -7,7 +7,6 @@ import rs.ac.uns.ftn.pkiservice.models.CertificateSigningRequest;
 import rs.ac.uns.ftn.pkiservice.models.enums.CSRStatus;
 
 import java.io.IOException;
-import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
 

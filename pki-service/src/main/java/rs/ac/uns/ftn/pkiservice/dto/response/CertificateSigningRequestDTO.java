@@ -1,12 +1,14 @@
 package rs.ac.uns.ftn.pkiservice.dto.response;
 
 import rs.ac.uns.ftn.pkiservice.models.CertificateSigningRequest;
+import rs.ac.uns.ftn.pkiservice.models.enums.CSRStatus;
 
 public class CertificateSigningRequestDTO {
 
     private Long id;
     private String subjectName;
     private String issuerName;
+    private CSRStatus status;
 
     public CertificateSigningRequestDTO() {
     }
@@ -15,6 +17,7 @@ public class CertificateSigningRequestDTO {
         this.id = csr.getId();
         this.subjectName = csr.getSubjectName();
         this.issuerName = csr.getIssuerName();
+        this.status = csr.getStatus();
     }
 
     public Long getId() {
@@ -40,4 +43,8 @@ public class CertificateSigningRequestDTO {
     public void setIssuerName(String issuerName) {
         this.issuerName = issuerName;
     }
+
+    public CSRStatus getStatus() { return status; }
+
+    public void setStatus(CSRStatus status) { this.status = status; }
 }
