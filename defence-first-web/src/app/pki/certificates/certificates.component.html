@@ -39,7 +39,7 @@
     <ng-container matColumnDef="replace">
         <th mat-header-cell *matHeaderCellDef> Replace </th>
         <td mat-cell *matCellDef="let element">
-            <button mat-flat-button color="primary" (click)="onClickReplace(element)">Replace</button>
+            <button *ngIf="element.type != 'LEAF_CERT'" mat-flat-button color="primary" (click)="onClickReplace(element)">Replace</button>
         </td>
     </ng-container>
     

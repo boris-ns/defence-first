@@ -24,7 +24,8 @@ export class CertificatesComponent implements OnInit {
 
   private getCertificates() {
     this.pkiService.getCertificates().subscribe(
-      (data: SimpleCertificate[]) => {
+      (data: any[]) => {
+        console.log(data);
         this.certificates = data;
         this.filter();
       }

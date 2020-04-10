@@ -7,6 +7,10 @@ table {
     margin: 1%;
 }
 
+button {
+    margin: 2px !important;
+}
+
 tr:not(.header):not(.warning):hover {
     background: #EEEEEE;
 }

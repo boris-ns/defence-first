@@ -13,12 +13,13 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface CertificateService {
 
-    List<X509Certificate> findAll();
+    Map<Constants.CERT_TYPE, List<X509Certificate>> findAll();
 
-    List<SimpleCertificateDTO> findAllDto();
+    Map<String, Boolean> findAllRevoked();
 
     List<X500PrivateCredential> findAllRootAndIntermediate();
 
@@ -28,8 +29,6 @@ public interface CertificateService {
             KeyStoreException, IOException, UnrecoverableKeyException;
 
     X509Certificate generateCertificateIntermediate(HashMap<String, String> subjectName, String issuerAlias) throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, IOException;
-
-    Certificate getCertificateByAlias(String alias);
 
     Certificate[] getCertificateChainByAlias(String alias);
 

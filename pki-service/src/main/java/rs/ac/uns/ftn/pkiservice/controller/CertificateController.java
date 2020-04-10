@@ -29,7 +29,9 @@ import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -49,7 +51,15 @@ public class CertificateController {
     @GetMapping(path = "/all")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<List<SimpleCertificateDTO>> findAll() {
-        return new ResponseEntity<>(certificateService.findAllDto(), HttpStatus.OK);
+        Map<Constants.CERT_TYPE, List<X509Certificate>> certifictes = certificateService.findAll();
+        Map<String, Boolean> revoked = certificateService.findAllRevoked();
+        List<SimpleCertificateDTO> result = new ArrayList<>();
+        for (Constants.CERT_TYPE key : certifictes.keySet()) {
+            for (X509Certificate cert : certifictes.get(key)) {
+                result.add(new SimpleCertificateDTO(cert, revoked.get(cert.getSerialNumber().toString()), key));
+            }
+        }
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping(path = "/all/intermediate")
