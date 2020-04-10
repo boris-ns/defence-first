@@ -92,7 +92,7 @@ public class CertificateServiceImpl implements CertificateService {
         // da prosledimo koji je SerialNumber o
         GeneralNames subjectAltName = null;
         GeneralName issuerSNName = new GeneralName(GeneralName.dNSName, issuerSerialNumber);
-        GeneralName myCertSerialNumber = new GeneralName(GeneralName.uniformResourceIdentifier, "1586209092785");
+        GeneralName myCertSerialNumber = new GeneralName(GeneralName.uniformResourceIdentifier, "1586543156159");
 
         if(renewal) {
             subjectAltName = new GeneralNames(new GeneralName[]{issuerSNName, myCertSerialNumber});

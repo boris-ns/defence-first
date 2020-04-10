@@ -19,10 +19,13 @@ import rs.ac.uns.ftn.pkiservice.models.IssuerData;
 import rs.ac.uns.ftn.pkiservice.models.SubjectData;
 import rs.ac.uns.ftn.pkiservice.models.enums.CSRStatus;
 import rs.ac.uns.ftn.pkiservice.repository.CertificateSigningRequestRepository;
+import rs.ac.uns.ftn.pkiservice.repository.KeyStoreRepository;
 import rs.ac.uns.ftn.pkiservice.service.CertificateGeneratorService;
 import rs.ac.uns.ftn.pkiservice.service.CertificateService;
 import rs.ac.uns.ftn.pkiservice.service.CertificateSigningRequestService;
+import rs.ac.uns.ftn.pkiservice.service.KeyPairGeneratorService;
 
+import java.security.KeyPair;
 import java.io.IOException;
 import java.io.StringReader;
 import java.security.PublicKey;
@@ -44,10 +47,20 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
     @Autowired
     private CertificateGeneratorService certificateGeneratorService;
 
+    @Autowired
+    private KeyStoreRepository keyStoreRepository;
+
+    @Autowired
+    private KeyPairGeneratorService keyPairGeneratorService;
+
 
     @Override
     public List<CertificateSigningRequest> findAllWaitingRequests() {
-        return csrRepository.findByStatus(CSRStatus.WAITING);
+        List<CertificateSigningRequest> waitingRequests = csrRepository.findByStatus(CSRStatus.WAITING);
+        List<CertificateSigningRequest> renewalRequests = csrRepository.findByStatus(CSRStatus.WAITING_RENEWAL);
+
+        waitingRequests.addAll(renewalRequests);
+        return waitingRequests;
     }
 
     @Override
@@ -113,15 +126,20 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
         return result;
     }
 
-    //@TODO: ARIIVITI STARI i A SACUVATI OVAJ NOVI!!!!
     @Override
     public X509Certificate saveCertificateRequest(String csr, Boolean renewal) throws Exception {
-
         PKCS10CertificationRequest certReq = isValidSigned(csr, renewal);
         Map<String, String> attributes = parseCsrAttributes(certReq);
-
-        //@TODO  UZ POMOC OVOG NACI STARI SERTIFIKAT I STAVITI GA U ARHIVU.
         String serialNumber = attributes.get("certSerialNumber");
+
+        if (renewal) {
+            Certificate oldCertificate = keyStoreRepository.readCertificate(serialNumber);
+
+            // Generisi novi par kljuceva samo da moze da se sacuva u keystore.
+            // @TODO: Da li je pametno ovo ovako raditi ?
+            KeyPair pair = keyPairGeneratorService.generateKeyPair();
+            keyStoreRepository.writeKeyEntryToArchive(serialNumber, pair.getPrivate(), new Certificate[] { oldCertificate });
+        }
 
         IssuerData issuerData= certificateService.findIssuerByAlias(attributes.get("issuerId"));
         PublicKey pk = certificateGeneratorService.toPublicKey(certReq.getSubjectPublicKeyInfo());
@@ -129,6 +147,9 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
         X509Certificate newCert = certificateGeneratorService.generateCertificate(subData,issuerData, Constants.CERT_TYPE.LEAF_CERT);
         Certificate[] certificates = certificateService.createChain(attributes.get("issuerId"), newCert);
         // stavljeno da se cuva sa pk od issuera u sustini taj kljuc nam ne sluzi ni za st, ali mora neki da se prosledi
+
+        keyStoreRepository.deleteEntry(serialNumber);
+
         certificateService.writeCertificateToKeyStore(newCert.getSerialNumber().toString(), certificates,
                 issuerData.getPrivateKey());
         return newCert;
@@ -139,15 +160,16 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
         CertificateSigningRequest csr = csrRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("CSR with id " + id + " doesn't exist"));
 
-        if (!csr.getStatus().equals(CSRStatus.WAITING) || !csr.getStatus().equals(CSRStatus.WAITING_RENEWAL)) {
+        if (!csr.getStatus().equals(CSRStatus.WAITING) && !csr.getStatus().equals(CSRStatus.WAITING_RENEWAL)) {
             throw new ApiRequestException("You can't change status for this CSR");
         }
 
+        CSRStatus prevState = csr.getStatus();
         csr.setStatus(toStatus);
         csrRepository.save(csr);
 
         if (toStatus.equals(CSRStatus.APPROVED)) {
-            saveCertificateRequest(csr.getCsr(), csr.getStatus() == CSRStatus.WAITING_RENEWAL);
+            saveCertificateRequest(csr.getCsr(), prevState == CSRStatus.WAITING_RENEWAL);
         }
     }
 }
