@@ -106,13 +106,12 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
         Map<String, String> result = new HashMap<>();
 
         String attrVal = null;
-        //@TODO: BOLJE CITATI KLJUCEVE
+        //@TODO: BOLJE CITATI KLJUCEVE od GenralNames
         String[] attNames = {"issuerId", "certSerialNumber"};
 
         Attribute[] attributes = csr.getAttributes(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest);
         for (Attribute attribute : attributes) {
             int i = 0;
-            System.out.println(attribute.getAttrType());
             for (ASN1Encodable values : attribute.getAttributeValues()) {
                 for(ASN1Encodable value : (DERSequence)values) {
                     DEROctetString oo = (DEROctetString) ((DERTaggedObject)value).getObject();

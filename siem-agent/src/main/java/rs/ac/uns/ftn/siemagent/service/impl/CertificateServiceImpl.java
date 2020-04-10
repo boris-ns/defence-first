@@ -84,10 +84,7 @@ public class CertificateServiceImpl implements CertificateService {
         JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder("SHA256withRSA");
         ContentSigner signer = null;
 
-        // @TODO: Dodati atribute sa komandom kao ispod, valjda
-        //
-
-
+        //@TODO: dodati jos atributa ako zatreba
         // da prosledimo koji je SerialNumber o
         GeneralNames subjectAltName = null;
         GeneralName issuerSNName = new GeneralName(GeneralName.dNSName, issuerSerialNumber);
@@ -209,10 +206,10 @@ public class CertificateServiceImpl implements CertificateService {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "bearer " + token.getAccesss_token());
         HttpEntity<String> entityReq = new HttpEntity<>(serialNumber, headers);
-        ResponseEntity<byte[]> certificate = null;
+        ResponseEntity<String> certificate = null;
 
         try {
-            certificate = restTemplate.exchange(getCertificateURL + "/" + serialNumber, HttpMethod.GET, entityReq, byte[].class);
+            certificate = restTemplate.exchange(getCertificateURL + "/" + serialNumber, HttpMethod.GET, entityReq, String.class);
         } catch (HttpClientErrorException e) {
             System.out.println("[ERROR] You are not allowed to make check request");
             return null;
@@ -223,21 +220,21 @@ public class CertificateServiceImpl implements CertificateService {
         if (certificate.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
             token = authService.refreshToken(token.getRefresh_token());
             headers.set("Authorization", "bearer " + token.getAccesss_token());
-            certificate = restTemplate.exchange(getCertificateURL + "/" + serialNumber, HttpMethod.GET, entityReq, byte[].class);
+            certificate = restTemplate.exchange(getCertificateURL + "/" + serialNumber, HttpMethod.GET, entityReq, String.class);
         }
 
 
-//        PEMParser pemParser = new PEMParser(new StringReader(certificate.getBody()));
-//        X509CertificateHolder certificateHolder = (X509CertificateHolder) pemParser.readObject();
+        PEMParser pemParser = new PEMParser(new StringReader(certificate.getBody()));
+        X509CertificateHolder certificateHolder = (X509CertificateHolder) pemParser.readObject();
 
-        CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
-        InputStream in = new ByteArrayInputStream(certificate.getBody());
-        X509Certificate cert = (X509Certificate) certFactory.generateCertificate(in);
-        return cert;
+//        CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+//        InputStream in = new ByteArrayInputStream(certificate.getBody());
+//        X509Certificate cert = (X509Certificate) certFactory.generateCertificate(in);
+//        return cert;
 
-//        JcaX509CertificateConverter certConverter = new JcaX509CertificateConverter();
-//        certConverter = certConverter.setProvider("BC");
-//        return certConverter.getCertificate(certificateHolder);
+        JcaX509CertificateConverter certConverter = new JcaX509CertificateConverter();
+        certConverter = certConverter.setProvider("BC");
+        return certConverter.getCertificate(certificateHolder);
     }
 
     @Override
