@@ -139,6 +139,7 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
             // @TODO: Da li je pametno ovo ovako raditi ?
             KeyPair pair = keyPairGeneratorService.generateKeyPair();
             keyStoreRepository.writeKeyEntryToArchive(serialNumber, pair.getPrivate(), new Certificate[] { oldCertificate });
+            keyStoreRepository.deleteEntry(serialNumber);
         }
 
         IssuerData issuerData= certificateService.findIssuerByAlias(attributes.get("issuerId"));
@@ -147,8 +148,6 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
         X509Certificate newCert = certificateGeneratorService.generateCertificate(subData,issuerData, Constants.CERT_TYPE.LEAF_CERT);
         Certificate[] certificates = certificateService.createChain(attributes.get("issuerId"), newCert);
         // stavljeno da se cuva sa pk od issuera u sustini taj kljuc nam ne sluzi ni za st, ali mora neki da se prosledi
-
-        keyStoreRepository.deleteEntry(serialNumber);
 
         certificateService.writeCertificateToKeyStore(newCert.getSerialNumber().toString(), certificates,
                 issuerData.getPrivateKey());
