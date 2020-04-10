@@ -4,6 +4,7 @@ export interface SimpleCertificate {
     serialNumber: number;
     notBefore: Date;
     notAfter: Date;
+    revoked: boolean;
     type: Type;
 }
 

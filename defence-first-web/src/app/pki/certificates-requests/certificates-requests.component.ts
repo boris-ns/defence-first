@@ -10,7 +10,7 @@ import { CertificateRequest } from 'src/app/models/certificate-request.model';
 export class CertificatesRequestsComponent implements OnInit {
 
   certificates: CertificateRequest[];
-  displayedColumns: string[] = ['id', 'subjectName', 'issuerName', 'approve', 'decline'];
+  displayedColumns: string[] = ['id', 'subjectName', 'issuerName', 'type', 'approve', 'decline'];
 
   constructor(
     private pkiService: PkiServiceService

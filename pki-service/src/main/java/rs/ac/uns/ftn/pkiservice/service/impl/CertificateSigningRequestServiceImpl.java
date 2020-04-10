@@ -22,11 +22,9 @@ import rs.ac.uns.ftn.pkiservice.repository.CertificateSigningRequestRepository;
 import rs.ac.uns.ftn.pkiservice.service.CertificateGeneratorService;
 import rs.ac.uns.ftn.pkiservice.service.CertificateService;
 import rs.ac.uns.ftn.pkiservice.service.CertificateSigningRequestService;
-import sun.security.x509.GeneralNames;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.security.KeyStore;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;

@@ -1,11 +1,6 @@
 package rs.ac.uns.ftn.pkiservice.controller;
 
-import org.apache.tomcat.jni.BIOCallback;
-import org.bouncycastle.cert.crmf.CRMFException;
-import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.pkcs.PKCSException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,18 +9,14 @@ import org.springframework.web.bind.annotation.*;
 
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
 import rs.ac.uns.ftn.pkiservice.dto.response.CertificateIssuerDTO;
-import rs.ac.uns.ftn.pkiservice.dto.response.CertificateRequestDTO;
 import rs.ac.uns.ftn.pkiservice.dto.response.CreateCertificateDTO;
-import rs.ac.uns.ftn.pkiservice.service.CertificateGeneratorService;
 import rs.ac.uns.ftn.pkiservice.dto.response.SimpleCertificateDTO;
 import rs.ac.uns.ftn.pkiservice.mapper.CertificateMapper;
 import rs.ac.uns.ftn.pkiservice.service.CertificateService;
-import rs.ac.uns.ftn.pkiservice.service.CertificateSigningRequestService;
 
 import javax.security.auth.x500.X500PrivateCredential;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;

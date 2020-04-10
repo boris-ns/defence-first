@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
-import rs.ac.uns.ftn.pkiservice.dto.response.SimpleCertificateDTO;
 import rs.ac.uns.ftn.pkiservice.exception.exceptions.ResourceNotFoundException;
 import rs.ac.uns.ftn.pkiservice.models.IssuerData;
 import rs.ac.uns.ftn.pkiservice.models.SubjectData;
@@ -27,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static rs.ac.uns.ftn.pkiservice.constants.Constants.ROOT_ALIAS;
 
