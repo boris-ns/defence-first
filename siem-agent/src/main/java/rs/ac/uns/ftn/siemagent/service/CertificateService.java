@@ -6,20 +6,23 @@ import javax.security.auth.x500.X500Principal;
 import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyStoreException;
+import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
 public interface CertificateService {
 
-    String buildCertificateRequest(TokenDTO token) throws Exception;
+    String buildCertificateRequest(KeyPair certKeyPair, PrivateKey signCerPrivateKey, Boolean renewal) throws Exception;
 
     X500Principal buildSertificateSubjetPrincipal();
 
     boolean checkSertificate(X509Certificate certificate);
 
-    void saveKeyPair(KeyPair keyPair) throws Exception;
+    void saveKeyPair(KeyPair keyPair, Boolean renewal) throws Exception;
 
     X509Certificate getCertificateBySerialNumber(String serialNumber, TokenDTO token) throws Exception;
 
-    void sendReplaceCertificateRequest(TokenDTO token);
+    String sendReplaceCertificateRequest(TokenDTO token) throws Exception;
+
+    String sendRequestForCertificate(TokenDTO token) throws Exception;
 
 }

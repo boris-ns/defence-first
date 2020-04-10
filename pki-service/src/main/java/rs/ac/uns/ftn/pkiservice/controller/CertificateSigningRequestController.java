@@ -50,4 +50,11 @@ public class CertificateSigningRequestController {
         csrService.addRequest(csr);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping(path = "/renewal")
+//    @PreAuthorize("hasRole('agent')")
+    public ResponseEntity renewAgentCertRequest(@RequestBody String csr) throws IOException, OperatorCreationException, PKCSException {
+        csrService.addRenewRequest(csr);
+        return ResponseEntity.ok().build();
+    }
 }

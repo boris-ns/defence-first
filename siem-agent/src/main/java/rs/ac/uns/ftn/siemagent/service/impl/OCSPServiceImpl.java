@@ -64,11 +64,11 @@ public class OCSPServiceImpl implements OCSPService {
 
 
     @Override
-    public OCSPReq generateOCSPRequest(X509Certificate certificate)
+    public OCSPReq generateOCSPRequest(X509Certificate certificate, TokenDTO token)
             throws Exception {
 
         //@TODO: issuerCert is still mocked
-        X509Certificate issuerCert = certificateService.getCertificateBySerialNumber("df.pki.root");
+        X509Certificate issuerCert = certificateService.getCertificateBySerialNumber("df.pki.root", token);
 
         BcDigestCalculatorProvider util = new BcDigestCalculatorProvider();
 

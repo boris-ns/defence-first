@@ -55,22 +55,38 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
     }
 
     @Override
-    public PKCS10CertificationRequest isValidSigned(String csr) throws PKCSException, IOException, OperatorCreationException{
+    public PKCS10CertificationRequest isValidSigned(String csr, Boolean renew) throws PKCSException, IOException, OperatorCreationException{
         PEMParser pm = new PEMParser(new StringReader(csr));
         PKCS10CertificationRequest certReq = (PKCS10CertificationRequest) pm.readObject();
-        ContentVerifierProvider prov = new JcaContentVerifierProviderBuilder().build(certReq.getSubjectPublicKeyInfo());
 
-        if (!certReq.isSignatureValid(prov)) {
-            throw new ApiRequestException("CSR is not valid");
+        ContentVerifierProvider prov = null;
+        if (!renew) {
+            prov = new JcaContentVerifierProviderBuilder().build(certReq.getSubjectPublicKeyInfo());
+        }else {
+            //@TODO: Pronadji stari PublicKey i sa njim proveri potpis..
+            prov = new JcaContentVerifierProviderBuilder().build(certReq.getSubjectPublicKeyInfo());
         }
+
+//        if (!certReq.isSignatureValid(prov)) {
+//            throw new ApiRequestException("CSR is not valid");
+//        }
         return certReq;
     }
 
     @Override
     public void addRequest(String csr) throws PKCSException, IOException, OperatorCreationException {
-        PKCS10CertificationRequest certReq = isValidSigned(csr);
+        PKCS10CertificationRequest certReq = isValidSigned(csr, false);
         Map<String, String> attributes = this.parseCsrAttributes(certReq);
         CertificateSigningRequest request = new CertificateSigningRequest(csr, certReq.getSubject().toString(), attributes.get("issuerId"));
+        csrRepository.save(request);
+    }
+
+    @Override
+    public void addRenewRequest(String csr) throws PKCSException, IOException, OperatorCreationException {
+        PKCS10CertificationRequest certReq = isValidSigned(csr, true);
+        Map<String, String> attributes = this.parseCsrAttributes(certReq);
+        CertificateSigningRequest request = new CertificateSigningRequest(csr, certReq.getSubject().toString(), attributes.get("issuerId"));
+        request.setStatus(CSRStatus.WAITING_RENEWAL);
         csrRepository.save(request);
     }
 
@@ -81,6 +97,7 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
 
         Attribute[] attributes = csr.getAttributes(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest);
         for (Attribute attribute : attributes) {
+            System.out.println(attribute.getAttrType());
             for (ASN1Encodable value : attribute.getAttributeValues()) {
                 DEROctetString oo = (DEROctetString) ((DERTaggedObject) ((DERSequence)value).getObjectAt(0)).getObject();
                 issuerId = new String(oo.getOctets());
@@ -94,9 +111,9 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
     }
 
     @Override
-    public X509Certificate saveCertificateRequest(String csr) throws Exception {
+    public X509Certificate saveCertificateRequest(String csr, Boolean renewal) throws Exception {
 
-        PKCS10CertificationRequest certReq = isValidSigned(csr);
+        PKCS10CertificationRequest certReq = isValidSigned(csr, renewal);
         Map<String, String> attributes = parseCsrAttributes(certReq);
 
         IssuerData issuerData= certificateService.findIssuerByAlias(attributes.get("issuerId"));
@@ -115,7 +132,7 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
         CertificateSigningRequest csr = csrRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("CSR with id " + id + " doesn't exist"));
 
-        if (!csr.getStatus().equals(CSRStatus.WAITING)) {
+        if (!csr.getStatus().equals(CSRStatus.WAITING) || !csr.getStatus().equals(CSRStatus.WAITING_RENEWAL)) {
             throw new ApiRequestException("You can't change status for this CSR");
         }
 
@@ -123,7 +140,7 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
         csrRepository.save(csr);
 
         if (toStatus.equals(CSRStatus.APPROVED)) {
-            saveCertificateRequest(csr.getCsr());
+            saveCertificateRequest(csr.getCsr(), csr.getStatus() == CSRStatus.WAITING_RENEWAL);
         }
     }
 }
