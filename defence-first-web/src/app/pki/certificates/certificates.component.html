@@ -29,7 +29,7 @@
     </ng-container>
 
     <ng-container matColumnDef="revoke">
-        <th mat-header-cell *matHeaderCellDef> Revoke </th>
+        <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let element">
             <button *ngIf="!element.revoked" mat-flat-button color="primary" (click)="onClickRevoke(element)">Revoke</button>
             <p *ngIf="element.revoked">Revoked</p>
@@ -37,9 +37,9 @@
     </ng-container>
 
     <ng-container matColumnDef="replace">
-        <th mat-header-cell *matHeaderCellDef> Replace </th>
+        <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let element">
-            <button mat-flat-button color="primary" (click)="onClickReplace(element)">Replace</button>
+            <button *ngIf="element.type != 'LEAF_CERT'" mat-flat-button color="primary" (click)="onClickReplace(element)">Renewal</button>
         </td>
     </ng-container>
     

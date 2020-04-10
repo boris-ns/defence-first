@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
-import rs.ac.uns.ftn.pkiservice.dto.response.SimpleCertificateDTO;
 import rs.ac.uns.ftn.pkiservice.exception.exceptions.ResourceNotFoundException;
 import rs.ac.uns.ftn.pkiservice.models.IssuerData;
 import rs.ac.uns.ftn.pkiservice.models.SubjectData;
@@ -23,9 +22,10 @@ import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 import static rs.ac.uns.ftn.pkiservice.constants.Constants.ROOT_ALIAS;
 
@@ -45,21 +45,34 @@ public class CertificateServiceImpl implements CertificateService {
     private RevokedCertificateRepository ocspRepository;
 
     @Override
-    public List<X509Certificate> findAll() {
+    public Map<Constants.CERT_TYPE, List<X509Certificate>> findAll() {
         List<Certificate> certificateList = keyStoreRepository.readAll();
-        return certificateList.stream().map(X509Certificate.class::cast).collect(Collectors.toList());
+        Map<Constants.CERT_TYPE, List<X509Certificate>> certificateMap = new HashMap<>();
+        Constants.CERT_TYPE type;
+        for (Certificate c: certificateList){
+            X509Certificate certificate = (X509Certificate) c;
+            if(certificate.getSerialNumber().toString().equals(ROOT_ALIAS)){
+                type = Constants.CERT_TYPE.ROOT_CERT;
+            }else if(certificate.getKeyUsage()[5] && certificate.getKeyUsage()[6]){
+                type = Constants.CERT_TYPE.INTERMEDIATE_CERT;
+            }else {
+                type = Constants.CERT_TYPE.LEAF_CERT;
+            }
+            ArrayList<X509Certificate> list = (ArrayList<X509Certificate>) certificateMap.getOrDefault(type, new ArrayList<>());
+            list.add(certificate);
+            certificateMap.put(type, list);
+        }
+        return certificateMap;
     }
 
     @Override
-    public List<SimpleCertificateDTO> findAllDto() {
-        List<X509Certificate> certificates = this.findAll();
-
-        return certificates.stream()
-                .map(cert -> {
-                    boolean revoked = ocspRepository.findBySerialNumber(cert.getSerialNumber().toString()).isPresent();
-                    return new SimpleCertificateDTO(cert, revoked);
-                })
-                .collect(Collectors.toList());
+    public Map<String, Boolean> findAllRevoked() {
+        List<String> aliases = keyStoreRepository.readAliases();
+        Map<String, Boolean> revokedMap = new HashMap<>();
+        for (String alias: aliases) {
+            revokedMap.put(alias, ocspRepository.findBySerialNumber(alias).isPresent());
+        }
+        return revokedMap;
     }
 
     @Override
@@ -76,11 +89,6 @@ public class CertificateServiceImpl implements CertificateService {
     public IssuerData findIssuerByAlias(String alias) throws NoSuchAlgorithmException, CertificateException,
             KeyStoreException, IOException, UnrecoverableKeyException {
         return keyStoreRepository.loadIssuer(alias);
-    }
-
-    @Override
-    public Certificate getCertificateByAlias(String alias) {
-        return keyStoreRepository.readCertificate(alias);
     }
 
     @Override
