@@ -1,0 +1,13 @@
+instalacija sertifikata
+za windows
+Double click on the certificate (server.crt)
+Click on the button “Install Certificate …”
+Select whether you want to store it on user level or on machine level
+Click “Next”
+Select “Place all certificates in the following store”
+Click “Browse”
+Select “Trusted Root Certification Authorities”
+Click “Ok”
+Click “Next”
+Click “Finish”
+If you get a prompt, click “Yes”
