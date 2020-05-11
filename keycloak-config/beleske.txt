@@ -1,0 +1,7 @@
+Exportovanje konfiguracije:
+standalone.sh -Dkeycloak.migration.action=export
+-Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=defence-first-keycloak-configuration.json
+
+Importovanje konfiguracije:
+standalone.sh -Dkeycloak.migration.action=import
+-Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=defence-first-keycloak-configuration.json
