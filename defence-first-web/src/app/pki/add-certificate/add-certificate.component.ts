@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { PkiServiceService } from 'src/app/services/pki-service.service';
+import { PkiServiceService } from 'src/app/services/pki-service/pki-service.service';
 import { CertificateCreate, Name } from 'src/app/models/certificate-create.model';
 import { CERTIFICATES_PATH } from 'src/app/config/router-paths';
 import { Router } from '@angular/router';

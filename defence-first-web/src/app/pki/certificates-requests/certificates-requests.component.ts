@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { PkiServiceService } from 'src/app/services/pki-service.service';
+import { PkiServiceService } from 'src/app/services/pki-service/pki-service.service';
 import { CertificateRequest } from 'src/app/models/certificate-request.model';
 
 @Component({

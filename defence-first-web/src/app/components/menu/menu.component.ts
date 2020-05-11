@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { KeycloakService } from 'keycloak-angular';
-import { PkiServiceService } from 'src/app/services/pki-service.service';
+import { PkiServiceService } from 'src/app/services/pki-service/pki-service.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 import { CERTIFICATES_PATH, ADD_PATH, REQUEST_PATH } from 'src/app/config/router-paths';
@@ -34,26 +34,6 @@ export class MenuComponent implements OnInit {
 
   addCertificates() {
     this.router.navigate([CERTIFICATES_PATH, ADD_PATH]);
-  }
-
-  getSertificates() {
-    this.pkiService.getCertificatByAlias('df.pki.root').subscribe(
-      res => {
-        console.log(res);
-      }
-    );
-    // this.pkiService.generateCertificat().subscribe(
-    //   res => {
-    //     console.log(res);
-    //   }
-    // );
-
-    // this.pkiService.checkCrlList(1).subscribe(res => {
-    //   console.log(res);
-    // },
-    // (err: HttpErrorResponse) => {
-    //   console.log(err.message);
-    // });
   }
 
   logOut() {
