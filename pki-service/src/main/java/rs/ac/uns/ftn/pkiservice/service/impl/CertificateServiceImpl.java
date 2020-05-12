@@ -17,6 +17,7 @@ import rs.ac.uns.ftn.pkiservice.service.CertificateService;
 import rs.ac.uns.ftn.pkiservice.service.KeyPairGeneratorService;
 
 import javax.security.auth.x500.X500PrivateCredential;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.*;
 import java.security.cert.Certificate;
@@ -219,4 +220,15 @@ public class CertificateServiceImpl implements CertificateService {
             }
         }
     }
+
+
+    @Override
+    public void writeCertToFile(String serialNumber, String certFilePath) throws Exception {
+        X509Certificate cert = this.findCertificateByAlias(serialNumber);
+        try (FileOutputStream stream = new FileOutputStream(certFilePath)) {
+            stream.write(cert.getEncoded());
+        }
+    }
+
+
 }

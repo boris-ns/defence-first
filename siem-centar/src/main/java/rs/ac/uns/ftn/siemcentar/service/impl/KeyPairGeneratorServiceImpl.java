@@ -1,10 +1,8 @@
-package rs.ac.uns.ftn.siemagent.service.impl;
+package rs.ac.uns.ftn.siemcentar.service.impl;
 
 import org.springframework.stereotype.Service;
-import rs.ac.uns.ftn.siemagent.service.KeyPairGeneratorService;
+import rs.ac.uns.ftn.siemcentar.service.KeyPairGeneratorService;
 
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 import java.security.*;
 
 @Service
@@ -23,13 +21,5 @@ public class KeyPairGeneratorServiceImpl implements KeyPairGeneratorService {
             e.printStackTrace();
         }
         return null;
-    }
-
-    @Override
-    public SecretKey generateSimetricKey() throws NoSuchAlgorithmException {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-        keyGenerator.init(256, new SecureRandom());
-        SecretKey key = keyGenerator.generateKey();
-        return key;
     }
 }

@@ -37,4 +37,8 @@ public interface CertificateService {
 
     void replace(String alias) throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException,
             KeyStoreException, IOException;
+
+
+    void writeCertToFile(String serialNumber, String certFilePath) throws Exception;
+
 }
