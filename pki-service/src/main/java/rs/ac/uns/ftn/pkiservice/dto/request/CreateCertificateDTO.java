@@ -1,10 +1,14 @@
-package rs.ac.uns.ftn.pkiservice.dto.response;
+package rs.ac.uns.ftn.pkiservice.dto.request;
 
+import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 
 public class CreateCertificateDTO {
 
+    @NotNull(message = "Subject name is required")
     private HashMap<String, String> subjectName;
+
+    @NotNull(message = "Issuer alias is required")
     private String issuerAlias;
 
     public CreateCertificateDTO(HashMap<String, String> subjectName, String issuerAlias) {

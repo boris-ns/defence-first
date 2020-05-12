@@ -4,6 +4,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCSException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -45,14 +46,14 @@ public class CertificateSigningRequestController {
     }
 
 
-    @PostMapping(path = "/generate")
+    @PostMapping(path = "/generate", consumes = MediaType.TEXT_PLAIN_VALUE)
     @PreAuthorize("hasRole('agent')")
     public ResponseEntity generate(@RequestBody String csr) throws IOException, OperatorCreationException, PKCSException {
         csrService.addRequest(csr);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping(path = "/renewal")
+    @PostMapping(path = "/renewal", consumes = MediaType.TEXT_PLAIN_VALUE)
     @PreAuthorize("hasRole('agent')")
     public ResponseEntity renewAgentCertRequest(@RequestBody String csr) throws IOException, OperatorCreationException, PKCSException {
         csrService.addRenewRequest(csr);

@@ -3,18 +3,20 @@ package rs.ac.uns.ftn.pkiservice.controller;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
 import rs.ac.uns.ftn.pkiservice.dto.response.CertificateIssuerDTO;
-import rs.ac.uns.ftn.pkiservice.dto.response.CreateCertificateDTO;
+import rs.ac.uns.ftn.pkiservice.dto.request.CreateCertificateDTO;
 import rs.ac.uns.ftn.pkiservice.dto.response.SimpleCertificateDTO;
 import rs.ac.uns.ftn.pkiservice.mapper.CertificateMapper;
 import rs.ac.uns.ftn.pkiservice.service.CertificateService;
 
 import javax.security.auth.x500.X500PrivateCredential;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.security.*;
@@ -66,9 +68,9 @@ public class CertificateController {
         return new ResponseEntity<>(sw.toString(), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/generate/intermediate")
+    @PostMapping(path = "/generate/intermediate", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<String> generateIntermediate(@RequestBody CreateCertificateDTO certificateDTO) throws
+    public ResponseEntity<String> generateIntermediate(@Valid @RequestBody CreateCertificateDTO certificateDTO) throws
             UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
         X509Certificate certificate = certificateService.generateCertificateIntermediate(
                 certificateDTO.getSubjectName(), certificateDTO.getIssuerAlias());
