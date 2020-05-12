@@ -15,7 +15,6 @@ export class MenuComponent implements OnInit {
   admin: boolean;
 
   constructor(private keycloakAngular: KeycloakService,
-              private pkiService: PkiServiceService,
               private authService: AuthService,
               private router: Router) {
   }
