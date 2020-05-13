@@ -1,5 +1,7 @@
 package rs.ac.uns.ftn.siemagent.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.bouncycastle.asn1.ocsp.OCSPResponse;
@@ -238,10 +240,10 @@ public class LogServiceImpl implements LogService {
 
 
     private byte[] convertToByteArray(ArrayList<Log> logs) throws IOException {
-
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         ArrayList<String> stringLogs = new ArrayList<>();
         for( Log l : logs) {
-            stringLogs.add(l.toString());
+            stringLogs.add(ow.writeValueAsString(l));
         }
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();

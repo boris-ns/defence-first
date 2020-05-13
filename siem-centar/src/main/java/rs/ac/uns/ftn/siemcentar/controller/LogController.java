@@ -1,5 +1,7 @@
 package rs.ac.uns.ftn.siemcentar.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
@@ -119,10 +121,13 @@ public class LogController {
         ArrayList<String> logs = logService.convertLogsFromByte(deciphered);
         System.out.println("desifrovano: ");
 
+        List<Log> logList = new ArrayList<>();
+        ObjectMapper mapper = new ObjectMapper();
         for(String l: logs) {
             System.out.println(l);
+            logList.add(mapper.readValue(l, Log.class));
         }
-
+        this.logService.saveLogs(logList);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
