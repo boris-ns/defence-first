@@ -6,7 +6,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import rs.ac.uns.ftn.siemagent.model.Log;
 import rs.ac.uns.ftn.siemagent.model.LogType;
-import rs.ac.uns.ftn.siemagent.service.AuthService;
 import rs.ac.uns.ftn.siemagent.service.CertificateService;
 import rs.ac.uns.ftn.siemagent.service.LogService;
 import rs.ac.uns.ftn.siemagent.service.OCSPService;
@@ -20,9 +19,6 @@ public class SiemAgentApplication implements CommandLineRunner {
 
 	@Autowired
 	private CertificateService certificateService;
-
-	@Autowired
-	private AuthService authService;
 
 	@Autowired
 	private OCSPService ocspService;

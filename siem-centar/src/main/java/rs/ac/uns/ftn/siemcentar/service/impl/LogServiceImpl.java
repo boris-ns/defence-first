@@ -65,9 +65,9 @@ public class LogServiceImpl implements LogService {
     public SecretKey processPreMasterSecret(X509Certificate clientCertificate, byte[] secretKey) throws Exception {
         SecretKey key = null;
         TokenDTO token = authService.login();
-        OCSPReq request = ocspService.generateOCSPRequest(clientCertificate, token);
-        OCSPResp response = ocspService.sendOCSPRequest(request, token);
-        boolean val = ocspService.processOCSPResponse(request,response, token);
+        OCSPReq request = ocspService.generateOCSPRequest(clientCertificate);
+        OCSPResp response = ocspService.sendOCSPRequest(request);
+        boolean val = ocspService.processOCSPResponse(request, response);
 
         if(val) {
             System.out.println("validan je sertifikat klijenta: " + clientCertificate.getSerialNumber());

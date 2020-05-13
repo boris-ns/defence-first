@@ -1,7 +1,5 @@
 package rs.ac.uns.ftn.siemcentar.service;
 
-import rs.ac.uns.ftn.siemcentar.dto.response.TokenDTO;
-
 import javax.security.auth.x500.X500Principal;
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -22,9 +20,9 @@ public interface CertificateService {
 
     void saveKeyPair(KeyPair keyPair, Boolean renewal) throws Exception;
 
-    X509Certificate getCertificateBySerialNumber(String serialNumber, TokenDTO token) throws Exception;
+    X509Certificate getCertificateBySerialNumber(String serialNumber) throws Exception;
 
-    String sendReplaceCertificateRequest(TokenDTO token) throws Exception;
+    String sendReplaceCertificateRequest() throws Exception;
 
-    String sendRequestForCertificate(TokenDTO token) throws Exception;
+    String sendRequestForCertificate() throws Exception;
 }

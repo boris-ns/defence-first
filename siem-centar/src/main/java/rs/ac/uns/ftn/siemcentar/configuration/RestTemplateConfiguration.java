@@ -1,11 +1,11 @@
-package rs.ac.uns.ftn.siemagent.config;
+package rs.ac.uns.ftn.siemcentar.configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
-import rs.ac.uns.ftn.siemagent.dto.response.TokenDTO;
-import rs.ac.uns.ftn.siemagent.service.AuthService;
+import rs.ac.uns.ftn.siemcentar.dto.response.TokenDTO;
+import rs.ac.uns.ftn.siemcentar.service.AuthService;
 
 @Configuration
 public class RestTemplateConfiguration {
