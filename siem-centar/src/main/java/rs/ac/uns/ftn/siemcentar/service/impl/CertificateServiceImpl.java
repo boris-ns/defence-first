@@ -77,11 +77,12 @@ public class CertificateServiceImpl implements CertificateService {
     @Autowired
     private CertificateBuilder certificateBuilder;
 
+    @Autowired
+    private RestTemplate restTemplate;
 
 
     @Override
     public void installCertificateFromFile() throws Exception {
-
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
         InputStream certstream = fullStream (certificatePath);
         Certificate certs =  cf.generateCertificate(certstream);
@@ -95,7 +96,6 @@ public class CertificateServiceImpl implements CertificateService {
     public X509Certificate findMyCertificate() throws Exception{
         return (X509Certificate) keystore.readMyCertificate();
     }
-
 
     @Override
     public String buildCertificateRequest(KeyPair certKeyPair, PrivateKey signCerPrivateKey, Boolean renewal) throws Exception {
@@ -149,16 +149,12 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public String sendRequestForCertificate(TokenDTO token) throws Exception {
-        RestTemplate restTemplate = new RestTemplate();
+    public String sendRequestForCertificate() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "bearer " + token.getAccesss_token());
-
 
         KeyPair pair = keyPairGeneratorService.generateKeyPair();
         PrivateKey privateKey = pair.getPrivate();
         String csr = this.buildCertificateRequest(pair, privateKey, false);
-
 
         HttpEntity<String> entityReq = new HttpEntity<>(csr, headers);
         ResponseEntity<String> certificate = null;
@@ -170,19 +166,17 @@ public class CertificateServiceImpl implements CertificateService {
             return null;
         }
 
-        // Ovo znaci da je istekao token, pa cemo refreshovati token
-        // i opet poslati zahtev
-        // @TODO: Nije testirano
-        if (certificate.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
-            token = authService.refreshToken(token.getRefresh_token());
-            headers.set("Authorization", "bearer " + token.getAccesss_token());
-            certificate = restTemplate.exchange(createCertificateURL, HttpMethod.POST, entityReq, String.class);
-        }
+        // @TODO: nadji bolji nacin za refresh
+//        // Ovo znaci da je istekao token, pa cemo refreshovati token
+//        // i opet poslati zahtev
+//        // @TODO: Nije testirano
+//        if (certificate.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+//            token = authService.refreshToken(token.getRefresh_token());
+//            headers.set("Authorization", "bearer " + token.getAccesss_token());
+//            certificate = restTemplate.exchange(createCertificateURL, HttpMethod.POST, entityReq, String.class);
+//        }
         return certificate.getBody();
     }
-
-
-
 
     @Override
     public X500Principal buildSertificateSubjetPrincipal() {
@@ -211,8 +205,6 @@ public class CertificateServiceImpl implements CertificateService {
         return false;
     }
 
-
-
     public void saveKeyPair(KeyPair keyPair, Boolean renewal) throws Exception {
         X509Certificate certificate =  createSertificateForKeyPair(keyPair);
         if (renewal) {
@@ -220,16 +212,11 @@ public class CertificateServiceImpl implements CertificateService {
         }else{
             keystore.write(Constants.KEY_PAIR_ALIAS, keyPair.getPrivate(), keyStorePassword.toCharArray(), certificate);
         }
-
-
     }
 
     @Override
-    public X509Certificate getCertificateBySerialNumber(String serialNumber, TokenDTO token) throws Exception{
-        RestTemplate restTemplate = new RestTemplate();
-
+    public X509Certificate getCertificateBySerialNumber(String serialNumber) throws Exception{
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "bearer " + token.getAccesss_token());
         HttpEntity<String> entityReq = new HttpEntity<>(serialNumber, headers);
         ResponseEntity<String> certificate = null;
 
@@ -239,15 +226,16 @@ public class CertificateServiceImpl implements CertificateService {
             System.out.println("[ERROR] You are not allowed to make check request");
             return null;
         }
-        // Ovo znaci da je istekao token, pa cemo refreshovati token
-        // i opet poslati zahtev
-        // @TODO: Nije testirano
-        if (certificate.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
-            token = authService.refreshToken(token.getRefresh_token());
-            headers.set("Authorization", "bearer " + token.getAccesss_token());
-            certificate = restTemplate.exchange(getCertificateURL + "/" + serialNumber, HttpMethod.GET, entityReq, String.class);
-        }
 
+        // @TODO: nadji bolji nacin za refresh
+//        // Ovo znaci da je istekao token, pa cemo refreshovati token
+//        // i opet poslati zahtev
+//        // @TODO: Nije testirano
+//        if (certificate.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+//            token = authService.refreshToken(token.getRefresh_token());
+//            headers.set("Authorization", "bearer " + token.getAccesss_token());
+//            certificate = restTemplate.exchange(getCertificateURL + "/" + serialNumber, HttpMethod.GET, entityReq, String.class);
+//        }
 
         PEMParser pemParser = new PEMParser(new StringReader(certificate.getBody()));
         X509CertificateHolder certificateHolder = (X509CertificateHolder) pemParser.readObject();
@@ -263,11 +251,8 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public String sendReplaceCertificateRequest(TokenDTO token) throws Exception {
-        RestTemplate restTemplate = new RestTemplate();
+    public String sendReplaceCertificateRequest() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "bearer " + token.getAccesss_token());
-
 
         KeyPair pair = keyPairGeneratorService.generateKeyPair();
         //UZIMA SE STARI KLJUC JER PKI ima stari public pa moze da proveri validnost tako..
@@ -285,14 +270,15 @@ public class CertificateServiceImpl implements CertificateService {
             return null;
         }
 
-        // Ovo znaci da je istekao token, pa cemo refreshovati token
-        // i opet poslati zahtev
-        // @TODO: Nije testirano
-        if (certificate.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
-            token = authService.refreshToken(token.getRefresh_token());
-            headers.set("Authorization", "bearer " + token.getAccesss_token());
-            certificate = restTemplate.exchange(renewCertificate, HttpMethod.POST, entityReq, Void.class);
-        }
+        // @TODO: nadji bolji nacin za refresh
+//        // Ovo znaci da je istekao token, pa cemo refreshovati token
+//        // i opet poslati zahtev
+//        // @TODO: Nije testirano
+//        if (certificate.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+//            token = authService.refreshToken(token.getRefresh_token());
+//            headers.set("Authorization", "bearer " + token.getAccesss_token());
+//            certificate = restTemplate.exchange(renewCertificate, HttpMethod.POST, entityReq, Void.class);
+//        }
         return null;
     }
 
@@ -310,7 +296,6 @@ public class CertificateServiceImpl implements CertificateService {
         certConverter = certConverter.setProvider("BC");
         return certConverter.getCertificate(certGen.build(contentSigner));
     }
-
 
     private InputStream fullStream(String certfile) throws IOException{
         FileInputStream fis = new FileInputStream(certfile);

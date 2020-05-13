@@ -20,11 +20,11 @@ public interface CertificateService {
 
     void saveKeyPair(KeyPair keyPair, Boolean renewal) throws Exception;
 
-    X509Certificate getCertificateBySerialNumber(String serialNumber, TokenDTO token) throws Exception;
+    X509Certificate getCertificateBySerialNumber(String serialNumber) throws Exception;
 
-    String sendReplaceCertificateRequest(TokenDTO token) throws Exception;
+    String sendReplaceCertificateRequest() throws Exception;
 
-    String sendRequestForCertificate(TokenDTO token) throws Exception;
+    String sendRequestForCertificate() throws Exception;
 
     void installCertificateFromFile() throws CertificateException, Exception;
 

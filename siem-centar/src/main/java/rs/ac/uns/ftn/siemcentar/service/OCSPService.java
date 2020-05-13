@@ -2,17 +2,16 @@ package rs.ac.uns.ftn.siemcentar.service;
 
 import org.bouncycastle.cert.ocsp.OCSPReq;
 import org.bouncycastle.cert.ocsp.OCSPResp;
-import rs.ac.uns.ftn.siemcentar.dto.response.TokenDTO;
 
 import java.security.cert.X509Certificate;
 
 public interface OCSPService {
 
-    OCSPReq generateOCSPRequest(X509Certificate certificate, TokenDTO tokenDTO) throws Exception;
+    OCSPReq generateOCSPRequest(X509Certificate certificate) throws Exception;
 
-    OCSPResp sendOCSPRequest(OCSPReq ocspReq, TokenDTO token) throws Exception;
+    OCSPResp sendOCSPRequest(OCSPReq ocspReq) throws Exception;
 
-    public boolean processOCSPResponse(OCSPReq ocspReq, OCSPResp ocspResp, TokenDTO token) throws Exception;
+    public boolean processOCSPResponse(OCSPReq ocspReq, OCSPResp ocspResp) throws Exception;
 
 }
 

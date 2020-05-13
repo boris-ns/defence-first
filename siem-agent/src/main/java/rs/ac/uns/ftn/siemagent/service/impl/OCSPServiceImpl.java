@@ -23,7 +23,6 @@ import org.springframework.web.client.RestTemplate;
 import rs.ac.uns.ftn.siemagent.Constants.Constants;
 import rs.ac.uns.ftn.siemagent.config.AgentConfiguration;
 import rs.ac.uns.ftn.siemagent.config.CertificateBuilder;
-import rs.ac.uns.ftn.siemagent.dto.response.TokenDTO;
 import rs.ac.uns.ftn.siemagent.service.AuthService;
 import rs.ac.uns.ftn.siemagent.service.CertificateService;
 import rs.ac.uns.ftn.siemagent.service.OCSPService;
@@ -65,13 +64,13 @@ public class OCSPServiceImpl implements OCSPService {
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Override
-    public OCSPReq generateOCSPRequest(X509Certificate certificate, TokenDTO token)
-            throws Exception {
-
+    public OCSPReq generateOCSPRequest(X509Certificate certificate) throws Exception {
         //@TODO: issuerCert is still mocked ---> AKO DOBAVIS LANAC ne MORAS OVO RADITI
-        X509Certificate issuerCert = certificateService.getCertificateBySerialNumber("1", token);
+        X509Certificate issuerCert = certificateService.getCertificateBySerialNumber("1");
 
         BcDigestCalculatorProvider util = new BcDigestCalculatorProvider();
 
@@ -105,11 +104,9 @@ public class OCSPServiceImpl implements OCSPService {
     }
 
     @Override
-    public OCSPResp sendOCSPRequest(OCSPReq ocspReq, TokenDTO token) throws Exception{
-
-        RestTemplate restTemplate = new RestTemplate();
+    public OCSPResp sendOCSPRequest(OCSPReq ocspReq) throws Exception{
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "bearer " + token.getAccesss_token());
+
         byte[] ocspBytes = ocspReq.getEncoded();
         HttpEntity<byte[]> entityReq = new HttpEntity<>(ocspBytes, headers);
         ResponseEntity<byte[]> ocspResponse = null;
@@ -121,27 +118,28 @@ public class OCSPServiceImpl implements OCSPService {
             return null;
         }
 
-        // Ovo znaci da je istekao token, pa cemo refreshovati token
-        // i opet poslati zahtev
-        // @TODO: Nije testirano
-        if (ocspResponse.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
-            token = authService.refreshToken(token.getRefresh_token());
-            headers.set("Authorization", "bearer " + token.getAccesss_token());
-            ocspResponse = restTemplate.exchange(ocspReqURL, HttpMethod.POST, entityReq, byte[].class);
-        }
+        // @TODO: naci bolji nacin za refresh
+//        // Ovo znaci da je istekao token, pa cemo refreshovati token
+//        // i opet poslati zahtev
+//        // @TODO: Nije testirano
+//        if (ocspResponse.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+//            token = authService.refreshToken(token.getRefresh_token());
+//            headers.set("Authorization", "bearer " + token.getAccesss_token());
+//            ocspResponse = restTemplate.exchange(ocspReqURL, HttpMethod.POST, entityReq, byte[].class);
+//        }
 
         OCSPResp ocspResp = new OCSPResp(OCSPResponse.getInstance(ocspResponse.getBody()));
         return ocspResp;
     }
 
     @Override
-    public boolean processOCSPResponse(OCSPReq ocspReq, OCSPResp ocspResp, TokenDTO token) throws Exception {
+    public boolean processOCSPResponse(OCSPReq ocspReq, OCSPResp ocspResp) throws Exception {
         if(!(ocspResp.getStatus() == OCSPRespBuilder.SUCCESSFUL)){
             throw new Exception("ocspResp now good overall");
         }
         BasicOCSPResp basicResponse = (BasicOCSPResp)ocspResp.getResponseObject();
 
-        X509Certificate rootCA = certificateService.getCertificateBySerialNumber(rootCASerialNumber, token);
+        X509Certificate rootCA = certificateService.getCertificateBySerialNumber(rootCASerialNumber);
 
         ContentVerifierProvider prov = new JcaContentVerifierProviderBuilder().build(rootCA.getPublicKey());
         boolean signatureValid = basicResponse.isSignatureValid(prov);
