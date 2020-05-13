@@ -5,3 +5,7 @@ standalone.sh -Dkeycloak.migration.action=export
 Importovanje konfiguracije:
 standalone.sh -Dkeycloak.migration.action=import
 -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=defence-first-keycloak-configuration.json
+
+
+Dodavanje blacklist:
+..\keycloak-9.0.2\standalone\data dodati folder password-blacklists
