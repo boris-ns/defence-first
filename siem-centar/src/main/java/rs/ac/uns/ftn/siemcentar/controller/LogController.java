@@ -16,15 +16,14 @@ import rs.ac.uns.ftn.siemcentar.service.LogService;
 import rs.ac.uns.ftn.siemcentar.service.OCSPService;
 
 import javax.crypto.SecretKey;
+import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.security.SecureRandom;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping(value = "/api/log")
@@ -41,7 +40,7 @@ public class LogController {
     private CertificateService certificateService;
 
 
-    public static ArrayList<SecretKey> simetricniKLjucev = new ArrayList<>();
+    public static HashMap<String, SecretKey> simetricniKLjucevi = new HashMap<>();
 
     @GetMapping(path = "/helloClient")
     @PreAuthorize("hasRole('agent')")
@@ -56,7 +55,7 @@ public class LogController {
 
     @PostMapping(path = "/preMasterSecret")
     @PreAuthorize("hasRole('agent')")
-    public ResponseEntity<String> preMasterSecret(@RequestBody String[] params) throws Exception{
+    public ResponseEntity<String[]> preMasterSecret(@RequestBody String[] params, HttpServletRequest request) throws Exception{
 
         String premasterSecret = params[0];
         String clienCertificate = params[1];
@@ -71,27 +70,60 @@ public class LogController {
         SecretKey key = logService.processPreMasterSecret(cert, decodedPremasterSecret);
 
         //TODO: NACI BOLJI NACIN DA SE CUVJAU OVI SIMETRICNI KLJUCEVI KOJI SU DOFOVORENI..
-        simetricniKLjucev.add(key);
+
+        byte[] criptedToken = null;
+        String keyToken = null;
+        while (true) {
+            String token = cipherService.generateSafeToken();
+            criptedToken = cipherService.encrypt(key, token.getBytes());
+            byte[] encodedToken = Base64.getEncoder().encode(criptedToken);
+            keyToken = new String(encodedToken);
+            if (!simetricniKLjucevi.containsKey(keyToken)) {
+                simetricniKLjucevi.put(keyToken, key);
+                break;
+            }
+        }
+        // cripted token ce da se salje kao header izmedju da bi se znalo koji kljuc iz mape da se uzme.
+
 
         byte[] encriptedSimetricForChack = logService.encriptSimetricKey(key, cert.getPublicKey());
         byte[] encoded = Base64.getEncoder().encode(encriptedSimetricForChack);
         String secretKey = new String(encoded);
+        byte[] encodedToken = Base64.getEncoder().encode(criptedToken);
 
-        return new ResponseEntity<>(secretKey, HttpStatus.OK);
+
+        String[] retVal = new String[2];
+        retVal[0] = secretKey;
+        retVal[1] = keyToken;
+
+        return new ResponseEntity<>(retVal, HttpStatus.OK);
     }
 
     @PostMapping(path = "/data")
     @PreAuthorize("hasRole('agent')")
-    public  ResponseEntity<String> preMasterSecret(@RequestBody String data) throws Exception{
+    public  ResponseEntity<String> preMasterSecret(@RequestBody String data, HttpServletRequest request) throws Exception{
 
         byte[] decodedData = Base64.getDecoder().decode(data);
         String stillChipered = new String(decodedData);
         System.out.println("nedesifrovano: " + stillChipered);
 
         //@TODO: OVO MORA DA SE RESI OVO JE SAMO ZA DEMONSTRACIJU DA MOZE OVAKO
-        SecretKey key = simetricniKLjucev.get(0);
+        String keyId = request.getHeader("HTTPS_session");
+        SecretKey key = simetricniKLjucevi.get(keyId);
+
+        if(key == null) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
         byte[] deciphered = cipherService.decrypt(key, decodedData);
-        System.out.println("desifrovano: " + new String(deciphered));
+        ArrayList<String> logs = logService.convertLogsFromByte(deciphered);
+        System.out.println("desifrovano: ");
+
+        for(String l: logs) {
+            System.out.println(l);
+        }
+
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

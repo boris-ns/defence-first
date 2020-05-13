@@ -19,4 +19,5 @@ public interface CipherService {
 
     public byte[] encrypt(PublicKey key, byte[] plaintext) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException;
 
+    public String generateSafeToken();
 }

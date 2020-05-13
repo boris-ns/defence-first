@@ -5,6 +5,7 @@ import rs.ac.uns.ftn.siemcentar.model.Log;
 import javax.crypto.SecretKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.List;
 
 public interface LogService {
@@ -20,5 +21,7 @@ public interface LogService {
     byte[] encriptSimetricKey(SecretKey secretKey, PublicKey publicKey) throws Exception;
 
     byte[] decriptWitmMyPrivate(byte[] data) throws Exception;
+
+    ArrayList<String> convertLogsFromByte(byte[] logs) throws Exception;
 
 }

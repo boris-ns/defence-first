@@ -17,11 +17,16 @@ import rs.ac.uns.ftn.siemcentar.service.OCSPService;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -91,6 +96,25 @@ public class LogServiceImpl implements LogService {
     public byte[] decriptWitmMyPrivate(byte[] data) throws Exception{
         PrivateKey myPrivateKey = keystore.readPrivateKey(Constants.KEY_PAIR_ALIAS, keyStorePassword);
         return cipherService.decrypt(myPrivateKey, data);
+    }
+
+    @Override
+    public ArrayList<String> convertLogsFromByte(byte[] logs) throws Exception {
+        ByteArrayInputStream bis = new ByteArrayInputStream(logs);
+        ObjectInput in = null;
+        try {
+            in = new ObjectInputStream(bis);
+            Object o = in.readObject();
+            return (ArrayList<String>)o;
+        } finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+            } catch (IOException ex) {
+                // ignore close exception
+            }
+        }
     }
 
     public SecretKey processSimetricKey(byte[] criptedSimetricKey) throws Exception{

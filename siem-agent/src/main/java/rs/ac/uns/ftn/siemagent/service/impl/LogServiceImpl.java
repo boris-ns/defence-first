@@ -19,21 +19,20 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import rs.ac.uns.ftn.siemagent.Constants.Constants;
 import rs.ac.uns.ftn.siemagent.dto.response.TokenDTO;
+import rs.ac.uns.ftn.siemagent.model.Log;
 import rs.ac.uns.ftn.siemagent.repository.Keystore;
 import rs.ac.uns.ftn.siemagent.service.*;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.*;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.*;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Base64;
 
 @Service
@@ -73,16 +72,19 @@ public class LogServiceImpl implements LogService {
 
 
     @Override
-    public void sendLogs(TokenDTO token) {
+    public void sendLogs(TokenDTO token, SecretKey simetricKey, String secureToken, ArrayList<Log> logs) {
         try {
-            SecretKey simetricKey = this.initCommunicationWithSiemCentar(token);
-            String prvaPoruka = "prvaPorukaaa";
-            byte[] criptedMessage = cipherService.encrypt(simetricKey, prvaPoruka.getBytes());
+
+            // ZAKRIPTUJE listu logova i posalje kao string
+            byte[] logsInByte = convertToByteArray(logs);
+            byte[] criptedMessage = cipherService.encrypt(simetricKey, logsInByte);
             String base64Message = new String(Base64.getEncoder().encode(criptedMessage));
 
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "bearer " + token.getAccesss_token());
+            // da zna koji simetricni kljuc da koristi SiemServer
+            headers.set("HTTPS_session", secureToken);
 
 
             HttpEntity<String> entityReq = new HttpEntity(base64Message, headers);
@@ -104,6 +106,7 @@ public class LogServiceImpl implements LogService {
             }
         }
         catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -144,8 +147,9 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    public SecretKey initCommunicationWithSiemCentar(TokenDTO token) throws Exception {
+    public Object[] initCommunicationWithSiemCentar(TokenDTO token) throws Exception {
 
+        Object[] retVal = new Object[2];
         SecretKey secretKey = keyPairGeneratorService.generateSimetricKey();
 
         X509Certificate centerCertificate = this.sendSiemCenterHello(token);
@@ -157,14 +161,11 @@ public class LogServiceImpl implements LogService {
 		    System.out.println("validan je sertifikat servera");
 
 		    byte simetricKey[] = this.preMasterSecret(centerCertificate, secretKey);
-		    SecretKey returnedKey = this.sendPreMasterSecret(token, simetricKey);
+		    String secureToken = this.sendPreMasterSecret(token, simetricKey);
 
-		    //TODO: da li su ova 2 kljuca ista ako jesu to je onda to moze da se sibaju podaci...
-            System.out.println(secretKey.toString());
-            System.out.println(returnedKey.toString());
-
-            return secretKey;
-
+            retVal[0] = secretKey;
+            retVal[1] = secureToken;
+            return retVal;
         }
 		else{
 		    System.out.println("nije validan sertifikat servera");
@@ -176,7 +177,7 @@ public class LogServiceImpl implements LogService {
 
 
     @Override
-    public SecretKey sendPreMasterSecret(TokenDTO token, byte[] simetricKey) throws Exception {
+    public String sendPreMasterSecret(TokenDTO token, byte[] simetricKey) throws Exception {
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -196,10 +197,10 @@ public class LogServiceImpl implements LogService {
         params[1] = myCert;
 
         HttpEntity<String[]> entityReq = new HttpEntity<>(params, headers);
-        ResponseEntity<String> responseEntity = null;
+        ResponseEntity<String[]> responseEntity = null;
 
         try {
-            responseEntity = restTemplate.exchange(httpsSiemCentarPreMasterSecret, HttpMethod.POST, entityReq, String.class);
+            responseEntity = restTemplate.exchange(httpsSiemCentarPreMasterSecret, HttpMethod.POST, entityReq, String[].class);
         } catch (HttpClientErrorException e) {
             e.printStackTrace();
 //            return null;
@@ -211,12 +212,17 @@ public class LogServiceImpl implements LogService {
         if (responseEntity.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
             token = authService.refreshToken(token.getRefresh_token());
             headers.set("Authorization", "bearer " + token.getAccesss_token());
-            responseEntity = restTemplate.exchange(httpsSiemCentarPreMasterSecret, HttpMethod.POST, entityReq, String.class);
+            responseEntity = restTemplate.exchange(httpsSiemCentarPreMasterSecret, HttpMethod.POST, entityReq, String[].class);
         }
-        byte[] decodedPremasterSecret = Base64.getDecoder().decode(responseEntity.getBody());
+
+        String key = responseEntity.getBody()[0];
+        String secretToken = responseEntity.getBody()[1];
+        byte[] decodedPremasterSecret = Base64.getDecoder().decode(key);
         byte[] decriptedKey = decpritWithMyPrivate(decodedPremasterSecret);
         SecretKey originalKey = new SecretKeySpec(decriptedKey, 0, decriptedKey.length, "AES");
-        return originalKey;
+
+
+        return secretToken;
     }
 
     @Override
@@ -230,6 +236,29 @@ public class LogServiceImpl implements LogService {
         return  cipherService.decrypt(myPrivateKey, data);
     }
 
+
+    private byte[] convertToByteArray(ArrayList<Log> logs) throws IOException {
+
+        ArrayList<String> stringLogs = new ArrayList<>();
+        for( Log l : logs) {
+            stringLogs.add(l.toString());
+        }
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream out = null;
+        try {
+            out = new ObjectOutputStream(bos);
+            out.writeObject(stringLogs);
+            out.flush();
+            return bos.toByteArray();
+        } finally {
+            try {
+                bos.close();
+            } catch (IOException ex) {
+                // ignore close exception
+            }
+        }
+    }
 
 
 

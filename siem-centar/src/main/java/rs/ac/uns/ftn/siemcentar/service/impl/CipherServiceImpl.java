@@ -4,10 +4,8 @@ import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.siemcentar.service.CipherService;
 
 import javax.crypto.*;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
+import java.util.Base64;
 
 @Service
 public class CipherServiceImpl implements CipherService {
@@ -42,5 +40,15 @@ public class CipherServiceImpl implements CipherService {
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
         cipher.init(Cipher.DECRYPT_MODE, key);
         return cipher.doFinal(ciphertext);
+    }
+
+    @Override
+    public String generateSafeToken() {
+        SecureRandom random = new SecureRandom();
+        byte bytes[] = new byte[20];
+        random.nextBytes(bytes);
+        Base64.Encoder encoder = Base64.getUrlEncoder().withoutPadding();
+        String token = encoder.encodeToString(bytes);
+        return token;
     }
 }
