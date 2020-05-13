@@ -1,7 +1,8 @@
-package rs.ac.uns.ftn.siemagent.service.impl;
+package rs.ac.uns.ftn.siemcentar.service.impl;
 
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
@@ -20,15 +21,14 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
-import rs.ac.uns.ftn.siemagent.Constants.Constants;
-import rs.ac.uns.ftn.siemagent.config.AgentConfiguration;
-import rs.ac.uns.ftn.siemagent.dto.response.TokenDTO;
-import rs.ac.uns.ftn.siemagent.config.CertificateBuilder;
-import rs.ac.uns.ftn.siemagent.repository.Keystore;
-import rs.ac.uns.ftn.siemagent.service.AuthService;
-import rs.ac.uns.ftn.siemagent.service.CertificateService;
-import rs.ac.uns.ftn.siemagent.service.KeyPairGeneratorService;
+import rs.ac.uns.ftn.siemcentar.constants.Constants;
+import rs.ac.uns.ftn.siemcentar.configuration.AgentConfiguration;
+import rs.ac.uns.ftn.siemcentar.configuration.CertificateBuilder;
+import rs.ac.uns.ftn.siemcentar.dto.response.TokenDTO;
+import rs.ac.uns.ftn.siemcentar.repository.Keystore;
+import rs.ac.uns.ftn.siemcentar.service.AuthService;
+import rs.ac.uns.ftn.siemcentar.service.CertificateService;
+import rs.ac.uns.ftn.siemcentar.service.KeyPairGeneratorService;
 
 import javax.security.auth.x500.X500Principal;
 import java.io.*;
@@ -36,7 +36,6 @@ import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -61,7 +60,7 @@ public class CertificateServiceImpl implements CertificateService {
     private String keyStorePassword;
 
     @Value("${my.certificate.path}")
-    private String pathToCertificate;
+    private String certificatePath;
 
     @Autowired
     private AgentConfiguration agentConfiguration;
@@ -84,7 +83,7 @@ public class CertificateServiceImpl implements CertificateService {
     public void installCertificateFromFile() throws Exception {
 
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
-        InputStream certstream = fullStream (pathToCertificate);
+        InputStream certstream = fullStream (certificatePath);
         Certificate certs =  cf.generateCertificate(certstream);
 
         PrivateKey privateKey = keystore.readPrivateKey(Constants.KEY_PAIR_ALIAS, keyStorePassword);

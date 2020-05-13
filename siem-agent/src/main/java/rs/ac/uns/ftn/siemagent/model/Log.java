@@ -1,15 +1,11 @@
-package rs.ac.uns.ftn.siemcentar.model;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+package rs.ac.uns.ftn.siemagent.model;
 
 import java.io.Serializable;
 import java.util.Date;
 
-@Document(collection = "Log")
+
 public class Log implements Serializable {
 
-    @Id
     public Long id;
     public Date date;
     public LogType logType;

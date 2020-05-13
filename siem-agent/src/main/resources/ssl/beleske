@@ -1,0 +1,18 @@
+1. Instalacija sertifikata u keyStore
+
+    - otkopomentarisati metodu sendRequestForCertificate da biste poslali CSR
+    - nakon slanja zakomentarisati
+    - potrebno je nakon povrdjenog CSR zahteva prekopirati fajl sertifikata sa PKI-a u ssl folder
+    - u SiemAgentApplication pozvati metodu installCertificateFromFile
+    - nakon instalacije zakomentarisati
+    - u application.properties staviti za mySerialNumber broj sertifikata koji se nalazi u imenu .crt fajla
+
+
+2. Pokretanje simulacije slanja logova
+
+    - ako sertifikat nije instaliran uraditi instalaciju
+
+    - potrebno je da budu pokrenuti i PKI i SiemCentar pre porkretanja simulacije
+    - simulation metodom vrsiti simulaciju
+
+    - u SiemCentru videti da su logovi usmesni pristigli

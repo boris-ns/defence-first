@@ -1,0 +1,4 @@
+1. Prenos sertifikata do aplikacije za koju je kreiran
+
+    - nakon prihvatanja CSR-a u folderu ce se kreirati .cer fajl
+    - potrebno je fajl preneti u ssl paket aplijacije i pratiti tamo prilozena uputstva

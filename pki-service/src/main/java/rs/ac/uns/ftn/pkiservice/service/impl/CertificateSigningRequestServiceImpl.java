@@ -149,6 +149,8 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
 
         certificateService.writeCertificateToKeyStore(newCert.getSerialNumber().toString(), certificates,
                 issuerData.getPrivateKey());
+
+        certificateService.writeCertToFile(newCert.getSerialNumber().toString(), Constants.GENERATED_CERT_DIRECTORY);
         return newCert;
     }
 

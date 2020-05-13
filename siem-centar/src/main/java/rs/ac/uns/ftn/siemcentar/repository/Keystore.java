@@ -1,20 +1,13 @@
-package rs.ac.uns.ftn.siemagent.repository;
+package rs.ac.uns.ftn.siemcentar.repository;
 
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
-import org.bouncycastle.openssl.PEMKeyPair;
-import org.bouncycastle.openssl.PEMParser;
-import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
-import rs.ac.uns.ftn.siemagent.Constants.Constants;
-import rs.ac.uns.ftn.siemagent.config.KeystoreConfiguration;
+import rs.ac.uns.ftn.siemcentar.constants.Constants;
+import rs.ac.uns.ftn.siemcentar.configuration.KeystoreConfiguration;
 
-import javax.crypto.SecretKey;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -79,4 +72,6 @@ public class Keystore {
     public Certificate readMyCertificate() throws KeyStoreException {
         return keyStore.getCertificate(Constants.CERTIFICATE_ALIAS);
     }
+
+
 }
