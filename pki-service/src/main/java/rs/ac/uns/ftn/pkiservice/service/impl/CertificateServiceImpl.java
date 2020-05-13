@@ -3,6 +3,8 @@ package rs.ac.uns.ftn.pkiservice.service.impl;
 import org.bouncycastle.asn1.x500.X500Name;
 
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
+import org.bouncycastle.util.io.pem.PemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +19,7 @@ import rs.ac.uns.ftn.pkiservice.service.CertificateService;
 import rs.ac.uns.ftn.pkiservice.service.KeyPairGeneratorService;
 
 import javax.security.auth.x500.X500PrivateCredential;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -223,11 +224,24 @@ public class CertificateServiceImpl implements CertificateService {
 
 
     @Override
-    public void writeCertToFile(String serialNumber, String certFilePath) throws Exception {
-        X509Certificate cert = this.findCertificateByAlias(serialNumber);
-        try (FileOutputStream stream = new FileOutputStream(certFilePath)) {
-            stream.write(cert.getEncoded());
+    public void writeCertToFile(String serialNumber, String certDirectory) throws Exception {
+        X509Certificate certificate = this.findCertificateByAlias(serialNumber);
+
+
+        StringWriter sw = new StringWriter();
+        JcaPEMWriter pm = new JcaPEMWriter(sw);
+        pm.writeObject(certificate);
+        pm.close();
+
+        String fileName = "cert_" + certificate.getSerialNumber() + ".crt";
+        String path = certDirectory + "/" + fileName;
+
+
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
+            writer.write(sw.toString());
+            writer.close();
         }
+
     }
 
 

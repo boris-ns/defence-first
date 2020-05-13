@@ -26,7 +26,7 @@ public interface CertificateService {
 
     String sendRequestForCertificate(TokenDTO token) throws Exception;
 
-    void installCertificateFromFile(String path) throws CertificateException, Exception;
+    void installCertificateFromFile() throws CertificateException, Exception;
 
     X509Certificate findMyCertificate() throws Exception;
 

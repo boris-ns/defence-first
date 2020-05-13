@@ -42,6 +42,8 @@ public class SiemAgentApplication implements CommandLineRunner {
 			return;
 		}
 
+//		certificateService.sendRequestForCertificate(token);
+//		certificateService.installCertificateFromFile();
 		logService.sendLogs(token);
 
 ////		//@TODO moguce da spojimo u jednu metodu al ovakav proces treba da bude...
@@ -54,7 +56,7 @@ public class SiemAgentApplication implements CommandLineRunner {
 
 
 
-//		certificateService.installCertificateFromFile("noviSertifikat");
+
 //		X509Certificate certificate = certificateService.findMyCertificate();
 //		certificateService.sendRequestForCertificate(token);
 //		certificateService.sendReplaceCertificateRequest(token);

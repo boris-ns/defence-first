@@ -10,7 +10,7 @@ import java.security.cert.X509Certificate;
 
 public interface CertificateService {
 
-    void installCertificateFromFile(String path) throws CertificateException, Exception;
+    void installCertificateFromFile() throws CertificateException, Exception;
 
     X509Certificate findMyCertificate() throws Exception;
 

@@ -60,6 +60,9 @@ public class CertificateServiceImpl implements CertificateService {
     @Value("${keystore.password}")
     private String keyStorePassword;
 
+    @Value("${my.certificate.path}")
+    private String pathToCertificate;
+
     @Autowired
     private AgentConfiguration agentConfiguration;
 
@@ -78,10 +81,10 @@ public class CertificateServiceImpl implements CertificateService {
 
 
     @Override
-    public void installCertificateFromFile(String certfile) throws Exception {
+    public void installCertificateFromFile() throws Exception {
 
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
-        InputStream certstream = fullStream (certfile);
+        InputStream certstream = fullStream (pathToCertificate);
         Certificate certs =  cf.generateCertificate(certstream);
 
         PrivateKey privateKey = keystore.readPrivateKey(Constants.KEY_PAIR_ALIAS, keyStorePassword);
