@@ -1,4 +1,4 @@
-package rs.ac.uns.ftn.siemagent.config;
+package rs.ac.uns.ftn.siemcentar.configuration;
 
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
