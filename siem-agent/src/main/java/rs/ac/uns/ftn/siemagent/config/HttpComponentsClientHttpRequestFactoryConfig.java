@@ -69,15 +69,4 @@ public class HttpComponentsClientHttpRequestFactoryConfig {
         }
     }
 
-    
-    class MyTrustStrategy implements TrustStrategy{
-
-        @Override
-        public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-            for(X509Certificate certificate : chain) {
-                System.out.println(certificate.getSerialNumber());
-            }
-            return true;
-        }
-    }
 }
