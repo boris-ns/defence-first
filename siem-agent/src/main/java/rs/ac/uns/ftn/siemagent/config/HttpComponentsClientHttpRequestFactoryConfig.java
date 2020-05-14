@@ -2,6 +2,7 @@ package rs.ac.uns.ftn.siemagent.config;
 
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -45,7 +46,7 @@ public class HttpComponentsClientHttpRequestFactoryConfig {
             // MORA STRATEGIJA DA SE NAMESTI DA VERUJE SMAO ONIMA KOJI SU U KEYSTORU
             // ili onima koje proveri...
             SSLContext sslContext = SSLContexts.custom()
-                    .loadTrustMaterial(keystore, new TrustSelfSignedStrategy())
+                    .loadTrustMaterial(null, new MyTrustStrategy())
                     .loadKeyMaterial(keystore, keyStorePassword.toCharArray()).build();
 
             SSLConnectionSocketFactory socketFactory =
@@ -65,6 +66,18 @@ public class HttpComponentsClientHttpRequestFactoryConfig {
         }
         finally {
             return requestFactory;
+        }
+    }
+
+    
+    class MyTrustStrategy implements TrustStrategy{
+
+        @Override
+        public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+            for(X509Certificate certificate : chain) {
+                System.out.println(certificate.getSerialNumber());
+            }
+            return true;
         }
     }
 }
