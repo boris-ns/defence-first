@@ -2,6 +2,7 @@ package rs.ac.uns.ftn.pkiservice.configuration;
 
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -10,12 +11,14 @@ import rs.ac.uns.ftn.pkiservice.constants.Constants;
 import rs.ac.uns.ftn.pkiservice.models.IssuerData;
 import rs.ac.uns.ftn.pkiservice.models.SubjectData;
 import rs.ac.uns.ftn.pkiservice.service.CertificateGeneratorService;
+import rs.ac.uns.ftn.pkiservice.service.CertificateService;
 import rs.ac.uns.ftn.pkiservice.service.KeyPairGeneratorService;
 
 import java.io.*;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 import static rs.ac.uns.ftn.pkiservice.constants.Constants.*;
 
@@ -40,6 +43,9 @@ public class MyKeyStore {
     @Value("${keystore.archive.password}")
     private String KEYSTORE_ARCHIVE_PASSWORD;
 
+    @Value("${generated.certifacates.directory}")
+    private String certDirectory;
+
     @Bean(name = "keyStore")
     public KeyStore getKeystore(){
         try {
@@ -61,6 +67,8 @@ public class MyKeyStore {
 
                 keyStore.setKeyEntry(ROOT_ALIAS, kp.getPrivate(), KEYSTORE_PASSWORD.toCharArray(), new Certificate[]{certificate});
                 keyStore.store(new FileOutputStream(KEYSTORE_FILE_PATH), KEYSTORE_PASSWORD.toCharArray());
+
+                this.writeRootCertToFile(certificate);
             }
             return keyStore;
         } catch (NoSuchAlgorithmException e) {
@@ -74,6 +82,8 @@ public class MyKeyStore {
         } catch (KeyStoreException e) {
             e.printStackTrace();
         } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
@@ -115,6 +125,23 @@ public class MyKeyStore {
         builder.addRDN(BCStyle.L, "Novi Sad");
         builder.addRDN(BCStyle.C, "RS");
         return builder;
+    }
+
+    private void writeRootCertToFile(Certificate certificate) throws Exception {
+        X509Certificate certificateX509 = (X509Certificate) certificate;
+
+        StringWriter sw = new StringWriter();
+        JcaPEMWriter pm = new JcaPEMWriter(sw);
+        pm.writeObject(certificate);
+        pm.close();
+
+        String fileName = "cert_" + certificateX509.getSerialNumber() + ".crt";
+        String path = certDirectory + "/" + fileName;
+
+
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
+            writer.write(sw.toString());
+        }
     }
 
     public String getKEYSTORE_FILE_PATH() {

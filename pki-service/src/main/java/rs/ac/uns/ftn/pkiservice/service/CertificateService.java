@@ -39,6 +39,6 @@ public interface CertificateService {
             KeyStoreException, IOException;
 
 
-    void writeCertToFile(String serialNumber, String certDirectoryPath) throws Exception;
+    void writeCertToFile(String serialNumber) throws Exception;
 
 }
