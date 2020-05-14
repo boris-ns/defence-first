@@ -3,6 +3,8 @@ package rs.ac.uns.ftn.siemagent.config;
 import org.apache.http.ssl.TrustStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
@@ -12,12 +14,18 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.*;
 import java.util.Arrays;
 
+@Component
 public class MyTrustStrategy implements TrustStrategy {
 
 
     // sto je ovo Null...
-    @Autowired @Qualifier("myKeyStore")
     private KeyStore trustStore;
+
+    public MyTrustStrategy(){}
+
+    public  MyTrustStrategy(KeyStore keyStore) {
+        this.trustStore = keyStore;
+    }
 
     @Override
     public boolean isTrusted(X509Certificate[] chain, String authType) {
@@ -27,6 +35,7 @@ public class MyTrustStrategy implements TrustStrategy {
             CertPath path = cf.generateCertPath(Arrays.asList(chain));
             CertPathValidator validator = CertPathValidator.getInstance("PKIX");
             PKIXParameters params = new PKIXParameters(trustStore);
+            params.setRevocationEnabled(false);
             PKIXCertPathValidatorResult r = (PKIXCertPathValidatorResult) validator.validate(path, params);
         }
         catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | InvalidAlgorithmParameterException e){e.printStackTrace();}

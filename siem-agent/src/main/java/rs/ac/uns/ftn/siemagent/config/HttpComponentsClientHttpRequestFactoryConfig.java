@@ -46,7 +46,7 @@ public class HttpComponentsClientHttpRequestFactoryConfig {
             // MORA STRATEGIJA DA SE NAMESTI DA VERUJE SMAO ONIMA KOJI SU U KEYSTORU
             // ili onima koje proveri...
             SSLContext sslContext = SSLContexts.custom()
-                    .loadTrustMaterial(null, new MyTrustStrategy())
+                    .loadTrustMaterial(null, new MyTrustStrategy(keystore))
                     .loadKeyMaterial(keystore, keyStorePassword.toCharArray()).build();
 
             SSLConnectionSocketFactory socketFactory =
