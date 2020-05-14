@@ -133,7 +133,7 @@ public class LogController {
     }
 
     @GetMapping(path = "/findAll")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('admin') or hasRole('operator')")
     public ResponseEntity<List<Log>> findAll() {
         return new ResponseEntity<>(logService.findAll(), HttpStatus.OK);
     }
