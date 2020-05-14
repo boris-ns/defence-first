@@ -18,7 +18,7 @@ public class SiemCentarApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-//        certificateService.sendRequestForCertificate(token);
+//        certificateService.sendRequestForCertificate();
 //        certificateService.installCertificateFromFile();
 //        X509Certificate certificate = certificateService.findMyCertificate();
 //        System.out.println(certificate.getSerialNumber());

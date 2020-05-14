@@ -4,6 +4,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import rs.ac.uns.ftn.pkiservice.configuration.MyKeyStore;
 import rs.ac.uns.ftn.pkiservice.exception.exceptions.ApiRequestException;
@@ -19,7 +20,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
-import static rs.ac.uns.ftn.pkiservice.constants.Constants.*;
+import static rs.ac.uns.ftn.pkiservice.configuration.MyKeyStore.*;
 
 
 @Repository
@@ -38,7 +39,7 @@ public class KeyStoreRepositoryImpl implements KeyStoreRepository {
         //Iscitava se sertifikat koji ima dati alias
         Certificate cert = keyStore.getCertificate(alias);
         //Iscitava se privatni kljuc vezan za javni kljuc koji se nalazi na sertifikatu sa datim aliasom
-        PrivateKey privKey = (PrivateKey) keyStore.getKey(alias, KEYSTORE_PASSWORD);
+        PrivateKey privKey = (PrivateKey) keyStore.getKey(alias, myKeyStore.getKEYSTORE_PASSWORD());
 
         X500Name issuerName = new JcaX509CertificateHolder((X509Certificate) cert).getSubject();
         return new IssuerData(privKey, issuerName);
@@ -143,7 +144,7 @@ public class KeyStoreRepositoryImpl implements KeyStoreRepository {
         KeyStore ks = myKeyStore.getKeystore();
 
         if (ks.isKeyEntry(alias)) {
-            return (PrivateKey) ks.getKey(alias, KEYSTORE_PASSWORD);
+            return (PrivateKey) ks.getKey(alias, myKeyStore.getKEYSTORE_PASSWORD());
         }
         return null;
     }
@@ -151,20 +152,21 @@ public class KeyStoreRepositoryImpl implements KeyStoreRepository {
     @Override
     public void writeKeyEntry(String alias, PrivateKey privateKey, Certificate[] certificates) throws
             KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
-        myKeyStore.getKeystore().setKeyEntry(alias, privateKey, KEYSTORE_PASSWORD, certificates);
+        myKeyStore.getKeystore().setKeyEntry(alias, privateKey, myKeyStore.getKEYSTORE_PASSWORD(), certificates);
         saveKeyStore();
     }
 
 
     @Override
     public void saveKeyStore() throws IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException {
-        myKeyStore.getKeystore().store(new FileOutputStream(KEYSTORE_FILE_PATH), KEYSTORE_PASSWORD);
+        myKeyStore.getKeystore().store(new FileOutputStream(myKeyStore.getKEYSTORE_FILE_PATH()), myKeyStore.getKEYSTORE_PASSWORD());
     }
 
     @Override
     public void writeKeyEntryToArchive(String alias, PrivateKey privateKey, Certificate[] certificates) throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException {
-        archiveKeyStore.setKeyEntry(alias, privateKey, KEYSTORE_ARCHIVE_PASSWORD, certificates);
-        archiveKeyStore.store(new FileOutputStream(KEYSTORE_ARCHIVE_FILE_PATH), KEYSTORE_ARCHIVE_PASSWORD);
+        archiveKeyStore.setKeyEntry(alias, privateKey, myKeyStore.getKEYSTORE_ARCHIVE_PASSWORD(), certificates);
+        archiveKeyStore.store(new FileOutputStream(myKeyStore.getKEYSTORE_ARCHIVE_FILE_PATH()),
+                myKeyStore.getKEYSTORE_ARCHIVE_PASSWORD());
     }
 
     @Override
