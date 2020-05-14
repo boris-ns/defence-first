@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.pkiservice.service;
 
+import org.bouncycastle.asn1.x500.X500Name;
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
 import rs.ac.uns.ftn.pkiservice.models.IssuerData;
 
@@ -9,7 +10,6 @@ import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +26,7 @@ public interface CertificateService {
     IssuerData findIssuerByAlias(String alias) throws NoSuchAlgorithmException, CertificateException,
             KeyStoreException, IOException, UnrecoverableKeyException;
 
-    X509Certificate generateCertificateIntermediate(HashMap<String, String> subjectName, String issuerAlias) throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, IOException;
+    X509Certificate generateCertificateIntermediate(X500Name subjectName, String issuerAlias) throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, IOException;
 
     Certificate[] getCertificateChainByAlias(String alias);
 

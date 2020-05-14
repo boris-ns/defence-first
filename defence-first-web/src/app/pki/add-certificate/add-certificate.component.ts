@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { PkiServiceService } from 'src/app/services/pki-service/pki-service.service';
-import { CertificateCreate, Name } from 'src/app/models/certificate-create.model';
+import { CertificateCreate } from 'src/app/models/certificate-create.model';
 import { CERTIFICATES_PATH } from 'src/app/config/router-paths';
 import { Router } from '@angular/router';
 
@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 })
 export class AddCertificateComponent implements OnInit {
 
-  certificate: CertificateCreate = new CertificateCreate( new Name('', '', '', '', '', ''), '');
+  certificate: CertificateCreate = new CertificateCreate('', '', '', '', '', '', '');
   countries: object[];
   aliases: string[];
   issuers: object[];
@@ -33,7 +33,7 @@ export class AddCertificateComponent implements OnInit {
 
   onSubmit() {
     this.pkiService.generateCertificatIntermediate(this.certificate).subscribe(
-      data => {
+      () => {
         this.router.navigate([CERTIFICATES_PATH]);
       }
     );

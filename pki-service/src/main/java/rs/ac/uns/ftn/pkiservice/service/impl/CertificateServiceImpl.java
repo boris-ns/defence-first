@@ -104,12 +104,11 @@ public class CertificateServiceImpl implements CertificateService {
      * */
 
     @Override
-    public X509Certificate generateCertificateIntermediate(HashMap<String, String> subjectName, String issuerAlias)
+    public X509Certificate generateCertificateIntermediate(X500Name subjectName, String issuerAlias)
             throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException,
             IOException {
         KeyPair keyPairSuject = keyPairGeneratorService.generateKeyPair();
-        X500Name name = certificateGenerator.generateName(subjectName);
-        SubjectData subjectData = certificateGenerator.generateSubjectData(keyPairSuject.getPublic(), name,
+        SubjectData subjectData = certificateGenerator.generateSubjectData(keyPairSuject.getPublic(), subjectName,
                 Constants.CERT_TYPE.INTERMEDIATE_CERT);
         IssuerData issuerData = findIssuerByAlias(issuerAlias);
 
