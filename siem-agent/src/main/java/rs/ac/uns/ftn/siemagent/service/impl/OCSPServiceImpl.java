@@ -118,16 +118,6 @@ public class OCSPServiceImpl implements OCSPService {
             return null;
         }
 
-        // @TODO: naci bolji nacin za refresh
-//        // Ovo znaci da je istekao token, pa cemo refreshovati token
-//        // i opet poslati zahtev
-//        // @TODO: Nije testirano
-//        if (ocspResponse.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
-//            token = authService.refreshToken(token.getRefresh_token());
-//            headers.set("Authorization", "bearer " + token.getAccesss_token());
-//            ocspResponse = restTemplate.exchange(ocspReqURL, HttpMethod.POST, entityReq, byte[].class);
-//        }
-
         OCSPResp ocspResp = new OCSPResp(OCSPResponse.getInstance(ocspResponse.getBody()));
         return ocspResp;
     }

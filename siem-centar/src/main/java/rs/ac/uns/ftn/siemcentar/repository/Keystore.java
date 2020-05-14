@@ -73,5 +73,7 @@ public class Keystore {
         return keyStore.getCertificate(Constants.CERTIFICATE_ALIAS);
     }
 
+    public KeyStore getKeyStore(){return this.keyStore;}
+
 
 }

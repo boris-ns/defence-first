@@ -27,10 +27,11 @@ public class KeystoreConfiguration {
     @Autowired
     private KeyPairGeneratorService keyPairGeneratorService;
 
-    @Bean
+    @Bean(name = "myKeyStore")
     public KeyStore getKeystore(){
         try {
             KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
+
             File f = new File(keyStoreFilePath);
 
             if (f.exists()) {

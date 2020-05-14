@@ -23,7 +23,6 @@ import org.springframework.web.client.RestTemplate;
 
 import rs.ac.uns.ftn.siemagent.Constants.Constants;
 import rs.ac.uns.ftn.siemagent.config.AgentConfiguration;
-import rs.ac.uns.ftn.siemagent.dto.response.TokenDTO;
 import rs.ac.uns.ftn.siemagent.config.CertificateBuilder;
 import rs.ac.uns.ftn.siemagent.repository.Keystore;
 import rs.ac.uns.ftn.siemagent.service.AuthService;
@@ -166,16 +165,6 @@ public class CertificateServiceImpl implements CertificateService {
             System.out.println("[ERROR] You are not allowed to make CSR request");
             return null;
         }
-
-        // @TODO: naci bolji nacin za refresh
-//        // Ovo znaci da je istekao token, pa cemo refreshovati token
-//        // i opet poslati zahtev
-//        // @TODO: Nije testirano
-//        if (certificate.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
-//            token = authService.refreshToken(token.getRefresh_token());
-//            headers.set("Authorization", "bearer " + token.getAccesss_token());
-//            certificate = restTemplate.exchange(createCertificateURL, HttpMethod.POST, entityReq, String.class);
-//        }
         return certificate.getBody();
     }
 
@@ -231,16 +220,6 @@ public class CertificateServiceImpl implements CertificateService {
             return null;
         }
 
-        // @TODO: isto
-//        // Ovo znaci da je istekao token, pa cemo refreshovati token
-//        // i opet poslati zahtev
-//        // @TODO: Nije testirano
-//        if (certificate.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
-//            token = authService.refreshToken(token.getRefresh_token());
-//            headers.set("Authorization", "bearer " + token.getAccesss_token());
-//            certificate = restTemplate.exchange(getCertificateURL + "/" + serialNumber, HttpMethod.GET, entityReq, String.class);
-//        }
-
         PEMParser pemParser = new PEMParser(new StringReader(certificate.getBody()));
         X509CertificateHolder certificateHolder = (X509CertificateHolder) pemParser.readObject();
 
@@ -273,16 +252,6 @@ public class CertificateServiceImpl implements CertificateService {
             System.out.println("[ERROR] You are not allowed to make CSR request");
             return null;
         }
-
-        // @TODO: isto
-//        // Ovo znaci da je istekao token, pa cemo refreshovati token
-//        // i opet poslati zahtev
-//        // @TODO: Nije testirano
-//        if (certificate.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
-//            token = authService.refreshToken(token.getRefresh_token());
-//            headers.set("Authorization", "bearer " + token.getAccesss_token());
-//            certificate = restTemplate.exchange(renewCertificate, HttpMethod.POST, entityReq, Void.class);
-//        }
         return null;
     }
 

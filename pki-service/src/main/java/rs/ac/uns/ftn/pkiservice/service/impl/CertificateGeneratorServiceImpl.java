@@ -72,14 +72,12 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
             else {
                 certGen.addExtension(Extension.keyUsage, true,
                         new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyCertSign | KeyUsage.cRLSign));
-
-
-                GeneralName altName = new GeneralName(GeneralName.dNSName, "localhost");
-                GeneralNames subjectAltName = new GeneralNames(altName);
-                certGen.addExtension(Extension.subjectAlternativeName, false, subjectAltName);
-
-
             }
+
+            GeneralName altName = new GeneralName(GeneralName.dNSName, "localhost");
+            GeneralNames subjectAltName = new GeneralNames(altName);
+            certGen.addExtension(Extension.subjectAlternativeName, false, subjectAltName);
+
 
             //Generise se sertifikat
             X509CertificateHolder certHolder = certGen.build(contentSigner);

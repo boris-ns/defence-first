@@ -13,17 +13,26 @@ import java.util.Arrays;
 @Component
 public class MyTrustStrategy implements TrustStrategy {
 
+
+    // sto je ovo Null...
     private KeyStore trustStore;
 
     public MyTrustStrategy(){}
 
-    public  MyTrustStrategy(KeyStore keyStore) {
+    public MyTrustStrategy(KeyStore keyStore) {
         this.trustStore = keyStore;
     }
 
     @Override
     public boolean isTrusted(X509Certificate[] chain, String authType) {
         boolean retVal = true;
+
+
+        for(X509Certificate certificate : chain) {
+            System.out.println(certificate.getSerialNumber());
+        }
+
+
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             CertPath path = cf.generateCertPath(Arrays.asList(chain));
@@ -32,15 +41,15 @@ public class MyTrustStrategy implements TrustStrategy {
             params.setRevocationEnabled(false);
             PKIXCertPathValidatorResult r = (PKIXCertPathValidatorResult) validator.validate(path, params);
         }
-        catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | InvalidAlgorithmParameterException e)
-        {
-            e.printStackTrace();
-        }
+        catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | InvalidAlgorithmParameterException e){e.printStackTrace();}
         catch (CertPathValidatorException e){
             e.printStackTrace();
             retVal = false;
         }finally {
             return retVal;
         }
+
+//
+//        return true;
     }
 }
