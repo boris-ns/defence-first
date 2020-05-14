@@ -1,3 +1,4 @@
+import { SHOW_LOGS_PATH } from './../../config/router-paths';
 import { Component, OnInit } from '@angular/core';
 import { KeycloakService } from 'keycloak-angular';
 import { PkiServiceService } from 'src/app/services/pki-service/pki-service.service';
@@ -33,6 +34,10 @@ export class MenuComponent implements OnInit {
 
   addCertificates() {
     this.router.navigate([CERTIFICATES_PATH, ADD_PATH]);
+  }
+
+  showLogs() {
+    this.router.navigate([SHOW_LOGS_PATH]);
   }
 
   logOut() {

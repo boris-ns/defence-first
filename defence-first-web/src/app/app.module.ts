@@ -14,6 +14,7 @@ import { NotFoundComponent } from './components/error-pages/not-found/not-found.
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from './material/material.module';
 import { MenuComponent } from './components/menu/menu.component';
+import { ShowLogsComponent } from './components/shared/show-logs/show-logs.component';
 
 
 @NgModule({
@@ -22,7 +23,8 @@ import { MenuComponent } from './components/menu/menu.component';
     HomeComponent,
     NotAuthorizedComponent,
     NotFoundComponent,
-    MenuComponent
+    MenuComponent,
+    ShowLogsComponent
   ],
   imports: [
     BrowserModule,

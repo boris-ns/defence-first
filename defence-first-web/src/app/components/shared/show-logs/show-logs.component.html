@@ -1,0 +1,22 @@
+<div class="container">
+    <h1>Logs</h1>
+
+    <table class="log-table">
+        <thead>
+            <th>ID</th>
+            <th>Type</th>
+            <th>Date & time</th>
+            <th>Source</th>
+            <th>Message</th>
+        </thead>
+        <tbody>
+            <tr *ngFor="let log of logs">
+                <td>{{ log.id }}</td>
+                <td>{{ log.logType }}</td>
+                <td>{{ log.date }}</td>
+                <td>{{ log.source }}</td>
+                <td>{{ log.message }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
