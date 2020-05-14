@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.pkiservice.controller;
 
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import rs.ac.uns.ftn.pkiservice.dto.response.CertificateIssuerDTO;
 import rs.ac.uns.ftn.pkiservice.dto.request.CreateCertificateDTO;
 import rs.ac.uns.ftn.pkiservice.dto.response.SimpleCertificateDTO;
 import rs.ac.uns.ftn.pkiservice.mapper.CertificateMapper;
+import rs.ac.uns.ftn.pkiservice.mapper.NameMapper;
 import rs.ac.uns.ftn.pkiservice.service.CertificateService;
 
 import javax.security.auth.x500.X500PrivateCredential;
@@ -70,11 +72,11 @@ public class CertificateController {
 
     @PostMapping(path = "/generate/intermediate", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<String> generateIntermediate(@Valid @RequestBody CreateCertificateDTO certificateDTO) throws
+    public ResponseEntity generateIntermediate(@Valid @RequestBody CreateCertificateDTO certificateDTO) throws
             UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
-        X509Certificate certificate = certificateService.generateCertificateIntermediate(
-                certificateDTO.getSubjectName(), certificateDTO.getIssuerAlias());
-        return new ResponseEntity<>(certificate.getSerialNumber().toString(), HttpStatus.OK);
+        X500Name subjectName = NameMapper.toX500Name(certificateDTO);
+        certificateService.generateCertificateIntermediate(subjectName, certificateDTO.getIssuerAlias());
+        return ResponseEntity.ok().build();
     }
 
 

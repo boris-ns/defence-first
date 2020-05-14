@@ -3,6 +3,7 @@ package rs.ac.uns.ftn.pkiservice.configuration;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
@@ -27,15 +28,27 @@ public class MyKeyStore {
     @Autowired
     private KeyPairGeneratorService keyPairGeneratorService;
 
+    @Value("${keystore.filepath}")
+    private String KEYSTORE_FILE_PATH;
+
+    @Value("${keystore.password}")
+    private String KEYSTORE_PASSWORD;
+
+    @Value("${keystore.archive.filepath}")
+    private String KEYSTORE_ARCHIVE_FILE_PATH;
+
+    @Value("${keystore.archive.password}")
+    private String KEYSTORE_ARCHIVE_PASSWORD;
+
     @Bean(name = "keyStore")
     public KeyStore getKeystore(){
         try {
             KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
             File f = new File(KEYSTORE_FILE_PATH);
             if (f.exists()){
-                keyStore.load(new FileInputStream(f), KEYSTORE_PASSWORD);
+                keyStore.load(new FileInputStream(f), KEYSTORE_PASSWORD.toCharArray());
             }else {
-                keyStore.load(null, KEYSTORE_PASSWORD);
+                keyStore.load(null, KEYSTORE_PASSWORD.toCharArray());
                 KeyPair kp = keyPairGeneratorService.generateKeyPair();
                 X500NameBuilder builder = generateName();
 
@@ -46,8 +59,8 @@ public class MyKeyStore {
                 Certificate certificate = certificateGeneratorService.generateCertificate
                             (subjectData, issuerData,Constants.CERT_TYPE.ROOT_CERT);
 
-                keyStore.setKeyEntry(ROOT_ALIAS, kp.getPrivate(), KEYSTORE_PASSWORD, new Certificate[]{certificate});
-                keyStore.store(new FileOutputStream(KEYSTORE_FILE_PATH), KEYSTORE_PASSWORD);
+                keyStore.setKeyEntry(ROOT_ALIAS, kp.getPrivate(), KEYSTORE_PASSWORD.toCharArray(), new Certificate[]{certificate});
+                keyStore.store(new FileOutputStream(KEYSTORE_FILE_PATH), KEYSTORE_PASSWORD.toCharArray());
             }
             return keyStore;
         } catch (NoSuchAlgorithmException e) {
@@ -72,10 +85,10 @@ public class MyKeyStore {
             KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
             File f = new File(KEYSTORE_ARCHIVE_FILE_PATH);
             if (f.exists()) {
-                keyStore.load(new FileInputStream(f), KEYSTORE_ARCHIVE_PASSWORD);
+                keyStore.load(new FileInputStream(f), KEYSTORE_ARCHIVE_PASSWORD.toCharArray());
             } else {
-                keyStore.load(null, KEYSTORE_ARCHIVE_PASSWORD);
-                keyStore.store(new FileOutputStream(KEYSTORE_ARCHIVE_FILE_PATH), KEYSTORE_PASSWORD);
+                keyStore.load(null, KEYSTORE_ARCHIVE_PASSWORD.toCharArray());
+                keyStore.store(new FileOutputStream(KEYSTORE_ARCHIVE_FILE_PATH), KEYSTORE_PASSWORD.toCharArray());
             }
             return keyStore;
         } catch (NoSuchAlgorithmException e) {
@@ -104,4 +117,19 @@ public class MyKeyStore {
         return builder;
     }
 
+    public String getKEYSTORE_FILE_PATH() {
+        return KEYSTORE_FILE_PATH;
+    }
+
+    public char[] getKEYSTORE_PASSWORD() {
+        return KEYSTORE_PASSWORD.toCharArray();
+    }
+
+    public String getKEYSTORE_ARCHIVE_FILE_PATH() {
+        return KEYSTORE_ARCHIVE_FILE_PATH;
+    }
+
+    public char[] getKEYSTORE_ARCHIVE_PASSWORD() {
+        return KEYSTORE_ARCHIVE_PASSWORD.toCharArray();
+    }
 }

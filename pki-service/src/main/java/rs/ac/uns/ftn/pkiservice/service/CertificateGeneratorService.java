@@ -23,5 +23,4 @@ public interface CertificateGeneratorService {
 
     void generateDate(SubjectData subjectData, Constants.CERT_TYPE certType);
 
-    X500Name generateName(HashMap<String, String> subjectName);
 }

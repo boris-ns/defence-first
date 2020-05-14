@@ -1,28 +1,21 @@
 export class CertificateCreate {
 
-    subjectName: Name;
+    countryCode: string;
+    state: string;
+    locality: string;
+    organization: string;
+    organizationalUnit: string;
+    commonName: string;
     issuerAlias: string;
 
-    constructor(subjectName: Name, issuerAlias: string) {
-        this.subjectName = subjectName;
+    constructor(countryCode: string, state: string, locality: string, organization: string, organizationalUnit: string,
+                commonName: string, issuerAlias: string) {
+        this.countryCode = countryCode;
+        this.state = state;
+        this.locality = locality;
+        this.organization = organization;
+        this. organizationalUnit = organizationalUnit;
+        this.commonName = commonName;
         this.issuerAlias = issuerAlias;
-    }
-}
-
-export class Name {
-    c: string;
-    st: string;
-    l: string;
-    o: string;
-    ou: string;
-    cn: string;
-
-    constructor(c: string, st: string, l: string, o: string, ou: string, cn: string) {
-        this.c = c;
-        this.st = st;
-        this.l = l;
-        this.o = o;
-        this.ou = ou;
-        this.cn = cn;
     }
 }

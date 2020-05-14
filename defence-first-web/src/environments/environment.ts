@@ -13,6 +13,7 @@ const keycloakConfig: KeycloakConfig = {
 
 const PKIServiceConfig = {
   url : 'http://localhost:8081/api'
+  // url : 'https://localhost:8081/api'
 };
 
 const SIEMCentarConfig = {

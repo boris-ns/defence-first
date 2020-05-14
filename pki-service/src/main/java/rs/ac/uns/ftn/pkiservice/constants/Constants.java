@@ -12,11 +12,6 @@ public class Constants {
     public static final Integer INTERMEDIATE_CERT_DURATION = 10;  // znaci 10 godina
     public static final Integer LEAF_CERT_DURATION = 5; // znaci 5 godina
 
-    public static String KEYSTORE_FILE_PATH = "myKeystore.jks";
-    public static char[] KEYSTORE_PASSWORD = "123456".toCharArray();
-    public static String KEYSTORE_ARCHIVE_FILE_PATH = "archiveKeyStore.jks";
-    public static char[] KEYSTORE_ARCHIVE_PASSWORD = "123456".toCharArray();
-
     public static String ROOT_ALIAS = "1";
 
     public static String GENERATED_CERT_DIRECTORY = "src/main/resources/generatedCerts";
