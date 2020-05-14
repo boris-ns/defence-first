@@ -40,9 +40,9 @@ public class SiemAgentApplication implements CommandLineRunner {
 //		}
 
 		// simulacija slanja logova
-		simulation();
+//		simulation();
 
-//		certificateService.sendRequestForCertificate();
+		certificateService.sendRequestForCertificate();
 //		certificateService.installCertificateFromFile();
 
 

@@ -16,6 +16,7 @@ import rs.ac.uns.ftn.pkiservice.models.IssuerData;
 import rs.ac.uns.ftn.pkiservice.models.SubjectData;
 import rs.ac.uns.ftn.pkiservice.service.CertificateGeneratorService;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.CertificateEncodingException;
@@ -31,6 +32,7 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import sun.security.x509.SubjectAlternativeNameExtension;
 
 @Service
 public class CertificateGeneratorServiceImpl implements CertificateGeneratorService {
@@ -70,6 +72,13 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
             else {
                 certGen.addExtension(Extension.keyUsage, true,
                         new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyCertSign | KeyUsage.cRLSign));
+
+
+                GeneralName altName = new GeneralName(GeneralName.dNSName, "localhost");
+                GeneralNames subjectAltName = new GeneralNames(altName);
+                certGen.addExtension(Extension.subjectAlternativeName, false, subjectAltName);
+
+
             }
 
             //Generise se sertifikat
@@ -93,6 +102,8 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
         } catch (CertificateException e) {
             e.printStackTrace();
         } catch (CertIOException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return null;

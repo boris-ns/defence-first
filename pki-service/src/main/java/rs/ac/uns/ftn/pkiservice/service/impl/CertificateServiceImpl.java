@@ -6,6 +6,7 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.util.io.pem.PemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import rs.ac.uns.ftn.pkiservice.constants.Constants;
@@ -45,6 +46,9 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Autowired
     private RevokedCertificateRepository ocspRepository;
+
+    @Value("${generated.certifacates.directory}")
+    private String certDirectory;
 
     @Override
     public Map<Constants.CERT_TYPE, List<X509Certificate>> findAll() {
@@ -223,9 +227,8 @@ public class CertificateServiceImpl implements CertificateService {
 
 
     @Override
-    public void writeCertToFile(String serialNumber, String certDirectory) throws Exception {
+    public void writeCertToFile(String serialNumber) throws Exception {
         X509Certificate certificate = this.findCertificateByAlias(serialNumber);
-
 
         StringWriter sw = new StringWriter();
         JcaPEMWriter pm = new JcaPEMWriter(sw);
