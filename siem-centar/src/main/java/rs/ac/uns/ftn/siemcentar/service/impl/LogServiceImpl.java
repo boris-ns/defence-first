@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.siemcentar.constants.Constants;
 import rs.ac.uns.ftn.siemcentar.dto.response.TokenDTO;
+import rs.ac.uns.ftn.siemcentar.messaging.WebSocketProducer;
 import rs.ac.uns.ftn.siemcentar.model.Log;
 import rs.ac.uns.ftn.siemcentar.repository.Keystore;
 import rs.ac.uns.ftn.siemcentar.repository.LogRepository;
@@ -21,13 +22,12 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class LogServiceImpl implements LogService {
@@ -50,16 +50,19 @@ public class LogServiceImpl implements LogService {
     @Autowired
     private CipherService cipherService;
 
+    @Autowired
+    private WebSocketProducer socketProducer;
+
     @Override
     public void saveLogs(List<Log> logs) {
         logRepository.saveAll(logs);
+        logs.forEach(log -> socketProducer.sendLog(log));
     }
 
     @Override
     public List<Log> findAll() {
         return logRepository.findAll();
     }
-
 
     @Override
     public SecretKey processPreMasterSecret(X509Certificate clientCertificate, byte[] secretKey) throws Exception {
