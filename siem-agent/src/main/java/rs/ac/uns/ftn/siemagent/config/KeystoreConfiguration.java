@@ -6,12 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import rs.ac.uns.ftn.siemagent.Constants.Constants;
+import rs.ac.uns.ftn.siemagent.service.CertificateService;
 import rs.ac.uns.ftn.siemagent.service.KeyPairGeneratorService;
 
 import java.io.*;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 
 @Configuration
 public class KeystoreConfiguration {
@@ -22,8 +25,11 @@ public class KeystoreConfiguration {
     @Value("${keystore.password}")
     private String keyStorePassword;
 
+    @Value("${pki.certificate.path}")
+    private String pkiCertFilePath;
+
     @Autowired
-    private KeyPairGeneratorService keyPairGeneratorService;
+    private CertificateService certificateService;
 
     @Bean(name = "myKeyStore")
     public KeyStore getKeystore(){
@@ -35,6 +41,12 @@ public class KeystoreConfiguration {
                 keyStore.load(new FileInputStream(f), keyStorePassword.toCharArray());
             } else {
                 keyStore.load(null, keyStorePassword.toCharArray());
+
+                CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                InputStream certstream = certificateService.fullStream(pkiCertFilePath);
+                Certificate certs =  cf.generateCertificate(certstream);
+
+                keyStore.setCertificateEntry("pki", certs);
                 keyStore.store(new FileOutputStream(keyStoreFilePath), keyStorePassword.toCharArray());
             }
             return keyStore;

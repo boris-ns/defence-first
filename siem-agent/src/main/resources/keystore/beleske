@@ -2,8 +2,8 @@
 
     - zakomentarisati SVE u application.properties-u u SSL sekciji
 
-    - potrebno je prvo instalirati sertifikat pki-a u keystore komandom
-        "keytool -import -alias pki -file cert_1.crt -keystore keystore.jks"
+    -  potrebno je u folderu keystore imati cert_1.crt koji je root certifikat od pki-a
+              on ce se sam prilikom inicijalizacije keystore.jks dodati kao trusted
 
     - nakon toga je moguce poslati CSR
 
@@ -15,7 +15,7 @@
 
 2. Komunikacija sa SiemCentrom
 
-    - trenutno je potrebno svoj sertifikat preneti na SiemCentar i tamo ga instalirati kao i
-        pki-ov sertifikat jer SiemCentar zateva da klijent salje sertifikat prilikom pristupa
+    - trenutno je potrebno svoj sertifikat preneti na SiemCentar i tamo ga instalirati
+     jer SiemCentar zateva da klijent salje sertifikat prilikom pristupa
             (obostrani handshake)
 

@@ -4,6 +4,7 @@ import rs.ac.uns.ftn.siemagent.dto.response.TokenDTO;
 
 import javax.security.auth.x500.X500Principal;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyPair;
 import java.security.KeyStoreException;
 import java.security.PrivateKey;
@@ -30,4 +31,5 @@ public interface CertificateService {
 
     X509Certificate findMyCertificate() throws Exception;
 
+    InputStream fullStream(String certFile) throws IOException;
 }

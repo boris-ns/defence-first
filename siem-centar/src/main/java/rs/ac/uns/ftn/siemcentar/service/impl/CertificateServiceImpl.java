@@ -297,8 +297,9 @@ public class CertificateServiceImpl implements CertificateService {
         return certConverter.getCertificate(certGen.build(contentSigner));
     }
 
-    private InputStream fullStream(String certfile) throws IOException{
-        FileInputStream fis = new FileInputStream(certfile);
+    @Override
+    public InputStream fullStream(String certFile) throws IOException{
+        FileInputStream fis = new FileInputStream(certFile);
         DataInputStream dis = new DataInputStream(fis);
         byte[] bytes = new byte[dis.available()];
         dis.readFully(bytes);
