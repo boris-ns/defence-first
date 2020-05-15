@@ -14,14 +14,4 @@ public interface LogService {
 
     List<Log> findAll();
 
-    SecretKey processPreMasterSecret(X509Certificate clientCertificate, byte[] secretKey) throws Exception;
-
-    byte[] encriptSimetricKeyWithMyKey(SecretKey key) throws Exception;
-
-    byte[] encriptSimetricKey(SecretKey secretKey, PublicKey publicKey) throws Exception;
-
-    byte[] decriptWitmMyPrivate(byte[] data) throws Exception;
-
-    ArrayList<String> convertLogsFromByte(byte[] logs) throws Exception;
-
 }

@@ -25,11 +25,4 @@ public class KeyPairGeneratorServiceImpl implements KeyPairGeneratorService {
         return null;
     }
 
-    @Override
-    public SecretKey generateSimetricKey() throws NoSuchAlgorithmException {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-        keyGenerator.init(256, new SecureRandom());
-        SecretKey key = keyGenerator.generateKey();
-        return key;
-    }
 }
