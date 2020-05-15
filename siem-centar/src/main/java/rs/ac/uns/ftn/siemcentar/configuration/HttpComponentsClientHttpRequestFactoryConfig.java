@@ -18,15 +18,9 @@ import java.security.KeyStore;
 @Configuration
 public class HttpComponentsClientHttpRequestFactoryConfig {
 
-    @Value("${keystore.password}")
-    private String keyStorePassword;
 
     @Autowired
-    @Qualifier("myKeyStore")
-    private KeyStore keystore;
-
-    @Autowired
-    private OCSPService ocspService;
+    private SSLContext sslContext;
 
     @Bean(name = "httFactory")
     public HttpComponentsClientHttpRequestFactory getHttpComponentsClientHttpRequestFactory() {
@@ -42,9 +36,9 @@ public class HttpComponentsClientHttpRequestFactoryConfig {
                 // neam pojma...
             // MORA STRATEGIJA DA SE NAMESTI DA VERUJE SMAO ONIMA KOJI SU U KEYSTORU
             // ili onima koje proveri...
-            SSLContext sslContext = SSLContexts.custom()
-                    .loadTrustMaterial(null, new MyTrustStrategy(keystore, ocspService))
-                    .loadKeyMaterial(keystore, keyStorePassword.toCharArray()).build();
+//            SSLContext sslContext = SSLContexts.custom()
+//                    .loadTrustMaterial(null, new MyTrustStrategy(keystore, ocspService))
+//                    .loadKeyMaterial(keystore, keyStorePassword.toCharArray()).build();
 
             SSLConnectionSocketFactory socketFactory =
                     new SSLConnectionSocketFactory(sslContext,
