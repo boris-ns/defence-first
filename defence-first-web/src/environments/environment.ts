@@ -17,7 +17,8 @@ const PKIServiceConfig = {
 };
 
 const SIEMCentarConfig = {
-  url : 'http://localhost:8082/api'
+  // url : 'http://localhost:8082/api'
+  url : 'https://localhost:8082/api'
 };
 
 export const environment = {
