@@ -16,6 +16,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -65,12 +66,14 @@ public class OCSPServiceImpl implements OCSPService {
     private AuthService authService;
 
     @Autowired
+    @Lazy
     private RestTemplate restTemplate;
 
     @Override
-    public OCSPReq generateOCSPRequest(X509Certificate certificate) throws Exception {
-        //@TODO: issuerCert is still mocked ---> AKO DOBAVIS LANAC ne MORAS OVO RADITI
-        X509Certificate issuerCert = certificateService.getCertificateBySerialNumber("1");
+    public OCSPReq generateOCSPRequest(X509Certificate[] chain) throws Exception {
+
+        X509Certificate certificate = chain[0];
+        X509Certificate issuerCert = chain[1];
 
         BcDigestCalculatorProvider util = new BcDigestCalculatorProvider();
 
@@ -129,7 +132,8 @@ public class OCSPServiceImpl implements OCSPService {
         }
         BasicOCSPResp basicResponse = (BasicOCSPResp)ocspResp.getResponseObject();
 
-        X509Certificate rootCA = certificateService.getCertificateBySerialNumber(rootCASerialNumber);
+
+        X509Certificate rootCA = (X509Certificate) keyStore.getKeyStore().getCertificate("pki");;
 
         ContentVerifierProvider prov = new JcaContentVerifierProviderBuilder().build(rootCA.getPublicKey());
         boolean signatureValid = basicResponse.isSignatureValid(prov);

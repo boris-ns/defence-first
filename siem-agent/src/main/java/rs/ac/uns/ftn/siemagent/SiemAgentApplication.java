@@ -34,7 +34,7 @@ public class SiemAgentApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 
 		// simulacija slanja logova
-//		simulation();
+		simulation();
 
 //		certificateService.sendRequestForCertificate();
 //		certificateService.installCertificateFromFile();

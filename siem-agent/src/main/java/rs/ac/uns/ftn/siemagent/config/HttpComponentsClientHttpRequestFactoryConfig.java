@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import rs.ac.uns.ftn.siemagent.service.OCSPService;
 
 import javax.net.ssl.SSLContext;
 import java.security.KeyStore;
@@ -23,6 +24,9 @@ public class HttpComponentsClientHttpRequestFactoryConfig {
     @Autowired
     @Qualifier("myKeyStore")
     private KeyStore keystore;
+
+    @Autowired
+    private OCSPService ocspService;
 
     @Bean(name = "httFactory")
     public HttpComponentsClientHttpRequestFactory getHttpComponentsClientHttpRequestFactory() {
@@ -39,7 +43,7 @@ public class HttpComponentsClientHttpRequestFactoryConfig {
             // MORA STRATEGIJA DA SE NAMESTI DA VERUJE SMAO ONIMA KOJI SU U KEYSTORU
             // ili onima koje proveri...
             SSLContext sslContext = SSLContexts.custom()
-                    .loadTrustMaterial(null, new MyTrustStrategy(keystore))
+                    .loadTrustMaterial(null, new MyTrustStrategy(keystore, ocspService))
                     .loadKeyMaterial(keystore, keyStorePassword.toCharArray()).build();
 
             SSLConnectionSocketFactory socketFactory =

@@ -5,6 +5,7 @@ import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.ocsp.OCSPResponse;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -16,6 +17,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -64,15 +66,15 @@ public class OCSPServiceImpl implements OCSPService {
     @Autowired
     private AuthService authService;
 
-    @Autowired
+    @Autowired @Lazy
     private RestTemplate restTemplate;
 
     @Override
-    public OCSPReq generateOCSPRequest(X509Certificate certificate)
+    public OCSPReq generateOCSPRequest(X509Certificate[] certificates)
             throws Exception {
 
-        //@TODO: issuerCert is still mocked ---> AKO DOBAVIS LANAC ne MORAS OVO RADITI
-        X509Certificate issuerCert = certificateService.getCertificateBySerialNumber("1");
+        X509Certificate certificate = certificates[0];
+        X509Certificate issuerCert =  certificates[1];
 
         BcDigestCalculatorProvider util = new BcDigestCalculatorProvider();
 
@@ -119,17 +121,6 @@ public class OCSPServiceImpl implements OCSPService {
             System.out.println("[ERROR] You are not allowed to make CSR request");
             return null;
         }
-
-        // @TODO: nadji bolji nacin za refresh
-//        // Ovo znaci da je istekao token, pa cemo refreshovati token
-//        // i opet poslati zahtev
-//        // @TODO: Nije testirano
-//        if (ocspResponse.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
-//            token = authService.refreshToken(token.getRefresh_token());
-//            headers.set("Authorization", "bearer " + token.getAccesss_token());
-//            ocspResponse = restTemplate.exchange(ocspReqURL, HttpMethod.POST, entityReq, byte[].class);
-//        }
-
         OCSPResp ocspResp = new OCSPResp(OCSPResponse.getInstance(ocspResponse.getBody()));
         return ocspResp;
     }
@@ -142,7 +133,7 @@ public class OCSPServiceImpl implements OCSPService {
 
         BasicOCSPResp basicResponse = (BasicOCSPResp)ocspResp.getResponseObject();
 
-        X509Certificate rootCA = certificateService.getCertificateBySerialNumber(rootCASerialNumber);
+        X509Certificate rootCA = (X509Certificate) keyStore.getKeyStore().getCertificate("pki");;
 
         ContentVerifierProvider prov = new JcaContentVerifierProviderBuilder().build(rootCA.getPublicKey());
         boolean signatureValid = basicResponse.isSignatureValid(prov);

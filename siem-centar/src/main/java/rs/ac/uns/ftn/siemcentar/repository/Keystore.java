@@ -55,6 +55,15 @@ public class Keystore {
         saveKeyStore();
     }
 
+    public void writeChain(String alias, PrivateKey privateKey, char[] password, Certificate[] certificates) {
+        try {
+            keyStore.setKeyEntry(alias, privateKey, password, certificates);
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        }
+        saveKeyStore();
+    }
+
     public void saveKeyStore() {
         try {
             keyStore.store(new FileOutputStream(keyStoreFilePath), keyStorePassword.toCharArray());
