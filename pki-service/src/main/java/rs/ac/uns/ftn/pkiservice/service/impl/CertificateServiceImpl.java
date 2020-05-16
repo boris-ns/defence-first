@@ -128,6 +128,8 @@ public class CertificateServiceImpl implements CertificateService {
         int size = certificatesChainIssuer.length;
         Certificate[] certificatesChain = new Certificate[size + 1];
         certificatesChain[0] = certificate;
+
+
         System.arraycopy(certificatesChainIssuer, 0, certificatesChain, 1, size);
         return certificatesChain;
     }

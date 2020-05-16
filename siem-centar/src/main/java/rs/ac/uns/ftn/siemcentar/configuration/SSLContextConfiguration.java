@@ -26,7 +26,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 @Configuration
-public class TrustStoreConfiguration {
+public class SSLContextConfiguration {
 
     @Value("${keystore.password}")
     private String keyStorePassword;
@@ -35,12 +35,17 @@ public class TrustStoreConfiguration {
     @Qualifier("myKeyStore")
     private KeyStore keystore;
 
+    @Autowired
+    @Qualifier("trustStore")
+    private KeyStore trustStore;
+
     @Autowired @Lazy
     private OCSPService ocspService;
 
+
     @Bean
     public SSLContext getCustomSSLContext() throws Exception{
-//
+
 //        System.out.println("evo ga custom SSLContext");
 //        TrustManagerFactory tmf = TrustManagerFactory.getInstance(
 //                TrustManagerFactory.getDefaultAlgorithm());
@@ -48,35 +53,28 @@ public class TrustStoreConfiguration {
 //        tmf.init((KeyStore)null);
 //        TrustManager[] trustManagers = tmf.getTrustManagers();
 //        final X509TrustManager origTrustmanager = (X509TrustManager)trustManagers[0];
-//
-//        TrustManager[] wrappedTrustManagers = new TrustManager[] {
-//                new X509TrustManager() {
-//                    @Override
-//                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-//                        System.out.println("jebavam klijenta");
-//                        return origTrustmanager.getAcceptedIssuers();
-//                    }
-//                    @Override
-//                    public void checkClientTrusted(X509Certificate[] certs, String authType) throws CertificateException {
-//                        System.out.println("jebavam klijenta");
-//                        origTrustmanager.checkClientTrusted(certs, authType);
-//                    }
-//                    @Override
-//                    public void checkServerTrusted(X509Certificate[] certs, String authType) throws CertificateException {
-//                        //add more my logical code to validate CRL
-//                        System.out.println("jebavam gde se kacim");
-//                        origTrustmanager.checkServerTrusted(certs, authType);
-//                    }
-//                }
-//        };
-//        SSLContext sslContext = SSLContext.getInstance("TLS");
-//        sslContext.init(null, wrappedTrustManagers, null);
+
+        TrustManagerCustomImpl trm = new TrustManagerCustomImpl(trustStore, ocspService);
+        TrustManager[] wrappedTrustManagers = new TrustManager[1];
+        wrappedTrustManagers[0] = trm;
 
 
-        SSLContext sslContext = SSLContexts.custom()
-                .loadTrustMaterial(
-                        null, new MyTrustStrategy(keystore, ocspService))
-                .loadKeyMaterial(keystore, keyStorePassword.toCharArray()).build();
+        char[] passwordForAllPrivateKeys = keyStorePassword.toCharArray(); // cannot be null
+        String algorithm = KeyManagerFactory.getDefaultAlgorithm(); // returns "SunX509" by default in 1.8
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
+        kmf.init(keystore, passwordForAllPrivateKeys);
+        KeyManager[] keyManagers = kmf.getKeyManagers();
+
+
+        SSLContext sslContext = SSLContexts.createDefault();
+        sslContext.init(keyManagers, wrappedTrustManagers, new SecureRandom());
+
+
+
+//        SSLContext sslContext = SSLContexts.custom()
+//                .loadTrustMaterial(
+//                        keystore, new MyTrustStrategy(trustStore, ocspService))
+//                .loadKeyMaterial(keystore, keyStorePassword.toCharArray()).build();
 
         return sslContext;
     }

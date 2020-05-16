@@ -16,6 +16,7 @@ import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.*;
@@ -32,6 +33,7 @@ import rs.ac.uns.ftn.siemcentar.service.CertificateService;
 import rs.ac.uns.ftn.siemcentar.service.OCSPService;
 
 import java.math.BigInteger;
+import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -53,6 +55,10 @@ public class OCSPServiceImpl implements OCSPService {
 
     @Autowired
     private Keystore keyStore;
+
+    @Autowired
+    @Qualifier("trustStore")
+    private KeyStore trustStore;
 
     @Autowired
     private CertificateBuilder certificateBuilder;
@@ -133,7 +139,7 @@ public class OCSPServiceImpl implements OCSPService {
 
         BasicOCSPResp basicResponse = (BasicOCSPResp)ocspResp.getResponseObject();
 
-        X509Certificate rootCA = (X509Certificate) keyStore.getKeyStore().getCertificate("pki");;
+        X509Certificate rootCA = (X509Certificate) trustStore.getCertificate("pki");;
 
         ContentVerifierProvider prov = new JcaContentVerifierProviderBuilder().build(rootCA.getPublicKey());
         boolean signatureValid = basicResponse.isSignatureValid(prov);

@@ -49,8 +49,8 @@ public class HttpComponentsClientHttpRequestFactoryConfig {
                     .setMaxConnTotal(Integer.valueOf(5)).setMaxConnPerRoute(Integer.valueOf(5)).build();
 
             requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
-            requestFactory.setReadTimeout(Integer.valueOf(10000));
-            requestFactory.setConnectTimeout(Integer.valueOf(10000));
+            requestFactory.setReadTimeout(Integer.valueOf(1000000000));
+            requestFactory.setConnectTimeout(Integer.valueOf(1000000000));
         }
         catch (Exception e){
             e.printStackTrace();

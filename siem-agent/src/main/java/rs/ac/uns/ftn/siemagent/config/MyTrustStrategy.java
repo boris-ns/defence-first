@@ -7,10 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import rs.ac.uns.ftn.siemagent.service.OCSPService;
 
-import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.*;
 import java.util.Arrays;
 
@@ -30,6 +27,12 @@ public class MyTrustStrategy implements TrustStrategy {
 
     @Override
     public boolean isTrusted(X509Certificate[] chain, String authType) {
+
+        for(X509Certificate c : chain) {
+            System.out.println(c.getSerialNumber());
+        }
+        System.out.println("end of chain");
+
         boolean retVal = true;
         X509Certificate pki_cert = null;
         // provera ako je lanac duzine 1 i da li to prica sa PKI-em

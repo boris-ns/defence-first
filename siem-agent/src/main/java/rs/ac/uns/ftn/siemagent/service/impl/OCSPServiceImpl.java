@@ -15,6 +15,7 @@ import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.*;
@@ -31,6 +32,7 @@ import rs.ac.uns.ftn.siemagent.service.OCSPService;
 import java.math.BigInteger;
 import rs.ac.uns.ftn.siemagent.repository.Keystore;
 
+import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -44,14 +46,16 @@ public class OCSPServiceImpl implements OCSPService {
     @Value("${uri.pki.ocspReqURL}")
     private String ocspReqURL;
 
-    @Value("${rootCASerialNumber}")
-    private String rootCASerialNumber;
-
     @Value("${mySerialNumber}")
     private String mySerialNumber;
 
     @Autowired
     private Keystore keyStore;
+
+    @Autowired
+    @Qualifier("myTrustStore")
+    private KeyStore myTrustStore;
+
 
     @Autowired
     private CertificateBuilder certificateBuilder;
@@ -133,7 +137,7 @@ public class OCSPServiceImpl implements OCSPService {
         BasicOCSPResp basicResponse = (BasicOCSPResp)ocspResp.getResponseObject();
 
 
-        X509Certificate rootCA = (X509Certificate) keyStore.getKeyStore().getCertificate("pki");;
+        X509Certificate rootCA = (X509Certificate) myTrustStore.getCertificate("pki");;
 
         ContentVerifierProvider prov = new JcaContentVerifierProviderBuilder().build(rootCA.getPublicKey());
         boolean signatureValid = basicResponse.isSignatureValid(prov);
