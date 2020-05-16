@@ -15,6 +15,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from './material/material.module';
 import { MenuComponent } from './components/menu/menu.component';
 import { ShowLogsComponent } from './components/shared/show-logs/show-logs.component';
+import { LogsSearchComponent } from './components/shared/logs-search/logs-search.component';
 
 
 @NgModule({
@@ -24,7 +25,8 @@ import { ShowLogsComponent } from './components/shared/show-logs/show-logs.compo
     NotAuthorizedComponent,
     NotFoundComponent,
     MenuComponent,
-    ShowLogsComponent
+    ShowLogsComponent,
+    LogsSearchComponent
   ],
   imports: [
     BrowserModule,

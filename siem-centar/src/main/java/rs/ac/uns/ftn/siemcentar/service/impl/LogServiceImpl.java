@@ -6,8 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.siemcentar.constants.Constants;
+import rs.ac.uns.ftn.siemcentar.dto.request.LogFilterDTO;
+import rs.ac.uns.ftn.siemcentar.dto.response.LogDTO;
 import rs.ac.uns.ftn.siemcentar.dto.response.TokenDTO;
 import rs.ac.uns.ftn.siemcentar.model.Log;
+import rs.ac.uns.ftn.siemcentar.model.LogType;
 import rs.ac.uns.ftn.siemcentar.repository.Keystore;
 import rs.ac.uns.ftn.siemcentar.repository.LogRepository;
 import rs.ac.uns.ftn.siemcentar.service.AuthService;
@@ -21,13 +24,15 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class LogServiceImpl implements LogService {
@@ -60,6 +65,29 @@ public class LogServiceImpl implements LogService {
         return logRepository.findAll();
     }
 
+    @Override
+    public List<Log> searchAndFilter(LogFilterDTO filter) {
+        List<Log> logs = logRepository.findAll();
+
+        if (filter.getId() != null)
+            logs = logs.stream().filter(log -> log.getId().equals(filter.getId())).collect(Collectors.toList());
+
+        if (filter.getLogType() != null)
+            logs = logs.stream().filter(log -> log.getLogType().equals(LogType.valueOf(filter.getLogType()))).collect(Collectors.toList());
+
+        if (filter.getMessage() != null)
+            logs = logs.stream().filter(log -> log.getMessage().toLowerCase().contains(filter.getMessage().toLowerCase())).collect(Collectors.toList());
+
+        if (filter.getSource() != null)
+            logs = logs.stream().filter(log -> log.getSource().toLowerCase().contains(filter.getSource().toLowerCase())).collect(Collectors.toList());
+
+
+//        Date date = new GregorianCalendar(year, month - 1, day).getTime();
+
+        // @TODO: dodati filtriranje po datumima
+
+        return logs;
+    }
 
     @Override
     public SecretKey processPreMasterSecret(X509Certificate clientCertificate, byte[] secretKey) throws Exception {

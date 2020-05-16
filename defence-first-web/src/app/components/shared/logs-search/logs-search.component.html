@@ -1,0 +1,72 @@
+<div class="container">
+    <h2>Search and filter</h2>
+
+    <div class="search-form">
+        <div>
+            <mat-form-field class="example-full-width">
+                <mat-label>ID</mat-label>
+                <input matInput type="text" [(ngModel)]="filter.id">
+            </mat-form-field>
+            
+            <mat-form-field>
+                <mat-label>Type</mat-label>
+                <mat-select [(ngModel)]="filter.logType">
+                  <mat-option value="SUCCESS">SUCCESS</mat-option>
+                  <mat-option value="INFO">INFO</mat-option>
+                  <mat-option value="WARN">WARN</mat-option>
+                  <mat-option value="ERROR">ERROR</mat-option>
+                </mat-select>
+            </mat-form-field>
+            
+            <mat-form-field class="example-full-width">
+                <mat-label>Source</mat-label>
+                <input matInput type="text" [(ngModel)]="filter.source">
+            </mat-form-field>
+        </div>
+
+        <div>
+            <mat-form-field class="example-full-width">
+                <mat-label>Message</mat-label>
+                <input matInput type="text" [(ngModel)]="filter.message">
+            </mat-form-field>
+            
+            <mat-form-field>
+                <mat-label>Start date</mat-label>
+                <input matInput [matDatepicker]="startDatepicker" [(ngModel)]="filter.startDate">
+                <mat-datepicker-toggle matSuffix [for]="startDatepicker"></mat-datepicker-toggle>
+                <mat-datepicker #startDatepicker></mat-datepicker>
+            </mat-form-field>
+    
+            <mat-form-field>
+                <mat-label>End date</mat-label>
+                <input matInput [matDatepicker]="endDatepicker" [(ngModel)]="filter.endDate">
+                <mat-datepicker-toggle matSuffix [for]="endDatepicker"></mat-datepicker-toggle>
+                <mat-datepicker #endDatepicker></mat-datepicker>
+            </mat-form-field>
+        </div>
+
+        <div>
+            <button mat-raised-button color="primary" (click)="onClickSearch()">Search</button>
+            <button mat-raised-button color="secondary" (click)="onClickClear()">Clear</button>
+        </div>
+    </div>
+
+    <table class="log-table">
+        <thead>
+            <th>ID</th>
+            <th>Type</th>
+            <th>Date & time</th>
+            <th>Source</th>
+            <th>Message</th>
+        </thead>
+        <tbody>
+            <tr *ngFor="let log of searchedLogs">
+                <td>{{ log.id }}</td>
+                <td>{{ log.logType }}</td>
+                <td>{{ log.date }}</td>
+                <td>{{ log.source }}</td>
+                <td>{{ log.message }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

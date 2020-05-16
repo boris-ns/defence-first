@@ -10,6 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import rs.ac.uns.ftn.siemcentar.dto.request.LogFilterDTO;
+import rs.ac.uns.ftn.siemcentar.dto.response.LogDTO;
+import rs.ac.uns.ftn.siemcentar.mapper.LogMapper;
 import rs.ac.uns.ftn.siemcentar.model.Log;
 import rs.ac.uns.ftn.siemcentar.model.LogType;
 import rs.ac.uns.ftn.siemcentar.service.CertificateService;
@@ -138,14 +141,18 @@ public class LogController {
         return new ResponseEntity<>(logService.findAll(), HttpStatus.OK);
     }
 
+    @PostMapping(path = "/filter")
+    @PreAuthorize("hasRole('admin') or hasRole('operator')")
+    public ResponseEntity<List<LogDTO>> filter(@RequestBody LogFilterDTO filter) {
+        List<Log> logs = logService.searchAndFilter(filter);
+        return new ResponseEntity<>(LogMapper.toListDto(logs), HttpStatus.OK);
+    }
+
     @PostMapping()
     @PreAuthorize("hasRole('agent')")
     public ResponseEntity<Void> saveLogs(@RequestBody List<Log> logs) {
         this.logService.saveLogs(logs);
         return new ResponseEntity(HttpStatus.OK);
     }
-
-
-
 
 }
