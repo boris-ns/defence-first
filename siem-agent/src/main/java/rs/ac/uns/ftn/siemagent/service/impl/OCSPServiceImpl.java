@@ -15,7 +15,9 @@ import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -30,6 +32,7 @@ import rs.ac.uns.ftn.siemagent.service.OCSPService;
 import java.math.BigInteger;
 import rs.ac.uns.ftn.siemagent.repository.Keystore;
 
+import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -43,14 +46,16 @@ public class OCSPServiceImpl implements OCSPService {
     @Value("${uri.pki.ocspReqURL}")
     private String ocspReqURL;
 
-    @Value("${rootCASerialNumber}")
-    private String rootCASerialNumber;
-
     @Value("${mySerialNumber}")
     private String mySerialNumber;
 
     @Autowired
     private Keystore keyStore;
+
+    @Autowired
+    @Qualifier("myTrustStore")
+    private KeyStore myTrustStore;
+
 
     @Autowired
     private CertificateBuilder certificateBuilder;
@@ -65,12 +70,14 @@ public class OCSPServiceImpl implements OCSPService {
     private AuthService authService;
 
     @Autowired
+    @Lazy
     private RestTemplate restTemplate;
 
     @Override
-    public OCSPReq generateOCSPRequest(X509Certificate certificate) throws Exception {
-        //@TODO: issuerCert is still mocked ---> AKO DOBAVIS LANAC ne MORAS OVO RADITI
-        X509Certificate issuerCert = certificateService.getCertificateBySerialNumber("1");
+    public OCSPReq generateOCSPRequest(X509Certificate[] chain) throws Exception {
+
+        X509Certificate certificate = chain[0];
+        X509Certificate issuerCert = chain[1];
 
         BcDigestCalculatorProvider util = new BcDigestCalculatorProvider();
 
@@ -129,7 +136,8 @@ public class OCSPServiceImpl implements OCSPService {
         }
         BasicOCSPResp basicResponse = (BasicOCSPResp)ocspResp.getResponseObject();
 
-        X509Certificate rootCA = certificateService.getCertificateBySerialNumber(rootCASerialNumber);
+
+        X509Certificate rootCA = (X509Certificate) myTrustStore.getCertificate("pki");;
 
         ContentVerifierProvider prov = new JcaContentVerifierProviderBuilder().build(rootCA.getPublicKey());
         boolean signatureValid = basicResponse.isSignatureValid(prov);

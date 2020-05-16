@@ -1,3 +1,4 @@
+import { LogFilterDTO } from './../../models/log-filter.model';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
@@ -15,5 +16,9 @@ export class LogService {
 
   getAllLogs() {
     return this.http.get(`${this.url}/log/findAll`);
+  }
+
+  filterLogs(filter: LogFilterDTO) {
+    return this.http.post(`${this.url}/log/filter`, filter);
   }
 }

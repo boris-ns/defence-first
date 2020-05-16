@@ -1,14 +1,22 @@
 package rs.ac.uns.ftn.pkiservice;
 
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class PkiServiceApplication {
+public class PkiServiceApplication implements CommandLineRunner {
 
 	public static void main(String[] args) {
 		SpringApplication.run(PkiServiceApplication.class, args);
 	}
 
 
+	@Override
+	public void run(String... args) throws Exception {
+		String trustStore = System.getProperty("javax.net.ssl.trustStore");
+		if (trustStore == null) {
+			System.out.println(trustStore);
+		}
+	}
 }

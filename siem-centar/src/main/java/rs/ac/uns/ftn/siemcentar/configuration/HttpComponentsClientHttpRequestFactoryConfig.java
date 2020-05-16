@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import rs.ac.uns.ftn.siemcentar.service.OCSPService;
 
 import javax.net.ssl.SSLContext;
 import java.security.KeyStore;
@@ -17,12 +18,9 @@ import java.security.KeyStore;
 @Configuration
 public class HttpComponentsClientHttpRequestFactoryConfig {
 
-    @Value("${keystore.password}")
-    private String keyStorePassword;
 
     @Autowired
-    @Qualifier("myKeyStore")
-    private KeyStore keystore;
+    private SSLContext sslContext;
 
     @Bean(name = "httFactory")
     public HttpComponentsClientHttpRequestFactory getHttpComponentsClientHttpRequestFactory() {
@@ -38,9 +36,9 @@ public class HttpComponentsClientHttpRequestFactoryConfig {
                 // neam pojma...
             // MORA STRATEGIJA DA SE NAMESTI DA VERUJE SMAO ONIMA KOJI SU U KEYSTORU
             // ili onima koje proveri...
-            SSLContext sslContext = SSLContexts.custom()
-                    .loadTrustMaterial(null, new MyTrustStrategy(keystore))
-                    .loadKeyMaterial(keystore, keyStorePassword.toCharArray()).build();
+//            SSLContext sslContext = SSLContexts.custom()
+//                    .loadTrustMaterial(null, new MyTrustStrategy(keystore, ocspService))
+//                    .loadKeyMaterial(keystore, keyStorePassword.toCharArray()).build();
 
             SSLConnectionSocketFactory socketFactory =
                     new SSLConnectionSocketFactory(sslContext,
@@ -51,8 +49,8 @@ public class HttpComponentsClientHttpRequestFactoryConfig {
                     .setMaxConnTotal(Integer.valueOf(5)).setMaxConnPerRoute(Integer.valueOf(5)).build();
 
             requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
-            requestFactory.setReadTimeout(Integer.valueOf(10000));
-            requestFactory.setConnectTimeout(Integer.valueOf(10000));
+            requestFactory.setReadTimeout(Integer.valueOf(1000000000));
+            requestFactory.setConnectTimeout(Integer.valueOf(1000000000));
         }
         catch (Exception e){
             e.printStackTrace();

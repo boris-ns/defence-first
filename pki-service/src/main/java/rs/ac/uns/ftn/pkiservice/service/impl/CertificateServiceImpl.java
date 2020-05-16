@@ -22,13 +22,9 @@ import rs.ac.uns.ftn.pkiservice.service.KeyPairGeneratorService;
 import javax.security.auth.x500.X500PrivateCredential;
 import java.io.*;
 import java.security.*;
+import java.security.cert.*;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static rs.ac.uns.ftn.pkiservice.constants.Constants.ROOT_ALIAS;
 
@@ -132,6 +128,8 @@ public class CertificateServiceImpl implements CertificateService {
         int size = certificatesChainIssuer.length;
         Certificate[] certificatesChain = new Certificate[size + 1];
         certificatesChain[0] = certificate;
+
+
         System.arraycopy(certificatesChainIssuer, 0, certificatesChain, 1, size);
         return certificatesChain;
     }
@@ -228,14 +226,23 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Override
     public void writeCertToFile(String serialNumber) throws Exception {
-        X509Certificate certificate = this.findCertificateByAlias(serialNumber);
+
+
+        Certificate[] chain = keyStoreRepository.readCertificateChain(serialNumber);
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        CertPath pathC = cf.generateCertPath(Arrays.asList(chain));
+
 
         StringWriter sw = new StringWriter();
         JcaPEMWriter pm = new JcaPEMWriter(sw);
-        pm.writeObject(certificate);
+        for(Certificate certificate : pathC.getCertificates()) {
+            pm.writeObject(certificate);
+            pm.flush();
+            sw.append(",");
+        }
         pm.close();
 
-        String fileName = "cert_" + certificate.getSerialNumber() + ".crt";
+        String fileName = "cert_" + serialNumber + ".crt";
         String path = certDirectory + "/" + fileName;
 
 
