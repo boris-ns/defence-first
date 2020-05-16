@@ -1,6 +1,6 @@
 export interface Log {
     id: number;
-    date: string;
+    date: Date;
     logType: LogType;
     message: string;
     source: string;

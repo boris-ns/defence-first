@@ -12,7 +12,8 @@ import * as SockJS from 'sockjs-client';
 })
 export class ShowLogsComponent implements OnInit {
 
-  logs: Log[] = [];
+  data: Log[];
+  displayedColumns: string[] = ['id', 'type', 'date', 'source', 'message'];
 
   serverUrl = 'https://localhost:8082/websockets';
   stompClient: any;
@@ -27,7 +28,7 @@ export class ShowLogsComponent implements OnInit {
 
   private getLogs() {
     this.logService.getAllLogs().subscribe((data: Log[]) => {
-      this.logs = data;
+      this.data = data;
     }, error => {
       // @TODO: dodati toastr
       console.log(error);
@@ -48,4 +49,8 @@ export class ShowLogsComponent implements OnInit {
     // });
   }
 
+  checkClass(row: any) {
+    console.log(row);
+    return '';
+  }
 }

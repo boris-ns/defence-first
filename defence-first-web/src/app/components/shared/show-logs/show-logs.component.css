@@ -1,13 +1,41 @@
-.container {
-    margin: 10px;
+h1 {
+    margin: 20px;
 }
 
-.log-table {
-    width: 100%;
-    text-align: center;
-    border: 1px solid #cacaca;
+table {
+    width: 98%;
+    margin: 1%;
 }
 
-.log-table tr:nth-child(odd) {
-    background-color: #f2f2f2;
+tr:not(.header):not(.WARN):not(.INFO):not(.ERROR):not(.SUCCESS):hover {
+    background: #EEEEEE;
 }
+
+.INFO {
+    background: #2196F3;
+}
+.INFO:hover {
+    background: #BBDEFB;
+}
+
+.WARN {
+    background: #FF5722;
+}
+.WARN:hover {
+    background: #FFCCBC;
+}
+
+.ERROR {
+    background: #D50000;
+}
+.ERROR:hover {
+    background: #FF8A80;
+}
+
+.SUCCESS {
+    background: #4CAF50;
+}
+.SUCCESS:hover {
+    background: #C8E6C9;
+}
+

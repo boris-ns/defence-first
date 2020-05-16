@@ -11,6 +11,7 @@ import rs.ac.uns.ftn.siemcentar.dto.response.LogDTO;
 import rs.ac.uns.ftn.siemcentar.mapper.LogMapper;
 import rs.ac.uns.ftn.siemcentar.model.Log;
 import rs.ac.uns.ftn.siemcentar.service.CertificateService;
+import rs.ac.uns.ftn.siemcentar.service.DatabaseSequenceService;
 import rs.ac.uns.ftn.siemcentar.service.LogService;
 import java.util.*;
 
@@ -24,6 +25,9 @@ public class LogController {
     @Autowired
     private CertificateService certificateService;
 
+    @Autowired
+    private DatabaseSequenceService databaseSequenceService;
+
     @PostMapping(path = "/send")
     @PreAuthorize("hasRole('agent')")
     public  ResponseEntity<String> preMasterSecret(@RequestBody ArrayList<String> logs) throws Exception{
@@ -32,7 +36,7 @@ public class LogController {
         for(String l: logs) {
             System.out.println(l);
             Log log = mapper.readValue(l, Log.class);
-            log.setId(null);
+            log.setId(databaseSequenceService.generateSequence(Log.SEQUENCE_NAME));
             logList.add(log);
         }
 
