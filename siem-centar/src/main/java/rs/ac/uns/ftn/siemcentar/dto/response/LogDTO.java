@@ -1,40 +1,27 @@
-package rs.ac.uns.ftn.siemcentar.model;
+package rs.ac.uns.ftn.siemcentar.dto.response;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import rs.ac.uns.ftn.siemcentar.model.Log;
+import rs.ac.uns.ftn.siemcentar.model.LogType;
 
-import java.io.Serializable;
 import java.util.Date;
 
-@Document(collection = "Log")
-public class Log implements Serializable {
+public class LogDTO {
 
-    @Id
     private Long id;
     private Date date;
     private LogType logType;
     private String message;
     private String source;
 
-    public Log() {}
-
-    public Log(Long id, Date date, LogType logType, String message, String source) {
-        this.id = id;
-        this.date = date;
-        this.logType = logType;
-        this.message = message;
-        this.source = source;
+    public LogDTO() {
     }
 
-    @Override
-    public String toString() {
-        return "Log{" +
-                "id=" + id +
-                ", date=" + date +
-                ", logType=" + logType +
-                ", message='" + message + '\'' +
-                ", source='" + source + '\'' +
-                '}';
+    public LogDTO(Log log) {
+        this.id = log.getId();
+        this.date = log.getDate();
+        this.logType = log.getLogType();
+        this.message = log.getMessage();
+        this.source = log.getSource();
     }
 
     public Long getId() {
