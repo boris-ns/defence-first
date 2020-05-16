@@ -2,6 +2,8 @@ import { LogFilterDTO } from './../../../models/log-filter.model';
 import { Log } from './../../../models/log.model';
 import { LogService } from './../../../services/siem-centar/log.service';
 import { Component, OnInit } from '@angular/core';
+import * as Stomp from 'stompjs';
+import * as SockJS from 'sockjs-client';
 
 @Component({
   selector: 'app-show-logs',
@@ -10,9 +12,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ShowLogsComponent implements OnInit {
 
-  logs: Log[] = [];
+  data: Log[];
+  displayedColumns: string[] = ['id', 'type', 'date', 'source', 'message'];
 
-  constructor(private logService: LogService) { 
+  serverUrl = 'https://localhost:8082/websockets';
+  stompClient: any;
+
+  constructor(private logService: LogService) {
+    this.initializeWebSocketConnection();
   }
 
   ngOnInit() {
@@ -21,10 +28,29 @@ export class ShowLogsComponent implements OnInit {
 
   private getLogs() {
     this.logService.getAllLogs().subscribe((data: Log[]) => {
-      this.logs = data;
+      this.data = data;
     }, error => {
       // @TODO: dodati toastr
       console.log(error);
     });
+  }
+
+  initializeWebSocketConnection() {
+    // const ws = new SockJS(this.serverUrl);
+    // this.stompClient = Stomp.over(ws);
+    // const that = this;
+    // this.stompClient.connect({}, () => {
+    //   that.stompClient.subscribe('/topic', (message) => {
+    //     console.log(message);
+    //     if (message.body) {
+    //       console.log(message.body);
+    //     }
+    //   });
+    // });
+  }
+
+  checkClass(row: any) {
+    console.log(row);
+    return '';
   }
 }

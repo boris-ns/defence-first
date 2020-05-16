@@ -9,9 +9,14 @@
             <tr><td><button mat-button (click)="addCertificates()" color="accent">Add certificate</button></td></tr>
         </table>
     </mat-toolbar-row>
-    <mat-toolbar-row>
+    <mat-toolbar-row *ngIf="admin || operator">
         <table>
             <tr><td><button mat-button (click)="showLogs()" color="accent">Logs</button></td></tr>
+            <tr><td><button mat-button (click)="searchLogs()" color="accent">Search logs</button></td></tr>
+        </table>
+    </mat-toolbar-row>
+    <mat-toolbar-row>
+        <table>
             <tr><td><button mat-button (click)="logOut()" color="accent">LogOut</button></td></tr>
         </table>
     </mat-toolbar-row>

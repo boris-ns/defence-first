@@ -1,4 +1,4 @@
-import { SHOW_LOGS_PATH } from './../../config/router-paths';
+import { SHOW_LOGS_PATH, SEARCH_LOGS_PATH } from './../../config/router-paths';
 import { Component, OnInit } from '@angular/core';
 import { KeycloakService } from 'keycloak-angular';
 import { PkiServiceService } from 'src/app/services/pki-service/pki-service.service';
@@ -14,6 +14,7 @@ import { CERTIFICATES_PATH, ADD_PATH, REQUEST_PATH } from 'src/app/config/router
 export class MenuComponent implements OnInit {
 
   admin: boolean;
+  operator: boolean;
 
   constructor(private keycloakAngular: KeycloakService,
               private authService: AuthService,
@@ -22,6 +23,7 @@ export class MenuComponent implements OnInit {
 
   ngOnInit() {
     this.admin = this.authService.isUserAdmin();
+    this.operator = this.authService.isUserOperator();
   }
 
   certificates() {
@@ -38,6 +40,10 @@ export class MenuComponent implements OnInit {
 
   showLogs() {
     this.router.navigate([SHOW_LOGS_PATH]);
+  }
+
+  searchLogs() {
+    this.router.navigate([SEARCH_LOGS_PATH]);
   }
 
   logOut() {
