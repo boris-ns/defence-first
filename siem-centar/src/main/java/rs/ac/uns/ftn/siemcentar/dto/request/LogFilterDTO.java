@@ -3,11 +3,11 @@ package rs.ac.uns.ftn.siemcentar.dto.request;
 public class LogFilterDTO {
 
     private Long id;
-    private String startDate;
-    private String endDate;
     private String logType;
     private String message;
     private String source;
+    private int[] startDate;
+    private int[] endDate;
 
     public LogFilterDTO() {
     }
@@ -20,19 +20,19 @@ public class LogFilterDTO {
         this.id = id;
     }
 
-    public String getStartDate() {
+    public int[] getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(String startDate) {
+    public void setStartDate(int[] startDate) {
         this.startDate = startDate;
     }
 
-    public String getEndDate() {
+    public int[] getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(String endDate) {
+    public void setEndDate(int[] endDate) {
         this.endDate = endDate;
     }
 

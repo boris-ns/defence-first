@@ -32,14 +32,14 @@
             
             <mat-form-field>
                 <mat-label>Start date</mat-label>
-                <input matInput [matDatepicker]="startDatepicker" [(ngModel)]="filter.startDate">
+                <input matInput [matDatepicker]="startDatepicker" [(ngModel)]="startDate">
                 <mat-datepicker-toggle matSuffix [for]="startDatepicker"></mat-datepicker-toggle>
                 <mat-datepicker #startDatepicker></mat-datepicker>
             </mat-form-field>
     
             <mat-form-field>
                 <mat-label>End date</mat-label>
-                <input matInput [matDatepicker]="endDatepicker" [(ngModel)]="filter.endDate">
+                <input matInput [matDatepicker]="endDatepicker" [(ngModel)]="endDate">
                 <mat-datepicker-toggle matSuffix [for]="endDatepicker"></mat-datepicker-toggle>
                 <mat-datepicker #endDatepicker></mat-datepicker>
             </mat-form-field>

@@ -27,10 +27,7 @@ import java.io.ObjectInputStream;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -70,21 +67,32 @@ public class LogServiceImpl implements LogService {
         List<Log> logs = logRepository.findAll();
 
         if (filter.getId() != null)
-            logs = logs.stream().filter(log -> log.getId().equals(filter.getId())).collect(Collectors.toList());
+            logs = logs.stream()
+                    .filter(log -> log.getId().equals(filter.getId())).collect(Collectors.toList());
 
         if (filter.getLogType() != null)
-            logs = logs.stream().filter(log -> log.getLogType().equals(LogType.valueOf(filter.getLogType()))).collect(Collectors.toList());
+            logs = logs.stream()
+                    .filter(log -> log.getLogType().equals(LogType.valueOf(filter.getLogType()))).collect(Collectors.toList());
 
         if (filter.getMessage() != null)
-            logs = logs.stream().filter(log -> log.getMessage().toLowerCase().contains(filter.getMessage().toLowerCase())).collect(Collectors.toList());
+            logs = logs.stream()
+                    .filter(log -> log.getMessage().toLowerCase().contains(filter.getMessage().toLowerCase())).collect(Collectors.toList());
 
         if (filter.getSource() != null)
-            logs = logs.stream().filter(log -> log.getSource().toLowerCase().contains(filter.getSource().toLowerCase())).collect(Collectors.toList());
+            logs = logs.stream()
+                    .filter(log -> log.getSource().toLowerCase().contains(filter.getSource().toLowerCase())).collect(Collectors.toList());
 
+        if (filter.getStartDate() != null) {
+            Date startDate = new GregorianCalendar(filter.getStartDate()[2], filter.getStartDate()[1] - 1, filter.getStartDate()[0]).getTime();
+            logs = logs.stream()
+                    .filter(log -> log.getDate().after(startDate)).collect(Collectors.toList());
+        }
 
-//        Date date = new GregorianCalendar(year, month - 1, day).getTime();
-
-        // @TODO: dodati filtriranje po datumima
+        if (filter.getEndDate() != null) {
+            Date endDate = new GregorianCalendar(filter.getEndDate()[2], filter.getEndDate()[1] - 1, filter.getEndDate()[0]).getTime();
+            logs = logs.stream()
+                    .filter(log -> log.getDate().before(endDate)).collect(Collectors.toList());
+        }
 
         return logs;
     }

@@ -12,6 +12,8 @@ export class LogsSearchComponent implements OnInit {
 
   searchedLogs: Log[] = [];
   filter: LogFilterDTO = {};
+  startDate: string;
+  endDate: string;
 
   constructor(private logService: LogService) { 
   }
@@ -21,7 +23,25 @@ export class LogsSearchComponent implements OnInit {
 
   onClickSearch() {
     console.log(this.filter);
-    
+
+    if (this.startDate) {
+      const startDate = new Date(this.startDate);
+      this.filter.startDate = [
+        startDate.getUTCDate() + 1, 
+        startDate.getUTCMonth() + 1, 
+        startDate.getFullYear()
+      ];
+    }
+
+    if (this.endDate) {
+      const endDate = new Date(this.endDate);
+      this.filter.endDate = [
+        endDate.getUTCDate() + 1,
+        endDate.getUTCMonth() + 1,
+        endDate.getFullYear()
+      ];
+    }
+
     this.logService.filterLogs(this.filter).subscribe((data: Log[]) => {
       this.searchedLogs = data;
     }, error => {

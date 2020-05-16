@@ -3,6 +3,6 @@ export interface LogFilterDTO {
     source?: string;
     message?: string;
     logType?: string;
-    startDate?: string; 
-    endDate?: string;
+    startDate?: number[]; 
+    endDate?: number[];
 }
