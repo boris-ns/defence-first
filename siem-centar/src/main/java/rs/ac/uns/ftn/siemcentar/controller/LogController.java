@@ -30,7 +30,9 @@ public class LogController {
         ObjectMapper mapper = new ObjectMapper();
         for(String l: logs) {
             System.out.println(l);
-            logList.add(mapper.readValue(l, Log.class));
+            Log log = mapper.readValue(l, Log.class);
+            log.setId(null);
+            logList.add(log);
         }
 
         this.logService.saveLogs(logList);
@@ -42,13 +44,6 @@ public class LogController {
     public ResponseEntity<List<LogDTO>> findAll() {
         List<Log> logs = logService.findAll();
         return new ResponseEntity<>(LogMapper.toListDto(logs), HttpStatus.OK);
-    }
-
-    @PostMapping()
-    @PreAuthorize("hasRole('agent')")
-    public ResponseEntity<Void> saveLogs(@RequestBody List<Log> logs) {
-        this.logService.saveLogs(logs);
-        return new ResponseEntity(HttpStatus.OK);
     }
 
 }
