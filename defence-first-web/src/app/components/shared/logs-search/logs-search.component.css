@@ -1,0 +1,23 @@
+.log-table {
+    width: 100%;
+    text-align: center;
+    border: 1px solid #cacaca;
+}
+
+.log-table tr:nth-child(odd) {
+    background-color: #f2f2f2;
+}
+
+.search-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.search-form div {
+    margin: 5px;
+}
+
+.search-form div mat-form-field {
+    margin-left: 5px;
+    margin-right: 5px;
+}
