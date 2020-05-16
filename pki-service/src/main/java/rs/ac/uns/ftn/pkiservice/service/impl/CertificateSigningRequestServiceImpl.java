@@ -144,13 +144,14 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
         PublicKey pk = certificateGeneratorService.toPublicKey(certReq.getSubjectPublicKeyInfo());
         SubjectData subData = certificateGeneratorService.generateSubjectData(pk, certReq.getSubject(), Constants.CERT_TYPE.LEAF_CERT);
         X509Certificate newCert = certificateGeneratorService.generateCertificate(subData,issuerData, Constants.CERT_TYPE.LEAF_CERT);
+
         Certificate[] certificates = certificateService.createChain(attributes.get("issuerId"), newCert);
         // stavljeno da se cuva sa pk od issuera u sustini taj kljuc nam ne sluzi ni za st, ali mora neki da se prosledi
 
         certificateService.writeCertificateToKeyStore(newCert.getSerialNumber().toString(), certificates,
                 issuerData.getPrivateKey());
 
-        certificateService.writeCertToFile(newCert.getSerialNumber().toString(), Constants.GENERATED_CERT_DIRECTORY);
+        certificateService.writeCertToFile(newCert.getSerialNumber().toString());
         return newCert;
     }
 

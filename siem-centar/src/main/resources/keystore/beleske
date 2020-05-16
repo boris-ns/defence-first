@@ -1,0 +1,20 @@
+1. Slanje CSR-a i Instaliranje sopstvenog sertifikata, komunikacija sa PKI-em
+
+    - zakomentarisati SVE u application.properties-u u SSL sekciji
+
+    - potrebno je u folderu keystore imati cert_1.crt koji je root certifikat od pki-a
+        on ce se sam prilikom inicijalizacije keystore.jks dodati kao trusted
+
+    - nakon toga je moguce poslati CSR
+
+    - kada se sertifikat odobri kopirati ga u ssl paket i pokrenuti metodu za instalaciju
+        sertifikata
+
+    - odkomentarisati u application.properties-u sekciju za SSL
+
+
+2. Komunikacija sa SiemAgentom
+
+    - potrebno je prvo instalirati sertifikat agenta-a u keystore komandom
+      "keytool -import -alias agent -file cert_....crt -keystore keystore.jks"
+

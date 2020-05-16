@@ -8,5 +8,4 @@ public interface KeyPairGeneratorService {
 
     KeyPair generateKeyPair();
 
-    SecretKey generateSimetricKey() throws NoSuchAlgorithmException;
 }

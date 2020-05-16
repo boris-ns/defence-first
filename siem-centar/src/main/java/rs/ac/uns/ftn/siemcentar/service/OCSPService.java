@@ -7,7 +7,7 @@ import java.security.cert.X509Certificate;
 
 public interface OCSPService {
 
-    OCSPReq generateOCSPRequest(X509Certificate certificate) throws Exception;
+    OCSPReq generateOCSPRequest(X509Certificate[] certificate) throws Exception;
 
     OCSPResp sendOCSPRequest(OCSPReq ocspReq) throws Exception;
 

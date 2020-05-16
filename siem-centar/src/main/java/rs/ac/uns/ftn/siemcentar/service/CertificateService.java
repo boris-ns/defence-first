@@ -1,6 +1,8 @@
 package rs.ac.uns.ftn.siemcentar.service;
 
 import javax.security.auth.x500.X500Principal;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
@@ -25,4 +27,6 @@ public interface CertificateService {
     String sendReplaceCertificateRequest() throws Exception;
 
     String sendRequestForCertificate() throws Exception;
+
+    InputStream fullStream(String certFile) throws IOException;
 }
