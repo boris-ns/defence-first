@@ -6,6 +6,7 @@ import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import rs.ac.uns.ftn.siemagent.Constants.Constants;
@@ -31,7 +32,7 @@ public class Keystore {
     private KeystoreConfiguration keystoreConfiguration;
     private KeyStore keyStore;
 
-    @Autowired
+    @Autowired()
     public Keystore(KeystoreConfiguration keystoreConfiguration) {
         this.keystoreConfiguration = keystoreConfiguration;
         this.keyStore = keystoreConfiguration.getKeystore();
@@ -61,6 +62,14 @@ public class Keystore {
         }
         saveKeyStore();
     }
+    public void writeChain(String alias, PrivateKey privateKey, char[] password, Certificate[] certificates) {
+        try {
+            keyStore.setKeyEntry(alias, privateKey, password, certificates);
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        }
+        saveKeyStore();
+    }
 
     public void saveKeyStore() {
         try {
@@ -79,4 +88,6 @@ public class Keystore {
     public Certificate readMyCertificate() throws KeyStoreException {
         return keyStore.getCertificate(Constants.CERTIFICATE_ALIAS);
     }
+
+    public KeyStore getKeyStore() {return  this.keyStore;}
 }

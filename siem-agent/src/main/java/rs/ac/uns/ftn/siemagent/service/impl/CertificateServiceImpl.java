@@ -16,6 +16,7 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -23,7 +24,6 @@ import org.springframework.web.client.RestTemplate;
 
 import rs.ac.uns.ftn.siemagent.Constants.Constants;
 import rs.ac.uns.ftn.siemagent.config.AgentConfiguration;
-import rs.ac.uns.ftn.siemagent.dto.response.TokenDTO;
 import rs.ac.uns.ftn.siemagent.config.CertificateBuilder;
 import rs.ac.uns.ftn.siemagent.repository.Keystore;
 import rs.ac.uns.ftn.siemagent.service.AuthService;
@@ -33,11 +33,16 @@ import rs.ac.uns.ftn.siemagent.service.KeyPairGeneratorService;
 import javax.security.auth.x500.X500Principal;
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.security.PrivateKey;
+import java.security.cert.CertPath;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -78,17 +83,31 @@ public class CertificateServiceImpl implements CertificateService {
     private CertificateBuilder certificateBuilder;
 
     @Autowired
+    @Lazy
     private RestTemplate restTemplate;
 
     @Override
     public void installCertificateFromFile() throws Exception {
-
+        ArrayList<Certificate> certificates = new ArrayList<>();
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
-        InputStream certstream = fullStream (pathToCertificate);
-        Certificate certs =  cf.generateCertificate(certstream);
+        String retVal = readAllBytesJava7(pathToCertificate);
+        String[] cet = retVal.split(",");
+        for (String c : cet) {
+            InputStream inputStream = new ByteArrayInputStream(c.getBytes());
+            Certificate cert = cf.generateCertificate(inputStream);
+            certificates.add(cert);
+        }
+
+        Certificate[] certificatesArray = new Certificate[certificates.size()];
+        for(int i=0; i <certificates.size();i++) {
+            certificatesArray[i] = certificates.get(i);
+        }
+        CertPath certPath = cf.generateCertPath(certificates);
+
 
         PrivateKey privateKey = keystore.readPrivateKey(Constants.KEY_PAIR_ALIAS, keyStorePassword);
-        keystore.write(Constants.CERTIFICATE_ALIAS, privateKey, keyStorePassword.toCharArray(), certs);
+        keystore.writeChain(Constants.CERTIFICATE_ALIAS, privateKey,
+                keyStorePassword.toCharArray(), certificatesArray);
 
     }
 
@@ -166,16 +185,6 @@ public class CertificateServiceImpl implements CertificateService {
             System.out.println("[ERROR] You are not allowed to make CSR request");
             return null;
         }
-
-        // @TODO: naci bolji nacin za refresh
-//        // Ovo znaci da je istekao token, pa cemo refreshovati token
-//        // i opet poslati zahtev
-//        // @TODO: Nije testirano
-//        if (certificate.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
-//            token = authService.refreshToken(token.getRefresh_token());
-//            headers.set("Authorization", "bearer " + token.getAccesss_token());
-//            certificate = restTemplate.exchange(createCertificateURL, HttpMethod.POST, entityReq, String.class);
-//        }
         return certificate.getBody();
     }
 
@@ -231,16 +240,6 @@ public class CertificateServiceImpl implements CertificateService {
             return null;
         }
 
-        // @TODO: isto
-//        // Ovo znaci da je istekao token, pa cemo refreshovati token
-//        // i opet poslati zahtev
-//        // @TODO: Nije testirano
-//        if (certificate.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
-//            token = authService.refreshToken(token.getRefresh_token());
-//            headers.set("Authorization", "bearer " + token.getAccesss_token());
-//            certificate = restTemplate.exchange(getCertificateURL + "/" + serialNumber, HttpMethod.GET, entityReq, String.class);
-//        }
-
         PEMParser pemParser = new PEMParser(new StringReader(certificate.getBody()));
         X509CertificateHolder certificateHolder = (X509CertificateHolder) pemParser.readObject();
 
@@ -273,16 +272,6 @@ public class CertificateServiceImpl implements CertificateService {
             System.out.println("[ERROR] You are not allowed to make CSR request");
             return null;
         }
-
-        // @TODO: isto
-//        // Ovo znaci da je istekao token, pa cemo refreshovati token
-//        // i opet poslati zahtev
-//        // @TODO: Nije testirano
-//        if (certificate.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
-//            token = authService.refreshToken(token.getRefresh_token());
-//            headers.set("Authorization", "bearer " + token.getAccesss_token());
-//            certificate = restTemplate.exchange(renewCertificate, HttpMethod.POST, entityReq, Void.class);
-//        }
         return null;
     }
 
@@ -301,12 +290,27 @@ public class CertificateServiceImpl implements CertificateService {
         return certConverter.getCertificate(certGen.build(contentSigner));
     }
 
-    private InputStream fullStream(String certfile) throws IOException{
-        FileInputStream fis = new FileInputStream(certfile);
+    @Override
+    public InputStream fullStream(String certFile) throws IOException{
+        FileInputStream fis = new FileInputStream(certFile);
         DataInputStream dis = new DataInputStream(fis);
         byte[] bytes = new byte[dis.available()];
         dis.readFully(bytes);
         return new ByteArrayInputStream(bytes);
+    }
+
+    private static String readAllBytesJava7(String filePath)
+    {
+        String content = "";
+        try
+        {
+            content = new String ( Files.readAllBytes( Paths.get(filePath) ) );
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        return content;
     }
 
 }

@@ -32,15 +32,12 @@ public class SiemAgentApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-//		TokenDTO token = authService.login();
 
-//		if (token == null) {
-//			System.out.println("[ERROR] Error while trying to login.");
-//			return;
-//		}
+
+
 
 		// simulacija slanja logova
-//		simulation();
+		simulation();
 
 //		certificateService.sendRequestForCertificate();
 //		certificateService.installCertificateFromFile();
@@ -60,20 +57,17 @@ public class SiemAgentApplication implements CommandLineRunner {
 	}
 
 	private void simulation() throws Exception{
-		Object[] values = logService.initCommunicationWithSiemCentar();
-		SecretKey key = (SecretKey) values[0];
-		String secretToken = (String) values[1];
 
 		ArrayList<Log> logs = new ArrayList<Log>();
 		logs.add(new Log(1l, new Date(), LogType.SUCCESS, "prviLog", "ja"));
 		logs.add(new Log(2l, new Date(), LogType.SUCCESS, "drugiLog", "ja"));
-		logService.sendLogs(key, secretToken, logs);
+		logService.sendLogs(logs);
 
-		logs.clear();
-		logs.add(new Log(3l, new Date(), LogType.ERROR, "treciLog", "ja"));
-		logs.add(new Log(4l, new Date(), LogType.WARN, "certvrtiLog", "ja"));
-
-		logService.sendLogs(key, secretToken, logs);
+//		logs.clear();
+//		logs.add(new Log(3l, new Date(), LogType.ERROR, "treciLog", "ja"));
+//		logs.add(new Log(4l, new Date(), LogType.WARN, "certvrtiLog", "ja"));
+//
+//		logService.sendLogs(logs);
 	}
 
 }

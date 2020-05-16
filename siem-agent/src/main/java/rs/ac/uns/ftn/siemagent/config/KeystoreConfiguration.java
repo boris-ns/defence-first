@@ -6,12 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import rs.ac.uns.ftn.siemagent.Constants.Constants;
+import rs.ac.uns.ftn.siemagent.service.CertificateService;
 import rs.ac.uns.ftn.siemagent.service.KeyPairGeneratorService;
 
 import java.io.*;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 
 @Configuration
 public class KeystoreConfiguration {
@@ -19,13 +22,19 @@ public class KeystoreConfiguration {
     @Value("${keystore.filePath}")
     private String keyStoreFilePath;
 
+    @Value("${trustStore.filePath}")
+    private String trustStoreFilePath;
+
     @Value("${keystore.password}")
     private String keyStorePassword;
 
-    @Autowired
-    private KeyPairGeneratorService keyPairGeneratorService;
+    @Value("${pki.certificate.path}")
+    private String pkiCertFilePath;
 
-    @Bean
+    @Autowired
+    private CertificateService certificateService;
+
+    @Bean(name = "myKeyStore")
     public KeyStore getKeystore(){
         try {
             KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
@@ -36,6 +45,41 @@ public class KeystoreConfiguration {
             } else {
                 keyStore.load(null, keyStorePassword.toCharArray());
                 keyStore.store(new FileOutputStream(keyStoreFilePath), keyStorePassword.toCharArray());
+            }
+            return keyStore;
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Bean(name = "myTrustStore")
+    public KeyStore geTrustStore(){
+        try {
+            KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
+            File f = new File(trustStoreFilePath);
+
+            if (f.exists()) {
+                keyStore.load(new FileInputStream(f), keyStorePassword.toCharArray());
+            } else {
+                keyStore.load(null, keyStorePassword.toCharArray());
+
+                CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                InputStream certstream = certificateService.fullStream(pkiCertFilePath);
+                Certificate certs =  cf.generateCertificate(certstream);
+
+                keyStore.setCertificateEntry("pki", certs);
+                keyStore.store(new FileOutputStream(trustStoreFilePath), keyStorePassword.toCharArray());
             }
             return keyStore;
         } catch (NoSuchAlgorithmException e) {
