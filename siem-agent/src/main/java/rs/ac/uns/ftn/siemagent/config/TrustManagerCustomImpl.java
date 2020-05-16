@@ -82,9 +82,22 @@ public class TrustManagerCustomImpl implements X509TrustManager {
         }
         if (chain.length == 1) {
             X509Certificate cert = (X509Certificate) chain[0];
-            if (cert.getSerialNumber() != pki_cert.getSerialNumber() ||
+            if (cert.getSerialNumber() == pki_cert.getSerialNumber() ||
                     !Arrays.equals(cert.getSignature(), pki_cert.getSignature())) {
-                throw new CertificateException("len=1 i nije root");
+                return;
+            }
+            else{
+                try {
+                    OCSPReq request = ocspService.generateOCSPRequest(chain);
+                    OCSPResp response = ocspService.sendOCSPRequest(request);
+                    boolean val = ocspService.processOCSPResponse(request,response);
+                    if(!val) {
+                        throw new CertificateException("bad OCSP response");
+                    }
+                }catch (Exception e) {
+                    e.printStackTrace();
+                    throw new CertificateException(e.getMessage());
+                }
             }
         }
         // ako je lanac duzi od 1 onda se pravi OCS request i salje se PKI-u
