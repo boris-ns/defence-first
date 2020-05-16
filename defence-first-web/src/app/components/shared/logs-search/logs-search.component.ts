@@ -2,6 +2,7 @@ import { LogService } from './../../../services/siem-centar/log.service';
 import { LogFilterDTO } from './../../../models/log-filter.model';
 import { Component, OnInit } from '@angular/core';
 import { Log } from 'src/app/models/log.model';
+import { createArrayFromDate } from 'src/app/utils/date-utils';
 
 @Component({
   selector: 'app-logs-search',
@@ -22,24 +23,18 @@ export class LogsSearchComponent implements OnInit {
   }
 
   onClickSearch() {
-    console.log(this.filter);
-
     if (this.startDate) {
-      const startDate = new Date(this.startDate);
-      this.filter.startDate = [
-        startDate.getUTCDate() + 1, 
-        startDate.getUTCMonth() + 1, 
-        startDate.getFullYear()
-      ];
+      this.filter.startDate = createArrayFromDate(this.startDate);
     }
 
     if (this.endDate) {
-      const endDate = new Date(this.endDate);
-      this.filter.endDate = [
-        endDate.getUTCDate() + 1,
-        endDate.getUTCMonth() + 1,
-        endDate.getFullYear()
-      ];
+      this.filter.endDate = createArrayFromDate(this.endDate);
+    }
+
+    if (this.startDate && this.endDate && (new Date(this.startDate).getTime() > (new Date(this.endDate).getTime()))) {
+      console.log("Startdate je posle enddate");
+      // @TODO: dodati toastr
+      return;
     }
 
     this.logService.filterLogs(this.filter).subscribe((data: Log[]) => {
@@ -53,5 +48,7 @@ export class LogsSearchComponent implements OnInit {
   onClickClear() {
     this.searchedLogs = [];
     this.filter = {};
+    this.startDate = null;
+    this.endDate = null;
   }
 }

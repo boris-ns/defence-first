@@ -9,6 +9,7 @@ import rs.ac.uns.ftn.siemcentar.constants.Constants;
 import rs.ac.uns.ftn.siemcentar.dto.request.LogFilterDTO;
 import rs.ac.uns.ftn.siemcentar.dto.response.LogDTO;
 import rs.ac.uns.ftn.siemcentar.dto.response.TokenDTO;
+import rs.ac.uns.ftn.siemcentar.exception.exceptions.ApiRequestException;
 import rs.ac.uns.ftn.siemcentar.model.Log;
 import rs.ac.uns.ftn.siemcentar.model.LogType;
 import rs.ac.uns.ftn.siemcentar.repository.Keystore;
@@ -17,6 +18,7 @@ import rs.ac.uns.ftn.siemcentar.service.AuthService;
 import rs.ac.uns.ftn.siemcentar.service.CipherService;
 import rs.ac.uns.ftn.siemcentar.service.LogService;
 import rs.ac.uns.ftn.siemcentar.service.OCSPService;
+import rs.ac.uns.ftn.siemcentar.utils.DateUtils;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
@@ -29,7 +31,6 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class LogServiceImpl implements LogService {
@@ -64,6 +65,12 @@ public class LogServiceImpl implements LogService {
 
     @Override
     public List<Log> searchAndFilter(LogFilterDTO filter) {
+        if (filter.getStartDate() != null && filter.getEndDate() != null) {
+            if (DateUtils.dateFrom(filter.getStartDate()).after(DateUtils.dateFrom(filter.getEndDate()))) {
+                throw new ApiRequestException("Start date must be before end date.");
+            }
+        }
+
         List<Log> logs = logRepository.findAll();
 
         if (filter.getId() != null)
@@ -76,20 +83,20 @@ public class LogServiceImpl implements LogService {
 
         if (filter.getMessage() != null)
             logs = logs.stream()
-                    .filter(log -> log.getMessage().toLowerCase().contains(filter.getMessage().toLowerCase())).collect(Collectors.toList());
+                    .filter(log -> log.getMessage().matches(filter.getMessage())).collect(Collectors.toList());
 
         if (filter.getSource() != null)
             logs = logs.stream()
-                    .filter(log -> log.getSource().toLowerCase().contains(filter.getSource().toLowerCase())).collect(Collectors.toList());
+                    .filter(log -> log.getSource().matches(filter.getSource())).collect(Collectors.toList());
 
         if (filter.getStartDate() != null) {
-            Date startDate = new GregorianCalendar(filter.getStartDate()[2], filter.getStartDate()[1] - 1, filter.getStartDate()[0]).getTime();
+            Date startDate = DateUtils.dateFrom(filter.getStartDate());
             logs = logs.stream()
                     .filter(log -> log.getDate().after(startDate)).collect(Collectors.toList());
         }
 
         if (filter.getEndDate() != null) {
-            Date endDate = new GregorianCalendar(filter.getEndDate()[2], filter.getEndDate()[1] - 1, filter.getEndDate()[0]).getTime();
+            Date endDate = DateUtils.dateFrom(filter.getEndDate());
             logs = logs.stream()
                     .filter(log -> log.getDate().before(endDate)).collect(Collectors.toList());
         }
