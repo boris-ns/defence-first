@@ -33,8 +33,9 @@ public class MyTrustStrategy implements TrustStrategy {
             System.out.println(c.getSerialNumber());
         }
 
+
         // da mora da se prijavi samo sa sertifikatom
-        if (chain.length < 2) {return  false;}
+        if (chain.length < 2) {return  true;}
 
 
         X509Certificate pki_cert = null;

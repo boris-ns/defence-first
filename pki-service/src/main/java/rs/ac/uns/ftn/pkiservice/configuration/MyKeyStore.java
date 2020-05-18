@@ -43,6 +43,13 @@ public class MyKeyStore {
     @Value("${keystore.archive.password}")
     private String KEYSTORE_ARCHIVE_PASSWORD;
 
+    @Value("${truststore.path}")
+    private String TRUSTSTORE_FILE_PATH;
+
+    @Value("${truststore.password}")
+    private String TRUSTSTORE_PASSWORD;
+
+
     @Value("${generated.certifacates.directory}")
     private String certDirectory;
 
@@ -50,17 +57,23 @@ public class MyKeyStore {
     public KeyStore getKeystore(){
         try {
             KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
+            KeyStore trustStore = KeyStore.getInstance("JKS", "SUN");
             File f = new File(KEYSTORE_FILE_PATH);
             if (f.exists()){
                 keyStore.load(new FileInputStream(f), KEYSTORE_PASSWORD.toCharArray());
             }else {
                 keyStore.load(null, KEYSTORE_PASSWORD.toCharArray());
+                trustStore.load(null, TRUSTSTORE_PASSWORD.toCharArray());
 
                 X509Certificate root_cert = generateRoot(keyStore);
                 this.writeRootCertToFile(root_cert);
+                trustStore.setCertificateEntry(ROOT_ALIAS, root_cert);
+
                 X509Certificate pki_cert = generatePKICert(keyStore, root_cert);
                 this.writeRootCertToFile(pki_cert);
+                trustStore.setCertificateEntry(PKI_ALIAS, pki_cert);
 
+                trustStore.store(new FileOutputStream(TRUSTSTORE_FILE_PATH), TRUSTSTORE_PASSWORD.toCharArray());
                 keyStore.store(new FileOutputStream(KEYSTORE_FILE_PATH), KEYSTORE_PASSWORD.toCharArray());
             }
             return keyStore;
