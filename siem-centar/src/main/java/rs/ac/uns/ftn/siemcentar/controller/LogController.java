@@ -11,6 +11,7 @@ import rs.ac.uns.ftn.siemcentar.dto.response.LogDTO;
 import rs.ac.uns.ftn.siemcentar.mapper.LogMapper;
 import rs.ac.uns.ftn.siemcentar.model.Log;
 import rs.ac.uns.ftn.siemcentar.service.CertificateService;
+import rs.ac.uns.ftn.siemcentar.service.DatabaseSequenceService;
 import rs.ac.uns.ftn.siemcentar.service.LogService;
 import java.util.*;
 
@@ -25,6 +26,9 @@ public class LogController {
     @Autowired
     private CertificateService certificateService;
 
+    @Autowired
+    private DatabaseSequenceService databaseSequenceService;
+
     @PostMapping(path = "/send")
     @PreAuthorize("hasRole('agent')")
     public  ResponseEntity<String> preMasterSecret(@RequestBody ArrayList<String> logs) throws Exception{
@@ -32,7 +36,9 @@ public class LogController {
         ObjectMapper mapper = new ObjectMapper();
         for(String l: logs) {
             System.out.println(l);
-            logList.add(mapper.readValue(l, Log.class));
+            Log log = mapper.readValue(l, Log.class);
+            log.setId(databaseSequenceService.generateSequence(Log.SEQUENCE_NAME));
+            logList.add(log);
         }
 
         this.logService.saveLogs(logList);
@@ -41,8 +47,9 @@ public class LogController {
 
     @GetMapping(path = "/findAll")
     @PreAuthorize("hasRole('admin') or hasRole('operator')")
-    public ResponseEntity<List<Log>> findAll() {
-        return new ResponseEntity<>(logService.findAll(), HttpStatus.OK);
+    public ResponseEntity<List<LogDTO>> findAll() {
+        List<Log> logs = logService.findAll();
+        return new ResponseEntity<>(LogMapper.toListDto(logs), HttpStatus.OK);
     }
 
     @PostMapping(path = "/filter")

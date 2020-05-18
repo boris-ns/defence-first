@@ -12,11 +12,12 @@ import { createArrayFromDate } from 'src/app/utils/date-utils';
 export class LogsSearchComponent implements OnInit {
 
   searchedLogs: Log[] = [];
+  displayedColumns: string[] = ['id', 'type', 'date', 'source', 'message'];
   filter: LogFilterDTO = {};
   startDate: string;
   endDate: string;
 
-  constructor(private logService: LogService) { 
+  constructor(private logService: LogService) {
   }
 
   ngOnInit() {
@@ -32,7 +33,7 @@ export class LogsSearchComponent implements OnInit {
     }
 
     if (this.startDate && this.endDate && (new Date(this.startDate).getTime() > (new Date(this.endDate).getTime()))) {
-      console.log("Startdate je posle enddate");
+      console.log('Startdate je posle enddate');
       // @TODO: dodati toastr
       return;
     }

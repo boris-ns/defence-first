@@ -51,22 +51,33 @@
         </div>
     </div>
 
-    <table class="log-table">
-        <thead>
-            <th>ID</th>
-            <th>Type</th>
-            <th>Date & time</th>
-            <th>Source</th>
-            <th>Message</th>
-        </thead>
-        <tbody>
-            <tr *ngFor="let log of searchedLogs">
-                <td>{{ log.id }}</td>
-                <td>{{ log.logType }}</td>
-                <td>{{ log.date }}</td>
-                <td>{{ log.source }}</td>
-                <td>{{ log.message }}</td>
-            </tr>
-        </tbody>
+    <table mat-table [dataSource]="searchedLogs" class="mat-elevation-z8">
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef> ID </th>
+          <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef> Type </th>
+            <td mat-cell *matCellDef="let element"> {{element.logType}} </td>
+        </ng-container>
+      
+        <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef> Date & time </th>
+            <td mat-cell *matCellDef="let element"> {{element.date | date: 'medium' }} </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="source">
+            <th mat-header-cell *matHeaderCellDef> Source </th>
+            <td mat-cell *matCellDef="let element"> {{element.source}} </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="message">
+            <th mat-header-cell *matHeaderCellDef> Message </th>
+            <td mat-cell *matCellDef="let element"> {{element.message }} </td>
+        </ng-container>
+        
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="header"></tr>
+        <tr mat-row [ngClass]="row.logType" *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
 </div>

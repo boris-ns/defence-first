@@ -72,11 +72,11 @@ public class SiemAgentApplication implements CommandLineRunner {
 		logs.add(new Log(2l, new Date(), LogType.SUCCESS, "drugiLog", "ja"));
 		logService.sendLogs(logs);
 
-//		logs.clear();
-//		logs.add(new Log(3l, new Date(), LogType.ERROR, "treciLog", "ja"));
-//		logs.add(new Log(4l, new Date(), LogType.WARN, "certvrtiLog", "ja"));
-//
-//		logService.sendLogs(logs);
+		logs.clear();
+		logs.add(new Log(3l, new Date(), LogType.ERROR, "treciLog", "ja"));
+		logs.add(new Log(4l, new Date(), LogType.WARN, "certvrtiLog", "ja"));
+
+		logService.sendLogs(logs);
 	}
 
 }

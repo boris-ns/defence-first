@@ -3,10 +3,12 @@ package rs.ac.uns.ftn.siemcentar.dto.response;
 import rs.ac.uns.ftn.siemcentar.model.Log;
 import rs.ac.uns.ftn.siemcentar.model.LogType;
 
+import java.util.Date;
+
 public class LogDTO {
 
     private Long id;
-    private String date;
+    private Date date;
     private LogType logType;
     private String message;
     private String source;
@@ -16,7 +18,7 @@ public class LogDTO {
 
     public LogDTO(Log log) {
         this.id = log.getId();
-        this.date = log.getDate().toString();
+        this.date = log.getDate();
         this.logType = log.getLogType();
         this.message = log.getMessage();
         this.source = log.getSource();
@@ -30,11 +32,11 @@ public class LogDTO {
         this.id = id;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
