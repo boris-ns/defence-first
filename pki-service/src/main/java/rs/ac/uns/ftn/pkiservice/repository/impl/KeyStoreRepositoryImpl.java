@@ -42,7 +42,7 @@ public class KeyStoreRepositoryImpl implements KeyStoreRepository {
         PrivateKey privKey = (PrivateKey) keyStore.getKey(alias, myKeyStore.getKEYSTORE_PASSWORD());
 
         X500Name issuerName = new JcaX509CertificateHolder((X509Certificate) cert).getSubject();
-        return new IssuerData(privKey, issuerName);
+        return new IssuerData(privKey, issuerName, cert.getPublicKey());
     }
 
     @Override

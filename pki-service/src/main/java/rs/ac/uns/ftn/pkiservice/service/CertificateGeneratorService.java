@@ -15,7 +15,7 @@ public interface CertificateGeneratorService {
 
     X509Certificate generateCertificate(SubjectData subjectData, IssuerData issuerData, Constants.CERT_TYPE typeCert);
 
-    IssuerData generateIssuerData(PrivateKey issuerKey, X500Name name);
+    IssuerData generateIssuerData(PrivateKey issuerKey, X500Name name, PublicKey publicKey);
 
     SubjectData generateSubjectData(PublicKey publicKey, X500Name name, Constants.CERT_TYPE certType);
 

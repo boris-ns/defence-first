@@ -44,7 +44,16 @@ public class CertificateController {
         List<SimpleCertificateDTO> result = new ArrayList<>();
         for (Constants.CERT_TYPE key : certifictes.keySet()) {
             for (X509Certificate cert : certifictes.get(key)) {
-                result.add(new SimpleCertificateDTO(cert, revoked.get(cert.getSerialNumber().toString()), key));
+
+                System.out.println(cert.getSerialNumber());
+                if(revoked.containsKey(cert.getSerialNumber())) {
+                    result.add(new SimpleCertificateDTO(cert, revoked.get(cert.getSerialNumber().toString()), key));
+                }
+                else {
+                    result.add(new SimpleCertificateDTO(cert, false, key));
+                }
+
+
             }
         }
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -73,7 +82,7 @@ public class CertificateController {
     @PostMapping(path = "/generate/intermediate", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity generateIntermediate(@Valid @RequestBody CreateCertificateDTO certificateDTO) throws
-            UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+            Exception {
         X500Name subjectName = NameMapper.toX500Name(certificateDTO);
         certificateService.generateCertificateIntermediate(subjectName, certificateDTO.getIssuerAlias());
         return ResponseEntity.ok().build();

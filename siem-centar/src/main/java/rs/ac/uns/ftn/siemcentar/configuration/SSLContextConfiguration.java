@@ -43,38 +43,38 @@ public class SSLContextConfiguration {
     private OCSPService ocspService;
 
 
-    @Bean
+    @Bean(name = "myContext")
     public SSLContext getCustomSSLContext() throws Exception{
 
-//        System.out.println("evo ga custom SSLContext");
-//        TrustManagerFactory tmf = TrustManagerFactory.getInstance(
-//                TrustManagerFactory.getDefaultAlgorithm());
-//                    // Initialise the TMF as you normally would, for example:
-//        tmf.init((KeyStore)null);
-//        TrustManager[] trustManagers = tmf.getTrustManagers();
-//        final X509TrustManager origTrustmanager = (X509TrustManager)trustManagers[0];
+////        System.out.println("evo ga custom SSLContext");
+////        TrustManagerFactory tmf = TrustManagerFactory.getInstance(
+////                TrustManagerFactory.getDefaultAlgorithm());
+////                    // Initialise the TMF as you normally would, for example:
+////        tmf.init((KeyStore)null);
+////        TrustManager[] trustManagers = tmf.getTrustManagers();
+////        final X509TrustManager origTrustmanager = (X509TrustManager)trustManagers[0];
+//
+//        TrustManagerCustomImpl trm = new TrustManagerCustomImpl(trustStore, ocspService);
+//        TrustManager[] wrappedTrustManagers = new TrustManager[1];
+//        wrappedTrustManagers[0] = trm;
+//
+//
+//        char[] passwordForAllPrivateKeys = keyStorePassword.toCharArray(); // cannot be null
+//        String algorithm = KeyManagerFactory.getDefaultAlgorithm(); // returns "SunX509" by default in 1.8
+//        KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
+//        kmf.init(keystore, passwordForAllPrivateKeys);
+//        KeyManager[] keyManagers = kmf.getKeyManagers();
+//
+//
+//        SSLContext sslContext = SSLContexts.createDefault();
+//        sslContext.init(keyManagers, wrappedTrustManagers, new SecureRandom());
 
-        TrustManagerCustomImpl trm = new TrustManagerCustomImpl(trustStore, ocspService);
-        TrustManager[] wrappedTrustManagers = new TrustManager[1];
-        wrappedTrustManagers[0] = trm;
 
 
-        char[] passwordForAllPrivateKeys = keyStorePassword.toCharArray(); // cannot be null
-        String algorithm = KeyManagerFactory.getDefaultAlgorithm(); // returns "SunX509" by default in 1.8
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
-        kmf.init(keystore, passwordForAllPrivateKeys);
-        KeyManager[] keyManagers = kmf.getKeyManagers();
-
-
-        SSLContext sslContext = SSLContexts.createDefault();
-        sslContext.init(keyManagers, wrappedTrustManagers, new SecureRandom());
-
-
-
-//        SSLContext sslContext = SSLContexts.custom()
-//                .loadTrustMaterial(
-//                        keystore, new MyTrustStrategy(trustStore, ocspService))
-//                .loadKeyMaterial(keystore, keyStorePassword.toCharArray()).build();
+        SSLContext sslContext = SSLContexts.custom()
+                .loadTrustMaterial(
+                        keystore, new MyTrustStrategy(trustStore, ocspService))
+                .loadKeyMaterial(keystore, keyStorePassword.toCharArray()).build();
 
         return sslContext;
     }

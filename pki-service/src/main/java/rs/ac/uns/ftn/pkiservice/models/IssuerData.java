@@ -1,6 +1,7 @@
 package rs.ac.uns.ftn.pkiservice.models;
 
 import java.security.PrivateKey;
+import java.security.PublicKey;
 
 import org.bouncycastle.asn1.x500.X500Name;
 
@@ -8,13 +9,15 @@ public class IssuerData {
 
     private X500Name x500name;
     private PrivateKey privateKey;
+    private PublicKey publicKey;
 
     public IssuerData() {
     }
 
-    public IssuerData(PrivateKey privateKey, X500Name x500name) {
+    public IssuerData(PrivateKey privateKey, X500Name x500name, PublicKey publicKey) {
         this.privateKey = privateKey;
         this.x500name = x500name;
+        this.publicKey = publicKey;
     }
 
     public X500Name getX500name() {
@@ -33,4 +36,11 @@ public class IssuerData {
         this.privateKey = privateKey;
     }
 
+    public void setPublicKey(PublicKey publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    public PublicKey getPublicKey() {
+        return publicKey;
+    }
 }

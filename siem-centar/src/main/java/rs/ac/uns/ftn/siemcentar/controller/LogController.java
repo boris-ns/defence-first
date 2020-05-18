@@ -14,6 +14,7 @@ import rs.ac.uns.ftn.siemcentar.service.CertificateService;
 import rs.ac.uns.ftn.siemcentar.service.LogService;
 import java.util.*;
 
+@CrossOrigin(origins = "https://localhost:4200/")
 @RestController
 @RequestMapping(value = "/api/log")
 public class LogController {

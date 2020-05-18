@@ -14,6 +14,8 @@ public class Constants {
 
     public static String ROOT_ALIAS = "1";
 
+    public static String PKI_ALIAS = "2";
+
     public static String GENERATED_CERT_DIRECTORY = "src/main/resources/generatedCerts";
 
 }

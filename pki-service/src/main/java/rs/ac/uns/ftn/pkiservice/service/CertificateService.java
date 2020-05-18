@@ -26,7 +26,7 @@ public interface CertificateService {
     IssuerData findIssuerByAlias(String alias) throws NoSuchAlgorithmException, CertificateException,
             KeyStoreException, IOException, UnrecoverableKeyException;
 
-    X509Certificate generateCertificateIntermediate(X500Name subjectName, String issuerAlias) throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, IOException;
+    X509Certificate generateCertificateIntermediate(X500Name subjectName, String issuerAlias) throws Exception;
 
     Certificate[] getCertificateChainByAlias(String alias);
 

@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.siemcentar.configuration;
 
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -20,6 +21,7 @@ public class HttpComponentsClientHttpRequestFactoryConfig {
 
 
     @Autowired
+    @Qualifier("myContext")
     private SSLContext sslContext;
 
     @Bean(name = "httFactory")
@@ -41,8 +43,8 @@ public class HttpComponentsClientHttpRequestFactoryConfig {
 //                    .loadKeyMaterial(keystore, keyStorePassword.toCharArray()).build();
 
             SSLConnectionSocketFactory socketFactory =
-                    new SSLConnectionSocketFactory(sslContext,
-                            SSLConnectionSocketFactory.getDefaultHostnameVerifier()
+                    new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE
+//                            SSLConnectionSocketFactory.getDefaultHostnameVerifier()
                     );
 
             CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory)
