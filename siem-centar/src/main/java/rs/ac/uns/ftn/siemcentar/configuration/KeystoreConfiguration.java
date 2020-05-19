@@ -33,6 +33,9 @@ public class KeystoreConfiguration {
     @Value("${pki.certificate.path}")
     private String pkiCertFilePath;
 
+    @Value("${root.certificate.path}")
+    private String rootCertFilePath;
+
     @Autowired
     private CertificateService certificateService;
 
@@ -82,7 +85,11 @@ public class KeystoreConfiguration {
                 InputStream certstream = certificateService.fullStream(pkiCertFilePath);
                 Certificate certs =  cf.generateCertificate(certstream);
 
+                InputStream certstream2 = certificateService.fullStream(rootCertFilePath);
+                Certificate certsRoot =  cf.generateCertificate(certstream2);
+
                 keyStore.setCertificateEntry("pki", certs);
+                keyStore.setCertificateEntry("root", certsRoot);
                 keyStore.store(new FileOutputStream(trustStoreFilePath), keyStorePassword.toCharArray());
             }
             return keyStore;

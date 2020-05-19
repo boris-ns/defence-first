@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.siemagent.config;
 
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -37,6 +38,7 @@ public class HttpComponentsClientHttpRequestFactoryConfig {
 //    private OCSPService ocspService;
 
     @Autowired
+    @Qualifier("mySSLContext")
     private SSLContext sslContext;
 
     @Bean(name = "httFactory")
@@ -61,7 +63,8 @@ public class HttpComponentsClientHttpRequestFactoryConfig {
 
             SSLConnectionSocketFactory socketFactory =
                     new SSLConnectionSocketFactory(sslContext,
-                            SSLConnectionSocketFactory.getDefaultHostnameVerifier()
+                            NoopHostnameVerifier.INSTANCE
+//                            SSLConnectionSocketFactory.getDefaultHostnameVerifier()
                     );
 
             CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory)

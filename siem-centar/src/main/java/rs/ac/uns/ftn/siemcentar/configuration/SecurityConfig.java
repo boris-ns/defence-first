@@ -13,9 +13,17 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 @KeycloakConfiguration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -58,6 +66,21 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter
         return new CustomKeycloakSpringBootConfigResolver(properties);
     }
 
+    @Bean
+    public CorsFilter corsFilter() {
+        final CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("");
+        config.addAllowedHeader("");
+        config.addAllowedMethod("*");
+        config.setMaxAge(1800L);
+
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+        return new CorsFilter(source);
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception
     {
@@ -65,6 +88,29 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter
         http.csrf().disable()
                 .authorizeRequests()
                 .anyRequest().authenticated().and()
+                .cors().and()
                 .csrf().disable();
+//                .x509()
+//                    .subjectPrincipalRegex("CN=(.*?)(?:,|$)")
+//                    .userDetailsService(userDetailsServiceX509());
     }
+
+
+//    public UserDetailsService userDetailsServiceX509() {
+//        return new UserDetailsService() {
+//            @Override
+//            public UserDetails loadUserByUsername(String username) {
+//
+//                System.out.println(username);
+//                //@TODO: ovde cemo ubaciti da centar proverava OCSP za agentov sertifikat,
+//                // desava se nakon sto prodje handShake u RestTemplate-u..
+//                if (true) {
+//                    return new User(username, "",
+//                            AuthorityUtils
+//                                    .commaSeparatedStringToAuthorityList("ROLE_ADMIN, ROLE_agent"));
+//                }
+//                throw new UsernameNotFoundException("User not found!");
+//            }
+//        };
+//    }
 }

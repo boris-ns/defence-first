@@ -1,5 +1,9 @@
 package rs.ac.uns.ftn.pkiservice.service.impl;
 
+import org.bouncycastle.asn1.ASN1Boolean;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
@@ -7,7 +11,10 @@ import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.CertIOException;
+import org.bouncycastle.cert.X509ExtensionUtils;
 import org.bouncycastle.cert.crmf.CRMFException;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
+import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.pkiservice.configuration.CertificateBuilder;
@@ -68,11 +75,35 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
 //                certGen.addExtension(X509Extensions.BasicConstraints, true, new BasicConstraints(false));
                 certGen.addExtension(Extension.keyUsage, true,
                         new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyEncipherment));
+                certGen.addExtension(Extension.basicConstraints, true, new BasicConstraints(false));
             }
             else {
                 certGen.addExtension(Extension.keyUsage, true,
                         new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyCertSign | KeyUsage.cRLSign));
+
+                certGen.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
+
+
+                byte[] subjectKeyIdentifier = new JcaX509ExtensionUtils()
+                        .createSubjectKeyIdentifier(subjectData.getPublicKey()).getKeyIdentifier();
+
+                certGen.addExtension(Extension.subjectKeyIdentifier, false,
+                        new SubjectKeyIdentifier(subjectKeyIdentifier));
             }
+
+
+            // ovo je da zna kojim issuera public kljucem da proveri potpis sertifika sertifikate
+            // jer su potpisani privatnim, koristi se kad CA ima vise parova kljucava
+            // kojima potpisuje sertifikate..
+            byte[] authorityKeyIdentifer = new JcaX509ExtensionUtils().
+                    createAuthorityKeyIdentifier(issuerData.getPublicKey()).getKeyIdentifier();
+//
+            certGen.addExtension(Extension.authorityKeyIdentifier, false,
+                    new AuthorityKeyIdentifier(authorityKeyIdentifer));
+
+//
+
+
 
             GeneralName altName = new GeneralName(GeneralName.dNSName, "localhost");
             GeneralNames subjectAltName = new GeneralNames(altName);
@@ -103,13 +134,15 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
         }
         return null;
     }
 
     @Override
-    public IssuerData generateIssuerData(PrivateKey issuerKey, X500Name name) {
-        return new IssuerData(issuerKey, name);
+    public IssuerData generateIssuerData(PrivateKey issuerKey, X500Name name, PublicKey publicKey) {
+        return new IssuerData(issuerKey, name, publicKey);
     }
 
 

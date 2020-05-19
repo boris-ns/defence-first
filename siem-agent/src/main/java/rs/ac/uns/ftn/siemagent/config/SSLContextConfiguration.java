@@ -35,7 +35,7 @@ public class SSLContextConfiguration {
     private OCSPService ocspService;
 
 
-    @Bean
+    @Bean(name = "mySSLContext")
     public SSLContext getCustomSSLContext() throws Exception{
 
 //        TrustManagerCustomImpl trm = new TrustManagerCustomImpl(trustStore, ocspService);

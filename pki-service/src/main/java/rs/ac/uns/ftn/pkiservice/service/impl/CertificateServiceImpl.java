@@ -51,11 +51,15 @@ public class CertificateServiceImpl implements CertificateService {
         List<Certificate> certificateList = keyStoreRepository.readAll();
         Map<Constants.CERT_TYPE, List<X509Certificate>> certificateMap = new HashMap<>();
         Constants.CERT_TYPE type;
+
         for (Certificate c: certificateList){
             X509Certificate certificate = (X509Certificate) c;
+
+            System.out.println(certificate.getKeyUsage());
+
             if(certificate.getSerialNumber().toString().equals(ROOT_ALIAS)){
                 type = Constants.CERT_TYPE.ROOT_CERT;
-            }else if(certificate.getKeyUsage()[5] && certificate.getKeyUsage()[6]){
+            }else if(certificate.getKeyUsage() != null && certificate.getKeyUsage()[5] && certificate.getKeyUsage()[6]){
                 type = Constants.CERT_TYPE.INTERMEDIATE_CERT;
             }else {
                 type = Constants.CERT_TYPE.LEAF_CERT;
@@ -105,8 +109,7 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Override
     public X509Certificate generateCertificateIntermediate(X500Name subjectName, String issuerAlias)
-            throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException,
-            IOException {
+            throws Exception {
         KeyPair keyPairSuject = keyPairGeneratorService.generateKeyPair();
         SubjectData subjectData = certificateGenerator.generateSubjectData(keyPairSuject.getPublic(), subjectName,
                 Constants.CERT_TYPE.INTERMEDIATE_CERT);
@@ -118,6 +121,9 @@ public class CertificateServiceImpl implements CertificateService {
 
         Certificate[] certificatesChain = createChain(issuerAlias, cert);
         keyStoreRepository.writeKeyEntry(cert.getSerialNumber().toString(), keyPairSuject.getPrivate(), certificatesChain);
+
+        writeCertToFile(cert.getSerialNumber().toString());
+
         return cert;
     }
 
@@ -159,7 +165,8 @@ public class CertificateServiceImpl implements CertificateService {
         SubjectData subjectData = new SubjectData(keyPair.getPublic(),
                 new JcaX509CertificateHolder(certificate).getSubject(), ROOT_ALIAS, null, null);
         certificateGenerator.generateDate(subjectData, Constants.CERT_TYPE.ROOT_CERT);
-        IssuerData issuerData = new IssuerData(keyPair.getPrivate(), new JcaX509CertificateHolder(certificate).getIssuer());
+        IssuerData issuerData = new IssuerData(keyPair.getPrivate(),
+                new JcaX509CertificateHolder(certificate).getIssuer(), keyPair.getPublic());
 
         Certificate newCertificate = certificateGenerator.generateCertificate(subjectData, issuerData,
                 Constants.CERT_TYPE.ROOT_CERT);
@@ -182,7 +189,7 @@ public class CertificateServiceImpl implements CertificateService {
                 Constants.CERT_TYPE.INTERMEDIATE_CERT);
         certificates[0] = newCertificate;
         keyStoreRepository.writeKeyEntry(alias, keyPair.getPrivate(), certificates);
-        IssuerData id = new IssuerData(keyPair.getPrivate(), subjectData.getX500name());
+        IssuerData id = new IssuerData(keyPair.getPrivate(), subjectData.getX500name(), keyPair.getPublic());
         childReplace(id, newCertificate, certificates.length);
     }
 
