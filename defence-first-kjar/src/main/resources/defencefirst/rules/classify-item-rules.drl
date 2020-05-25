@@ -1,0 +1,12 @@
+package defencefirst.rules;
+
+import rs.ac.uns.ftn.siemcentar.model.facts.Item;
+
+rule "Classify items"
+    when
+        $i: Item()
+    then
+        $i.setCategory(Item.Category.LOW_RANGE);
+        update($i);
+        System.out.println("[DROOLS] Item classified");
+end

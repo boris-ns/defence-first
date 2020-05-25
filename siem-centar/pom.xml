@@ -16,6 +16,7 @@
 
     <properties>
         <java.version>1.8</java.version>
+        <kie.version>7.17.0.Final</kie.version>
     </properties>
 
     <dependencies>
@@ -68,6 +69,23 @@
             <version>5.2.2.RELEASE</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.kie</groupId>
+            <artifactId>kie-ci</artifactId>
+            <version>${kie.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.kie</groupId>
+            <artifactId>kie-spring</artifactId>
+            <version>${kie.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>defencefirst</groupId>
+            <artifactId>defence-first-kjar</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>
