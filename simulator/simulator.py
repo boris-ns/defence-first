@@ -1,26 +1,45 @@
 import time
+from datetime import datetime
 from random import randrange
 from itertools import cycle
+from config import LOG_FILE_PATH
+from config import LOG_SOURCE
 
+# TODO: Napisati smislenije poruke
 normal_log_messages = [
-    "normal poruka 1",
-    "normal poruka 2",
-    "normal poruka 3",
-    "normal poruka 4",
-    "normal poruka 5",
+    "INFO - normal poruka 1",
+    "INFO - normal poruka 2",
+    "INFO - normal poruka 3",
+    "INFO - normal poruka 4",
+    "INFO - normal poruka 5",
+    "SUCCESS - normal poruka 1",
+    "SUCCESS - normal poruka 2",
+    "SUCCESS - normal poruka 3",
+    "SUCCESS - normal poruka 4",
+    "SUCCESS - normal poruka 5",
 ]
 
+# TODO: Napisati smislenije poruke
 attack_log_messages = [
-    "attack poruka 1",
-    "attack poruka 2",
-    "attack poruka 3",
-    "attack poruka 4",
-    "attack poruka 5",
+    "ERROR - attack poruka 1",
+    "ERROR - attack poruka 2",
+    "ERROR - attack poruka 3",
+    "ERROR - attack poruka 4",
+    "ERROR - attack poruka 5",
+    "WARN - attack poruka 1",
+    "WARN - attack poruka 2",
+    "WARN - attack poruka 3",
+    "WARN - attack poruka 4",
+    "WARN - attack poruka 5",
 ]
 
 class State:
     def handle(self):
         pass
+
+def write_to_log_file(msg):
+    with open(LOG_FILE_PATH, "a") as log:
+        log.write(msg + '\n')
 
 
 class NormalState(State):
@@ -28,10 +47,10 @@ class NormalState(State):
         print("--- State: Normal ---")
 
         for i in range(randrange(10)):
-            with open("simulator_log.txt", "a") as log:
-                msg = normal_log_messages[randrange(len(normal_log_messages))]
-                print(msg)
-                log.write(msg + '\n')
+            msg = normal_log_messages[randrange(len(normal_log_messages))]
+            msg = str(datetime.now()) + " - " + LOG_SOURCE + " - " + msg
+            print(msg)
+            write_to_log_file(msg)
 
             time.sleep(1)
 
@@ -40,15 +59,17 @@ class AttackState(State):
         print("--- State: Attack ---")
 
         for i in range(randrange(10)):
-            with open("simulator_log.txt", "a") as log:
-                msg = attack_log_messages[randrange(len(attack_log_messages))]
-                print(msg)
-                log.write(msg + '\n')
+            msg = attack_log_messages[randrange(len(attack_log_messages))]
+            msg = str(datetime.now()) + " - " + LOG_SOURCE + " - " + msg
+            print(msg)
+            write_to_log_file(msg)
 
             time.sleep(1)
 
 
 def simulate(states):
+    print('== Simulation started ==')
+
     # Beskonacna petlja koja prolazi kroz sva stanja
     for state in cycle(states):
         state.handle()
@@ -66,4 +87,6 @@ if __name__ == '__main__':
         NormalState()
     ]
     
+    print('Log file path: ' + LOG_FILE_PATH)
+
     simulate(states)
