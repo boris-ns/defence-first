@@ -17,6 +17,7 @@ normal_log_messages = [
     "SUCCESS - normal poruka 3",
     "SUCCESS - normal poruka 4",
     "SUCCESS - normal poruka 5",
+    "INFO - 1234567890"
 ]
 
 # TODO: Napisati smislenije poruke

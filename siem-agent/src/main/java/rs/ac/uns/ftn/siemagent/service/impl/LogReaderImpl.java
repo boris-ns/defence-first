@@ -23,8 +23,11 @@ public class LogReaderImpl implements LogReader {
     @Value("${log.reader.batchInterval}")
     private Integer batchInterval;
 
-    @Value("${log.reader.path.simulator}")
+    @Value("${log.reader.simulator.path}")
     private String simulatorLogPath;
+
+    @Value("${log.reader.simulator.filter}")
+    private String simulatorLogFilter;
 
     @Autowired
     private LogService logService;
@@ -58,12 +61,15 @@ public class LogReaderImpl implements LogReader {
             while (line != null) {
                 Log log = this.parseLogFromSimulator(line);
 
-                if (!log.date.after(threshold)) {
+                if (!log.getDate().after(threshold)) {
                     break;
                 }
 
-                System.out.println(line);
-                logs.add(log);
+                if (log.getMessage().matches(simulatorLogFilter)) {
+                    System.out.println(line);
+                    logs.add(log);
+                }
+
                 line = reader.readLine();
             }
         } finally {
