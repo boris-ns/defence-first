@@ -10,6 +10,7 @@ import rs.ac.uns.ftn.siemagent.model.Log;
 import rs.ac.uns.ftn.siemagent.model.LogType;
 import rs.ac.uns.ftn.siemagent.repository.Keystore;
 import rs.ac.uns.ftn.siemagent.service.CertificateService;
+import rs.ac.uns.ftn.siemagent.service.LogReader;
 import rs.ac.uns.ftn.siemagent.service.LogService;
 import rs.ac.uns.ftn.siemagent.service.OCSPService;
 
@@ -37,16 +38,19 @@ public class SiemAgentApplication implements CommandLineRunner {
 	@Autowired
 	private Keystore keystore;
 
+	@Autowired
+	private LogReader logReader;
+
 	public static void main(String[] args) {
 		SpringApplication.run(SiemAgentApplication.class, args);
 	}
 
 	@Override
 	public void run(String... args) throws Exception {
-
+		logReader.readLogs();
 
 		// simulacija slanja logova
-		simulation();
+//		simulation();
 
 //		certificateService.sendRequestForCertificate();
 //		certificateService.installCertificateFromFile();
@@ -65,6 +69,7 @@ public class SiemAgentApplication implements CommandLineRunner {
 //		certificateService.sendReplaceCertificateRequest(token);
 	}
 
+	// TODO: obrisati
 	private void simulation() throws Exception{
 
 		ArrayList<Log> logs = new ArrayList<Log>();

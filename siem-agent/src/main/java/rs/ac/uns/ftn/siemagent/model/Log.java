@@ -6,11 +6,11 @@ import java.util.Date;
 
 public class Log implements Serializable {
 
-    public Long id;
-    public Date date;
-    public LogType logType;
-    public String message;
-    public String source;
+    private Long id;
+    private Date date;
+    private LogType logType;
+    private String message;
+    private String source;
 
     public Log() {}
 
@@ -31,5 +31,25 @@ public class Log implements Serializable {
                 ", message='" + message + '\'' +
                 ", source='" + source + '\'' +
                 '}';
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public LogType getLogType() {
+        return logType;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public String getSource() {
+        return source;
     }
 }
