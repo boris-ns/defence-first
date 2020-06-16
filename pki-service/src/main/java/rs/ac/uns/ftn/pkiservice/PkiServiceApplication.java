@@ -33,7 +33,7 @@ public class PkiServiceApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
-		System.out.println("desiSeee");
+//		System.out.println("desiSeee");
 		PrivateKey privateKey = keystore.readPrivateKey("1");
 
 		StringWriter sw = new StringWriter();
