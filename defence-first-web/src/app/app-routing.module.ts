@@ -1,6 +1,7 @@
 import { AdminAuthorizationGuard } from './guards/admin-authorization.guard';
 import { NotAuthorizedComponent } from './components/error-pages/not-authorized/not-authorized.component';
-import { NOT_FOUND, NOT_AUTHORIZED, HOME_PATH, CERTIFICATES_PATH, SHOW_LOGS_PATH, SEARCH_LOGS_PATH } from './config/router-paths';
+import { NOT_FOUND, NOT_AUTHORIZED, HOME_PATH, CERTIFICATES_PATH, SHOW_LOGS_PATH, SEARCH_LOGS_PATH,
+   SHOW_ALARMS_PATH } from './config/router-paths';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { NotFoundComponent } from './components/error-pages/not-found/not-found.component';
@@ -8,6 +9,7 @@ import { HomeComponent } from './components/home/home.component';
 import { ShowLogsComponent } from './components/shared/show-logs/show-logs.component';
 import { OperatorAuthorizationGuard } from './guards/operator-authorization.guard';
 import { LogsSearchComponent } from './components/shared/logs-search/logs-search.component';
+import { ShowAlarmsComponent } from './components/shared/show-alarms/show-alarms.component';
 
 // !!! Guards !!!
 // canActivate: [OperatorAuthorizationGuard],
@@ -21,11 +23,18 @@ const routes: Routes = [
   },
   {
     path: SHOW_LOGS_PATH,
-    component: ShowLogsComponent
+    component: ShowLogsComponent,
+    canActivate: [AdminAuthorizationGuard, OperatorAuthorizationGuard]
   },
   {
     path: SEARCH_LOGS_PATH,
-    component: LogsSearchComponent
+    component: LogsSearchComponent,
+    canActivate: [AdminAuthorizationGuard, OperatorAuthorizationGuard]
+  },
+  {
+    path: SHOW_ALARMS_PATH,
+    component: ShowAlarmsComponent,
+    canActivate: [AdminAuthorizationGuard, OperatorAuthorizationGuard]
   },
   {
     path: NOT_FOUND,
