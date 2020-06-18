@@ -39,7 +39,6 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import sun.security.x509.SubjectAlternativeNameExtension;
 
 @Service
 public class CertificateGeneratorServiceImpl implements CertificateGeneratorService {

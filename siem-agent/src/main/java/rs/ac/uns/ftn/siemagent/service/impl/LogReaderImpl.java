@@ -80,8 +80,7 @@ public class LogReaderImpl implements LogReader {
         }
 
         Collections.reverse(logs);
-        // TODO: odkomentarisati ovo kad se rad sa mrezom lepo namesti
-        //logService.sendLogs(logs);
+        logService.sendLogs(logs);
     }
 
     private Log parseLogFromSimulator(String line) {

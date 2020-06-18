@@ -70,8 +70,8 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter
     public CorsFilter corsFilter() {
         final CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("");
-        config.addAllowedHeader("");
+        config.addAllowedOrigin("*");
+        config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         config.setMaxAge(1800L);
 
@@ -89,7 +89,8 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter
                 .authorizeRequests()
                 .anyRequest().authenticated().and()
                 .cors().and()
-                .csrf().disable();
+                .csrf().disable()
+                .headers().xssProtection();
 //                .x509()
 //                    .subjectPrincipalRegex("CN=(.*?)(?:,|$)")
 //                    .userDetailsService(userDetailsServiceX509());
