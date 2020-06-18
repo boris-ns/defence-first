@@ -137,7 +137,7 @@ public class OCSPServiceImpl implements OCSPService {
         BasicOCSPResp basicResponse = (BasicOCSPResp)ocspResp.getResponseObject();
 
 
-        X509Certificate rootCA = (X509Certificate) myTrustStore.getCertificate("pki");;
+        X509Certificate rootCA = (X509Certificate) myTrustStore.getCertificate(Constants.ROOT_ALIAS);
 
         ContentVerifierProvider prov = new JcaContentVerifierProviderBuilder().build(rootCA.getPublicKey());
         boolean signatureValid = basicResponse.isSignatureValid(prov);

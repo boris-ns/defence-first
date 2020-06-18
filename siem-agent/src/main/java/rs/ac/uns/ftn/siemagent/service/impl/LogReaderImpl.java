@@ -10,9 +10,12 @@ import rs.ac.uns.ftn.siemagent.service.LogReader;
 import rs.ac.uns.ftn.siemagent.service.LogService;
 import rs.ac.uns.ftn.siemagent.utils.DateUtil;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 
 @Service
 public class LogReaderImpl implements LogReader {

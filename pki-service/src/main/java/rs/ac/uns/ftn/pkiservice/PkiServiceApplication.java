@@ -17,6 +17,9 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.util.Arrays;
 
+import static rs.ac.uns.ftn.pkiservice.constants.Constants.ANGULAR_ALIAS;
+import static rs.ac.uns.ftn.pkiservice.constants.Constants.ROOT_ALIAS;
+
 @SpringBootApplication
 public class PkiServiceApplication implements CommandLineRunner {
 
@@ -33,15 +36,14 @@ public class PkiServiceApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
-		System.out.println("desiSeee");
-		PrivateKey privateKey = keystore.readPrivateKey("1");
+		PrivateKey privateKey = keystore.readPrivateKey(ANGULAR_ALIAS);
 
 		StringWriter sw = new StringWriter();
 		JcaPEMWriter pm = new JcaPEMWriter(sw);
 		pm.writeObject(privateKey);
 		pm.close();
 
-		String fileName = "cert_1.key";
+		String fileName = "cert_angular.key";
 		String path = certDirectory + "/" + fileName;
 
 

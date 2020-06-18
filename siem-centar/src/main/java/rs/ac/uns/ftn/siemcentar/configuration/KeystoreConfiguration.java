@@ -14,9 +14,11 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.cert.CertPath;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.util.List;
 
 @Configuration
 public class KeystoreConfiguration {
@@ -30,8 +32,8 @@ public class KeystoreConfiguration {
     @Value("${keystore.password}")
     private String keyStorePassword;
 
-    @Value("${pki.certificate.path}")
-    private String pkiCertFilePath;
+//    @Value("${pki.certificate.path}")
+//    private String pkiCertFilePath;
 
     @Value("${root.certificate.path}")
     private String rootCertFilePath;
@@ -82,13 +84,10 @@ public class KeystoreConfiguration {
                 keyStore.load(null, keyStorePassword.toCharArray());
 
                 CertificateFactory cf = CertificateFactory.getInstance("X.509");
-                InputStream certstream = certificateService.fullStream(pkiCertFilePath);
-                Certificate certs =  cf.generateCertificate(certstream);
 
                 InputStream certstream2 = certificateService.fullStream(rootCertFilePath);
                 Certificate certsRoot =  cf.generateCertificate(certstream2);
 
-                keyStore.setCertificateEntry("pki", certs);
                 keyStore.setCertificateEntry("root", certsRoot);
                 keyStore.store(new FileOutputStream(trustStoreFilePath), keyStorePassword.toCharArray());
             }

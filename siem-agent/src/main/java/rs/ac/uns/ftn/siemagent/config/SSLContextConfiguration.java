@@ -38,23 +38,6 @@ public class SSLContextConfiguration {
     @Bean(name = "mySSLContext")
     public SSLContext getCustomSSLContext() throws Exception{
 
-//        TrustManagerCustomImpl trm = new TrustManagerCustomImpl(trustStore, ocspService);
-//        TrustManager[] wrappedTrustManagers = new TrustManager[1];
-//        wrappedTrustManagers[0] = trm;
-//
-//
-//        char[] passwordForAllPrivateKeys = keyStorePassword.toCharArray(); // cannot be null
-//        String algorithm = KeyManagerFactory.getDefaultAlgorithm(); // returns "SunX509" by default in 1.8
-//        KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
-//        kmf.init(keystore, passwordForAllPrivateKeys);
-//        KeyManager[] keyManagers = kmf.getKeyManagers();
-//
-//
-//        SSLContext sslContext = SSLContexts.createDefault();
-//        sslContext.init(keyManagers, wrappedTrustManagers, new SecureRandom());
-
-
-
         SSLContext sslContext = SSLContexts.custom()
                 .loadTrustMaterial(
                         trustStore, new MyTrustStrategy(trustStore, ocspService))

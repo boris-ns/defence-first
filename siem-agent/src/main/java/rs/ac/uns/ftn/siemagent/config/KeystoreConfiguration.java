@@ -28,8 +28,8 @@ public class KeystoreConfiguration {
     @Value("${keystore.password}")
     private String keyStorePassword;
 
-    @Value("${pki.certificate.path}")
-    private String pkiCertFilePath;
+//    @Value("${pki.certificate.path}")
+//    private String pkiCertFilePath;
 
     @Value("${root.certificate.path}")
     private String rootCertFilePath;
@@ -76,15 +76,10 @@ public class KeystoreConfiguration {
                 keyStore.load(new FileInputStream(f), keyStorePassword.toCharArray());
             } else {
                 keyStore.load(null, keyStorePassword.toCharArray());
-
                 CertificateFactory cf = CertificateFactory.getInstance("X.509");
-                InputStream certstream = certificateService.fullStream(pkiCertFilePath);
-                Certificate certs =  cf.generateCertificate(certstream);
-
                 InputStream certstream2 = certificateService.fullStream(rootCertFilePath);
                 Certificate root =  cf.generateCertificate(certstream2);
 
-                keyStore.setCertificateEntry("pki", certs);
                 keyStore.setCertificateEntry("root", root);
                 keyStore.store(new FileOutputStream(trustStoreFilePath), keyStorePassword.toCharArray());
             }

@@ -4,6 +4,7 @@ import org.apache.http.ssl.TrustStrategy;
 import org.bouncycastle.cert.ocsp.OCSPReq;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.springframework.stereotype.Component;
+import rs.ac.uns.ftn.siemcentar.constants.Constants;
 import rs.ac.uns.ftn.siemcentar.service.OCSPService;
 import java.security.KeyStore;
 import java.security.cert.*;
@@ -25,55 +26,45 @@ public class MyTrustStrategy implements TrustStrategy {
     public boolean isTrusted(X509Certificate[] chain, String authType) {
         boolean retVal = true;
 
-        // napravi put i validiraj ako je put validan onda proveris ocsp
-        // ako nije validan onda vratis false i tjt...
-
-
+        // samo da isprinta lanac
         for(X509Certificate c : chain) {
             System.out.println(c.getSerialNumber());
         }
 
-
-        // da mora da se prijavi samo sa sertifikatom
-        if (chain.length < 2) {return  true;}
-
-
-        X509Certificate pki_cert = null;
-        X509Certificate root_cert = null;
-        // provera ako je lanac duzine 1 i da li to prica sa PKI-em
         try {
-            root_cert = (X509Certificate) this.trustStore.getCertificate("root");
-            pki_cert = (X509Certificate) this.trustStore.getCertificate("pki");
-        }catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            CertPath certPath = cf.generateCertPath(Arrays.asList(chain));
+            CertPathValidator validator = CertPathValidator.getInstance("PKIX");
+            PKIXParameters params = new PKIXParameters(this.trustStore);
+            params.setRevocationEnabled(false);
+            PKIXCertPathValidatorResult result = (PKIXCertPathValidatorResult) validator.validate(certPath, params);
         }
-        if (chain.length == 2) {
-            X509Certificate cert = (X509Certificate) chain[0];
-            X509Certificate cert2 = (X509Certificate) chain[1];
-            if (cert.getSerialNumber() != pki_cert.getSerialNumber() ||
-                    !Arrays.equals(cert.getSignature(), pki_cert.getSignature())) {
-                retVal = false;
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+            retVal = false;
+        }finally {
+            X509Certificate cert = chain[0];
+            String name = cert.getSubjectX500Principal().getName();
+            System.out.println(name);
+            if (name.equals(Constants.PKI_COMMUNICATION_CERT_NAME))
+            {
+                return true;
             }
-            if (cert2.getSerialNumber() != root_cert.getSerialNumber() ||
-                    !Arrays.equals(cert2.getSignature(), root_cert.getSignature())) {
-                retVal = false;
+            else{
+                try {
+                    OCSPReq request = ocspService.generateOCSPRequest(chain);
+                    OCSPResp response = ocspService.sendOCSPRequest(request);
+                    boolean val = ocspService.processOCSPResponse(request,response);
+                    retVal = val;
+                }catch (Exception e) {
+                    e.printStackTrace();
+                    retVal = false;
+                }
+                finally {
+                    return retVal;
+                }
             }
         }
-        // ako je lanac duzi od 2 onda se pravi OCS request i salje se PKI-u
-        else {
-            try {
-                OCSPReq request = ocspService.generateOCSPRequest(chain);
-                OCSPResp response = ocspService.sendOCSPRequest(request);
-                boolean val = ocspService.processOCSPResponse(request,response);
-                retVal = val;
-            }catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-
-        }
-        return retVal;
     }
 
 }

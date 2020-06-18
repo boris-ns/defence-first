@@ -76,6 +76,28 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
                 certGen.addExtension(Extension.keyUsage, true,
                         new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyEncipherment));
                 certGen.addExtension(Extension.basicConstraints, true, new BasicConstraints(false));
+
+
+                KeyPurposeId[] keyPurposeIds = new KeyPurposeId[2];
+                keyPurposeIds[0] = KeyPurposeId.id_kp_clientAuth;
+                keyPurposeIds[1] = KeyPurposeId.id_kp_serverAuth;
+
+                certGen.addExtension(Extension.extendedKeyUsage , true,
+                        new ExtendedKeyUsage(keyPurposeIds));
+            }
+            else if (type.equals(Constants.CERT_TYPE.SERVER_CERT))
+            {
+                certGen.addExtension(Extension.basicConstraints, true, new BasicConstraints(false));
+                certGen.addExtension(Extension.extendedKeyUsage , true,
+                        new ExtendedKeyUsage(KeyPurposeId.id_kp_serverAuth));
+
+                certGen.addExtension(Extension.keyUsage, true,
+                        new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyEncipherment));
+
+                byte[] subjectKeyIdentifier = new JcaX509ExtensionUtils()
+                        .createSubjectKeyIdentifier(subjectData.getPublicKey()).getKeyIdentifier();
+                certGen.addExtension(Extension.subjectKeyIdentifier, false,
+                        new SubjectKeyIdentifier(subjectKeyIdentifier));
             }
             else {
                 certGen.addExtension(Extension.keyUsage, true,
@@ -102,8 +124,6 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
                     new AuthorityKeyIdentifier(authorityKeyIdentifer));
 
 //
-
-
 
             GeneralName altName = new GeneralName(GeneralName.dNSName, "localhost");
             GeneralNames subjectAltName = new GeneralNames(altName);
@@ -201,6 +221,9 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
         }
         else if(certType.equals((Constants.CERT_TYPE.INTERMEDIATE_CERT))) {
             calendarLater.add(Calendar.YEAR, Constants.INTERMEDIATE_CERT_DURATION);
+        }
+        else if(certType.equals((Constants.CERT_TYPE.SERVER_CERT))) {
+            calendarLater.add(Calendar.YEAR, Constants.SERVER_CERT_DURATION);
         }
         else {
             calendarLater.add(Calendar.YEAR, Constants.LEAF_CERT_DURATION);

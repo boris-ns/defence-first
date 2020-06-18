@@ -66,12 +66,18 @@ public class MyKeyStore {
                 trustStore.load(null, TRUSTSTORE_PASSWORD.toCharArray());
 
                 X509Certificate root_cert = generateRoot(keyStore);
-                this.writeRootCertToFile(root_cert);
+                this.writeRootCertToFile(keyStore, ROOT_ALIAS);
                 trustStore.setCertificateEntry(ROOT_ALIAS, root_cert);
 
                 X509Certificate pki_cert = generatePKICert(keyStore, root_cert);
-                this.writeRootCertToFile(pki_cert);
-                trustStore.setCertificateEntry(PKI_ALIAS, pki_cert);
+                this.writeRootCertToFile(keyStore,PKI_ALIAS);
+//                trustStore.setCertificateEntry(PKI_ALIAS, pki_cert);
+
+                X509Certificate pki_communication_cert = generatePKICommunicationCert(keyStore, pki_cert, root_cert);
+                this.writeRootCertToFile(keyStore,PKI_COMMUNICATION_ALIAS);
+
+                X509Certificate angularCert = generateAngularCertificate(keyStore, pki_cert, root_cert);
+                this.writeRootCertToFile(keyStore, ANGULAR_ALIAS);
 
                 trustStore.store(new FileOutputStream(TRUSTSTORE_FILE_PATH), TRUSTSTORE_PASSWORD.toCharArray());
                 keyStore.store(new FileOutputStream(KEYSTORE_FILE_PATH), KEYSTORE_PASSWORD.toCharArray());
@@ -94,6 +100,7 @@ public class MyKeyStore {
         }
         return null;
     }
+
 
     @Bean(name = "archiveKeyStore")
     public KeyStore getArchiveKeyStore() {
@@ -136,6 +143,26 @@ public class MyKeyStore {
     private X500NameBuilder generateNamePKI(){
         X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
         builder.addRDN(BCStyle.CN, "PKI");
+        builder.addRDN(BCStyle.O, "UNS-FTN");
+        builder.addRDN(BCStyle.OU, "Katedra za informatiku");
+        builder.addRDN(BCStyle.L, "Novi Sad");
+        builder.addRDN(BCStyle.C, "RS");
+        return builder;
+    }
+
+    private X500NameBuilder generateNamePKICommunication(){
+        X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
+        builder.addRDN(BCStyle.CN, "pki_communication");
+        builder.addRDN(BCStyle.O, "UNS-FTN");
+        builder.addRDN(BCStyle.OU, "Katedra za informatiku");
+        builder.addRDN(BCStyle.L, "Novi Sad");
+        builder.addRDN(BCStyle.C, "RS");
+        return builder;
+    }
+
+    private X500NameBuilder generateNameAngular(){
+        X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
+        builder.addRDN(BCStyle.CN, "angular");
         builder.addRDN(BCStyle.O, "UNS-FTN");
         builder.addRDN(BCStyle.OU, "Katedra za informatiku");
         builder.addRDN(BCStyle.L, "Novi Sad");
@@ -188,19 +215,74 @@ public class MyKeyStore {
         return (X509Certificate) certificate;
     }
 
+    private X509Certificate generatePKICommunicationCert(KeyStore keyStore, X509Certificate pki_cert, X509Certificate root) throws Exception {
+        KeyPair kp = keyPairGeneratorService.generateKeyPair();
+
+        X500NameBuilder builder = generateNamePKICommunication();
+        X500NameBuilder issuerBuilder = generateNamePKI();
+
+        PrivateKey issuerPrivateKey = (PrivateKey) keyStore.getKey(PKI_ALIAS, KEYSTORE_PASSWORD.toCharArray());
+
+        IssuerData issuerData =
+                certificateGeneratorService.generateIssuerData(
+                        issuerPrivateKey, issuerBuilder.build(), pki_cert.getPublicKey());
+
+        SubjectData subjectData = certificateGeneratorService.generateSubjectData
+                (kp.getPublic(), builder.build(), CERT_TYPE.SERVER_CERT);
+
+        subjectData.setSerialNumber(PKI_COMMUNICATION_ALIAS);
+        Certificate certificate = certificateGeneratorService.generateCertificate
+                (subjectData, issuerData, CERT_TYPE.SERVER_CERT);
+
+        keyStore.setKeyEntry(PKI_COMMUNICATION_ALIAS, kp.getPrivate(),
+                KEYSTORE_PASSWORD.toCharArray(), new Certificate[]{certificate, pki_cert, root});
+
+        return (X509Certificate) certificate;
+    }
+
+
+    private X509Certificate generateAngularCertificate(KeyStore keyStore, X509Certificate pki_cert, X509Certificate root) throws Exception {
+        KeyPair kp = keyPairGeneratorService.generateKeyPair();
+
+        X500NameBuilder builder = generateNameAngular();
+        X500NameBuilder issuerBuilder = generateNamePKI();
+
+        PrivateKey issuerPrivateKey = (PrivateKey) keyStore.getKey(PKI_ALIAS, KEYSTORE_PASSWORD.toCharArray());
+
+        IssuerData issuerData =
+                certificateGeneratorService.generateIssuerData(
+                        issuerPrivateKey, issuerBuilder.build(), pki_cert.getPublicKey());
+
+        SubjectData subjectData = certificateGeneratorService.generateSubjectData
+                (kp.getPublic(), builder.build(), CERT_TYPE.LEAF_CERT);
+
+        subjectData.setSerialNumber(ANGULAR_ALIAS);
+        Certificate certificate = certificateGeneratorService.generateCertificate
+                (subjectData, issuerData, CERT_TYPE.LEAF_CERT);
+
+        keyStore.setKeyEntry(ANGULAR_ALIAS, kp.getPrivate(),
+                KEYSTORE_PASSWORD.toCharArray(), new Certificate[]{certificate, pki_cert, root});
+
+        return (X509Certificate) certificate;
+    }
 
 
 
 
-    private void writeRootCertToFile(Certificate certificate) throws Exception {
-        X509Certificate certificateX509 = (X509Certificate) certificate;
+    private void writeRootCertToFile(KeyStore keyStore, String alias) throws Exception {
+
+        Certificate[] chain = keyStore.getCertificateChain(alias);
 
         StringWriter sw = new StringWriter();
         JcaPEMWriter pm = new JcaPEMWriter(sw);
-        pm.writeObject(certificate);
+        for(Certificate certificate : chain) {
+            X509Certificate a = (X509Certificate)certificate;
+            pm.writeObject(a);
+        }
         pm.close();
 
-        String fileName = "cert_" + certificateX509.getSerialNumber() + ".crt";
+
+        String fileName = "cert_" + alias + ".crt";
         String path = certDirectory + "/" + fileName;
 
 
