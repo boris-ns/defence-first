@@ -20,14 +20,15 @@ export class ShowAlarmsComponent implements OnInit {
   }
 
   private getLogs() {
-    this.alarmService.getAllAlarms().subscribe((data: Alarm[]) => {
-      this.data = data;
-      this.data.push(new Alarm(1, new Date(), 'reason'))
-      this.data.push(new Alarm(2, new Date(), 'reason2'))
-    }, error => {
-      // @TODO: dodati toastr
-      console.log(error);
-    });
+    this.alarmService.getAllAlarms().subscribe(
+      (data: Alarm[]) => {
+        data.sort((a: Alarm, b: Alarm) => b.id - a.id);
+        this.data = data;
+      }, error => {
+        // @TODO: dodati toastr
+        console.log(error);
+      }
+    );
   }
 
   checkClass(row: any) {

@@ -1,5 +1,7 @@
 package rs.ac.uns.ftn.siemcentar.model;
 
+import org.kie.api.definition.type.Expires;
+import org.kie.api.definition.type.Role;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -7,6 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Date;
 
 @Document(collection = "Alarm")
+@Role(Role.Type.EVENT)
+@Expires("2m")
 public class Alarm {
 
     @Transient

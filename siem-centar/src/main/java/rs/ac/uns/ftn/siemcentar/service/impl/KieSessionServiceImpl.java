@@ -14,16 +14,15 @@ public class KieSessionServiceImpl implements KieSessionService {
     @Value("${cep.kie.session.name}")
     public String cepKieSession;
 
-    @Autowired
-    private KieContainer kieContainer;
+    private final KieContainer kieContainer;
 
     @Autowired
-    private AlarmService alarmService;
+    public KieSessionServiceImpl(KieContainer kieContainer) {
+        this.kieContainer = kieContainer;
+    }
 
     @Override
     public KieSession getKieSessionForAlarms() {
-        KieSession kieSession = kieContainer.newKieSession(cepKieSession);
-//        kieSession.setGlobal( ALARM_SERVICE, alarmService);
-        return kieSession;
+        return kieContainer.newKieSession(cepKieSession);
     }
 }
