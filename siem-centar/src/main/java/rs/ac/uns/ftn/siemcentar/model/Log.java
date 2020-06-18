@@ -19,6 +19,7 @@ public class Log implements Serializable {
     private LogType logType;
     private String message;
     private String source;
+    private boolean processed;
 
     public Log() {}
 
@@ -28,6 +29,7 @@ public class Log implements Serializable {
         this.logType = logType;
         this.message = message;
         this.source = source;
+        this.processed = false;
     }
 
     @Override
@@ -38,6 +40,7 @@ public class Log implements Serializable {
                 ", logType=" + logType +
                 ", message='" + message + '\'' +
                 ", source='" + source + '\'' +
+                ", processed=" + processed + '\'' +
                 '}';
     }
 
@@ -79,5 +82,13 @@ public class Log implements Serializable {
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public boolean isProcessed() {
+        return processed;
+    }
+
+    public void setProcessed(boolean processed) {
+        this.processed = processed;
     }
 }

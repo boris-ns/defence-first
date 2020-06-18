@@ -1,13 +1,17 @@
 package rs.ac.uns.ftn.siemcentar.service.impl;
 
+import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import rs.ac.uns.ftn.siemcentar.constants.Constants;
 import rs.ac.uns.ftn.siemcentar.messaging.WebSocketProducer;
 import rs.ac.uns.ftn.siemcentar.dto.request.LogFilterDTO;
 import rs.ac.uns.ftn.siemcentar.exception.exceptions.ApiRequestException;
 import rs.ac.uns.ftn.siemcentar.model.Log;
 import rs.ac.uns.ftn.siemcentar.model.LogType;
 import rs.ac.uns.ftn.siemcentar.repository.LogRepository;
+import rs.ac.uns.ftn.siemcentar.service.AlarmService;
+import rs.ac.uns.ftn.siemcentar.service.KieSessionService;
 import rs.ac.uns.ftn.siemcentar.service.LogService;
 
 import rs.ac.uns.ftn.siemcentar.utils.DateUtils;
@@ -25,10 +29,15 @@ public class LogServiceImpl implements LogService {
     @Autowired
     private WebSocketProducer socketProducer;
 
+    @Autowired
+    private AlarmService alarmService;
+
     @Override
     public void saveLogs(List<Log> logs) {
         logRepository.saveAll(logs);
         logs.forEach(log -> socketProducer.sendLog(log));
+
+        alarmService.processLogs(logs);
     }
 
     @Override
