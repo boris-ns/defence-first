@@ -1,0 +1,29 @@
+//created on: Jun 18, 2020
+package defencefirst.rules;
+
+//list any import classes here.
+import rs.ac.uns.ftn.siemcentar.model.Log;
+import rs.ac.uns.ftn.siemcentar.model.LogType;
+import rs.ac.uns.ftn.siemcentar.model.Alarm;
+import java.util.Date;
+//declare any global variables here
+
+rule "Your First Rule"
+    when
+    	$logs: List(size >= 1) from
+        	accumulate($l: Log (processed == false, logType == LogType.ERROR) @watch(!processed)
+        			   over window:time(2s)
+        			  ,collectList($l))
+        //conditions
+    then
+    	for(Object $o: $logs) {	 
+			 Log $o1 = (Log) $o;
+			 System.out.println("imamo alarm za log tipa ERROR");
+			 modify ($o1) {setProcessed(true);}
+			 $alarm = new Alarm();
+			 $alarm.setDate(new Date());
+			 $alarm.setReason("pojavio se log tipa error");
+			 insert($alarm);
+			 // moze se prvo sacuvati uz pomoc servisa
+        }
+end
