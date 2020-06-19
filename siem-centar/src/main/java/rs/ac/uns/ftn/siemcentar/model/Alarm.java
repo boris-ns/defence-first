@@ -10,7 +10,7 @@ import java.util.Date;
 
 @Document(collection = "Alarm")
 @Role(Role.Type.EVENT)
-@Expires("2m")
+@Expires("30m")
 public class Alarm {
 
     @Transient
@@ -20,14 +20,16 @@ public class Alarm {
     private Long id;
     private Date date;
     private String reason;
+    private Long logId;
 
     public Alarm() {
     }
 
-    public Alarm(Long id, Date date, String reason) {
+    public Alarm(Long id, Date date, String reason, Long logId) {
         this.id = id;
         this.date = date;
         this.reason = reason;
+        this.logId = logId;
     }
 
     public Long getId() {
@@ -53,4 +55,8 @@ public class Alarm {
     public void setReason(String reason) {
         this.reason = reason;
     }
+
+    public Long getLogId() { return logId; }
+
+    public void setLogId(Long logId) { this.logId = logId; }
 }

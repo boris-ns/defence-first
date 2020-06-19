@@ -22,7 +22,6 @@ public class Log implements Serializable {
     private String message;
     private String source;
     private String agent;
-    private boolean processed;
 
     public Log() {
     }
@@ -34,7 +33,6 @@ public class Log implements Serializable {
         this.message = message;
         this.source = source;
         this.agent = agent;
-        this.processed = false;
     }
 
     @Override
@@ -45,7 +43,6 @@ public class Log implements Serializable {
                 ", logType=" + logType +
                 ", message='" + message + '\'' +
                 ", source='" + source + '\'' +
-                ", processed=" + processed + '\'' +
                 '}';
     }
 
@@ -93,11 +90,4 @@ public class Log implements Serializable {
 
     public void setAgent(String agent) { this.agent = agent; }
 
-    public boolean isProcessed() {
-        return processed;
-    }
-
-    public void setProcessed(boolean processed) {
-        this.processed = processed;
-    }
 }

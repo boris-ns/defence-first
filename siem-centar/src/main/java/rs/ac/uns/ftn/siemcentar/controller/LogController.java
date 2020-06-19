@@ -36,7 +36,6 @@ public class LogController {
         for(String l: logs) {
             System.out.println(l);
             Log log = mapper.readValue(l, Log.class);
-            log.setProcessed(false);
             log.setId(databaseSequenceService.generateSequence(Log.SEQUENCE_NAME));
             logList.add(log);
         }
