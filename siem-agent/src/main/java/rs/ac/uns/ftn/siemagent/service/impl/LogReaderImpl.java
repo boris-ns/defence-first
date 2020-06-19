@@ -32,37 +32,46 @@ public class LogReaderImpl implements LogReader {
     @Value("${log.reader.simulator.filter}")
     private String simulatorLogFilter;
 
+    @Value("${agent.name}")
+    private String agent;
+
     @Autowired
     private LogService logService;
 
 
     @Override
     public void readLogs() throws IOException, InterruptedException {
+        Date threshold = new Date();
         if (logReaderMode.equals("batch")) {
             while (true) {
-                this.readLogFromSimulator();
+                threshold = this.readLogFromSimulator(threshold);
                 System.out.println(new Date() + " (Batch interval) Done reading logs");
                 Thread.sleep(batchInterval * 60 * 1000);
             }
         } else if (logReaderMode.equals("rt")) {
             while (true) {
-                this.readLogFromSimulator();
+                threshold = this.readLogFromSimulator(threshold);
                 System.out.println(new Date() + " (Real time) Done reading logs");
                 Thread.sleep(2000);
             }
         }
     }
 
-    private void readLogFromSimulator() throws IOException {
-        Date threshold = new Date(System.currentTimeMillis() - batchInterval * 60 * 1000);
+    private Date readLogFromSimulator(Date threshold) throws IOException {
+        System.out.println(threshold);
         ArrayList<Log> logs = new ArrayList<>();
         ReversedLinesFileReader reader = new ReversedLinesFileReader(new File(simulatorLogPath));
-
+        Date newThreshold = new Date();
         try {
             String line = reader.readLine();
-
+            boolean setNewThreshold = false;
             while (line != null) {
                 Log log = this.parseLogFromSimulator(line);
+
+                if (!setNewThreshold) {
+                    newThreshold = log.getDate();
+                    setNewThreshold = true;
+                }
 
                 if (!log.getDate().after(threshold)) {
                     break;
@@ -80,7 +89,9 @@ public class LogReaderImpl implements LogReader {
         }
 
         Collections.reverse(logs);
+        System.out.println(logs.size());
         logService.sendLogs(logs);
+        return newThreshold;
     }
 
     private Log parseLogFromSimulator(String line) {
@@ -98,6 +109,6 @@ public class LogReaderImpl implements LogReader {
         LogType type = LogType.valueOf(tokens[2]);
         String message = tokens[3];
 
-        return new Log(null, date, type, message, source);
+        return new Log(null, date, type, message, source, agent);
     }
 }

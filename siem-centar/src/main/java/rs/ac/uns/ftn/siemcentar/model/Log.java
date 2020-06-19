@@ -19,16 +19,19 @@ public class Log implements Serializable {
     private LogType logType;
     private String message;
     private String source;
+    private String agent;
     private boolean processed;
 
-    public Log() {}
+    public Log() {
+    }
 
-    public Log(Long id, Date date, LogType logType, String message, String source) {
+    public Log(Long id, Date date, LogType logType, String message, String source, String agent) {
         this.id = id;
         this.date = date;
         this.logType = logType;
         this.message = message;
         this.source = source;
+        this.agent = agent;
         this.processed = false;
     }
 
@@ -83,6 +86,10 @@ public class Log implements Serializable {
     public void setSource(String source) {
         this.source = source;
     }
+
+    public String getAgent() { return agent; }
+
+    public void setAgent(String agent) { this.agent = agent; }
 
     public boolean isProcessed() {
         return processed;

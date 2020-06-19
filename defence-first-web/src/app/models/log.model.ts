@@ -4,6 +4,7 @@ export interface Log {
     logType: LogType;
     message: string;
     source: string;
+    agent: string;
 }
 
 export enum LogType {

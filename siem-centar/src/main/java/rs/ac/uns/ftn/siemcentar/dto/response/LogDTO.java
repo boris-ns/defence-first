@@ -12,6 +12,7 @@ public class LogDTO {
     private LogType logType;
     private String message;
     private String source;
+    private String agent;
 
     public LogDTO() {
     }
@@ -22,6 +23,7 @@ public class LogDTO {
         this.logType = log.getLogType();
         this.message = log.getMessage();
         this.source = log.getSource();
+        this.agent = log.getAgent();
     }
 
     public Long getId() {
@@ -63,4 +65,9 @@ public class LogDTO {
     public void setSource(String source) {
         this.source = source;
     }
+
+    public String getAgent() { return agent; }
+
+    public void setAgent(String agent) { this.agent = agent; }
+    
 }
