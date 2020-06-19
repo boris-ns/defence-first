@@ -47,10 +47,10 @@ public class SiemAgentApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-//		logReader.readLogs();
+		logReader.readLogs();
 
 		// simulacija slanja logova
-		simulation();
+//		simulation();
 
 //		certificateService.sendRequestForCertificate();
 //		certificateService.installCertificateFromFile();
@@ -72,16 +72,16 @@ public class SiemAgentApplication implements CommandLineRunner {
 	// TODO: obrisati
 	private void simulation() throws Exception{
 
-		ArrayList<Log> logs = new ArrayList<Log>();
-		logs.add(new Log(1l, new Date(), LogType.SUCCESS, "prviLog", "ja"));
-		logs.add(new Log(2l, new Date(), LogType.SUCCESS, "drugiLog", "ja"));
-		logService.sendLogs(logs);
+//		ArrayList<Log> logs = new ArrayList<Log>();
+//		logs.add(new Log(1l, new Date(), LogType.SUCCESS, "prviLog", "ja"));
+//		logs.add(new Log(2l, new Date(), LogType.SUCCESS, "drugiLog", "ja"));
+//		logService.sendLogs(logs);
+//
+//		logs.clear();
+//		logs.add(new Log(3l, new Date(), LogType.ERROR, "treciLog", "ja"));
+//		logs.add(new Log(4l, new Date(), LogType.WARN, "certvrtiLog", "ja"));
 
-		logs.clear();
-		logs.add(new Log(3l, new Date(), LogType.ERROR, "treciLog", "ja"));
-		logs.add(new Log(4l, new Date(), LogType.WARN, "certvrtiLog", "ja"));
-
-		logService.sendLogs(logs);
+//		logService.sendLogs(logs);
 	}
 
 }

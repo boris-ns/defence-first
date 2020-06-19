@@ -13,7 +13,7 @@ import * as SockJS from 'sockjs-client';
 export class ShowLogsComponent implements OnInit {
 
   data: Log[];
-  displayedColumns: string[] = ['id', 'type', 'date', 'source', 'message'];
+  displayedColumns: string[] = ['id', 'type', 'date', 'source', 'agent', 'message'];
 
   serverUrl = 'https://localhost:8082/websockets';
   stompClient: any;

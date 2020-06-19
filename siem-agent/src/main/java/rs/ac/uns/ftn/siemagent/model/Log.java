@@ -11,15 +11,17 @@ public class Log implements Serializable {
     private LogType logType;
     private String message;
     private String source;
+    private String agent;
 
     public Log() {}
 
-    public Log(Long id, Date date, LogType logType, String message, String source) {
+    public Log(Long id, Date date, LogType logType, String message, String source, String agent) {
         this.id = id;
         this.date = date;
         this.logType = logType;
         this.message = message;
         this.source = source;
+        this.agent = agent;
     }
 
     @Override
@@ -30,6 +32,7 @@ public class Log implements Serializable {
                 ", logType=" + logType +
                 ", message='" + message + '\'' +
                 ", source='" + source + '\'' +
+                ", agent='" + agent + '\'' +
                 '}';
     }
 
@@ -51,5 +54,9 @@ public class Log implements Serializable {
 
     public String getSource() {
         return source;
+    }
+
+    public String getAgent() {
+        return agent;
     }
 }

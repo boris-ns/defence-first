@@ -12,7 +12,7 @@ import { createArrayFromDate } from 'src/app/utils/date-utils';
 export class LogsSearchComponent implements OnInit {
 
   searchedLogs: Log[] = [];
-  displayedColumns: string[] = ['id', 'type', 'date', 'source', 'message'];
+  displayedColumns: string[] = ['id', 'type', 'date', 'source', 'agent', 'message'];
   filter: LogFilterDTO = {};
   startDate: string;
   endDate: string;

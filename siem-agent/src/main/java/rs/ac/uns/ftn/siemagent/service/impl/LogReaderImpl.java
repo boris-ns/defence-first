@@ -32,6 +32,9 @@ public class LogReaderImpl implements LogReader {
     @Value("${log.reader.simulator.filter}")
     private String simulatorLogFilter;
 
+    @Value("${agent.name}")
+    private String agent;
+
     @Autowired
     private LogService logService;
 
@@ -98,6 +101,6 @@ public class LogReaderImpl implements LogReader {
         LogType type = LogType.valueOf(tokens[2]);
         String message = tokens[3];
 
-        return new Log(null, date, type, message, source);
+        return new Log(null, date, type, message, source, agent);
     }
 }
