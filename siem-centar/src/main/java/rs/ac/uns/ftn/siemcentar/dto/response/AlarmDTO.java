@@ -2,10 +2,12 @@ package rs.ac.uns.ftn.siemcentar.dto.response;
 
 import rs.ac.uns.ftn.siemcentar.model.Alarm;
 
+import java.util.Date;
+
 public class AlarmDTO {
 
     private Long id;
-    private String date;
+    private Date date;
     private String reason;
 
     public AlarmDTO() {
@@ -13,7 +15,7 @@ public class AlarmDTO {
 
     public AlarmDTO(Alarm alarm) {
         this.id = alarm.getId();
-        this.date = alarm.getDate().toString();
+        this.date = alarm.getDate();
         this.reason = alarm.getReason();
     }
 
@@ -25,11 +27,11 @@ public class AlarmDTO {
         this.id = id;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

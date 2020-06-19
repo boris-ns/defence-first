@@ -11,14 +11,14 @@ export class LogService {
   private url: string;
 
   constructor(private http: HttpClient) {
-    this.url = environment.SIEMCentarConfig.url;
+    this.url = environment.SIEMCentarConfig.url + '/log';
   }
 
   getAllLogs() {
-    return this.http.get(`${this.url}/log/findAll`);
+    return this.http.get(`${this.url}/findAll`);
   }
 
   filterLogs(filter: LogFilterDTO) {
-    return this.http.post(`${this.url}/log/filter`, filter);
+    return this.http.post(`${this.url}/filter`, filter);
   }
 }

@@ -1,7 +1,6 @@
-import { SHOW_LOGS_PATH, SEARCH_LOGS_PATH } from './../../config/router-paths';
+import { SHOW_LOGS_PATH, SEARCH_LOGS_PATH, SHOW_ALARMS_PATH } from './../../config/router-paths';
 import { Component, OnInit } from '@angular/core';
 import { KeycloakService } from 'keycloak-angular';
-import { PkiServiceService } from 'src/app/services/pki-service/pki-service.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 import { CERTIFICATES_PATH, ADD_PATH, REQUEST_PATH } from 'src/app/config/router-paths';
@@ -44,6 +43,10 @@ export class MenuComponent implements OnInit {
 
   searchLogs() {
     this.router.navigate([SEARCH_LOGS_PATH]);
+  }
+
+  showAlarms() {
+    this.router.navigate([SHOW_ALARMS_PATH]);
   }
 
   logOut() {

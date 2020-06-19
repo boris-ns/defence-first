@@ -3,6 +3,7 @@ export const HOME_PATH = 'home';
 // Shared (admin and operator)
 export const SHOW_LOGS_PATH = 'logs';
 export const SEARCH_LOGS_PATH = 'logs-search';
+export const SHOW_ALARMS_PATH = 'alarms';
 
 // Admin
 export const CERTIFICATES_PATH = 'certificates';

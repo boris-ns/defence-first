@@ -16,6 +16,7 @@ import { MaterialModule } from './material/material.module';
 import { MenuComponent } from './components/menu/menu.component';
 import { ShowLogsComponent } from './components/shared/show-logs/show-logs.component';
 import { LogsSearchComponent } from './components/shared/logs-search/logs-search.component';
+import { ShowAlarmsComponent } from './components/shared/show-alarms/show-alarms.component';
 
 
 @NgModule({
@@ -26,7 +27,8 @@ import { LogsSearchComponent } from './components/shared/logs-search/logs-search
     NotFoundComponent,
     MenuComponent,
     ShowLogsComponent,
-    LogsSearchComponent
+    LogsSearchComponent,
+    ShowAlarmsComponent
   ],
   imports: [
     BrowserModule,
