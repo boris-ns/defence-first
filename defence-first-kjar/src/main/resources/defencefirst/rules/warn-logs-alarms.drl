@@ -1,17 +1,28 @@
-////created on: Jun 19, 2020
-//package defencefirst.rules;
-//
-////list any import classes here.
-//import rs.ac.uns.ftn.siemcentar.model.Log;
-//import rs.ac.uns.ftn.siemcentar.model.LogType;
-//import rs.ac.uns.ftn.siemcentar.model.Alarm;
-//import java.util.Date;
-////declare any global variables here
-//
-//rule "Log error"
-//    when
-//        $log: Log(processed == false, logType == LogType.ERROR, $s: source, $a: agent, $m: message)
-//    then
-//        modify($log){setProcessed(true)}
-//        insert(new Alarm(null, new Date(), "Error - agent: " + $a + ", source: " + $s + ", message: " $m ));
-//end
+//created on: Jun 19, 2020
+package defencefirst.rules;
+
+//list any import classes here.
+import rs.ac.uns.ftn.siemcentar.model.Log;
+import rs.ac.uns.ftn.siemcentar.model.LogType;
+import rs.ac.uns.ftn.siemcentar.model.Alarm;
+import java.util.Date;
+//declare any global variables here
+
+rule "Log warn faild login, username"
+    lock-on-active true
+    when
+        $l: Log(processed == false, logType == LogType.WARN, $m: message, message.contains("failed login"),
+                $s: source, $a: agent)
+        $n: Number(intValue > 2) from accumulate(
+            $log : Log(
+            processed == false,
+            logType == LogType.WARN,
+            message == $m)
+            over window:time(1h),
+            count($log)
+        )
+    then
+        modify($l){setProcessed(true)}
+        insert(new Alarm(null, new Date(), "Warn failed login with same username - agent: " + $a + ", source: " + $s +
+        ", message: " + $m ));
+end

@@ -13,5 +13,5 @@ rule "Log error"
         $log: Log(processed == false, logType == LogType.ERROR, $s: source, $a: agent, $m: message)
     then
         modify($log){setProcessed(true)}
-        insert(new Alarm(null, new Date(), "Error - agent: " + $a + ", source: " + $s + ", message: " + $m ));
+        insert(new Alarm(null, new Date(), "Error in log - agent: " + $a + ", source: " + $s + ", message: " + $m ));
 end

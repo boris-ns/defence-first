@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.siemcentar.model;
 
+import org.kie.api.definition.type.Role;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -8,6 +9,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Document(collection = "Log")
+@Role(Role.Type.EVENT)
 public class Log implements Serializable {
 
     @Transient
