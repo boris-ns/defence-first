@@ -49,6 +49,7 @@ public class SiemAgentApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		logReader.readLogs();
 
+
 		// simulacija slanja logova
 //		simulation();
 

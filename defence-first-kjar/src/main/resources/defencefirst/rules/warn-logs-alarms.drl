@@ -1,17 +1,76 @@
-////created on: Jun 19, 2020
-//package defencefirst.rules;
-//
-////list any import classes here.
-//import rs.ac.uns.ftn.siemcentar.model.Log;
-//import rs.ac.uns.ftn.siemcentar.model.LogType;
-//import rs.ac.uns.ftn.siemcentar.model.Alarm;
-//import java.util.Date;
-////declare any global variables here
-//
-//rule "Log error"
-//    when
-//        $log: Log(processed == false, logType == LogType.ERROR, $s: source, $a: agent, $m: message)
-//    then
-//        modify($log){setProcessed(true)}
-//        insert(new Alarm(null, new Date(), "Error - agent: " + $a + ", source: " + $s + ", message: " $m ));
-//end
+//created on: Jun 19, 2020
+package defencefirst.rules;
+
+//list any import classes here.
+import rs.ac.uns.ftn.siemcentar.model.Log;
+import rs.ac.uns.ftn.siemcentar.model.LogType;
+import rs.ac.uns.ftn.siemcentar.model.Alarm;
+import java.util.Date;
+import java.util.ArrayList;
+
+//declare any global variables here
+
+rule "Log warn faild login, same username"
+    when
+        $l: Log($id: id, logType == LogType.WARN, $m: message, message.contains("failed login"), $s: source, $a: agent)
+        $alarms: ArrayList() from collect( Alarm())
+        $n: Number(intValue > 2) from accumulate(
+            $log : Log(
+            $lId: id,
+            logType == LogType.WARN,
+            message == $m)
+            over window:time(30m),
+            init (int count = 0;),
+            action (
+                int c = 0;
+                for(Object o : $alarms) {
+                    Alarm a = (Alarm) o;
+                    if (a.getLogId() == $lId && a.getReason().contains("same username")) {
+                        c += 1;
+                        break;
+                    }
+                }
+                if (c == 0) {
+                    count += 1;
+                }
+            ),
+            result (count)
+        )
+        not (Alarm(logId == $id))
+    then
+        insert(new Alarm(null, new Date(), "Warn failed login with same username - agent: " + $a + ", source: " + $s +
+        ", message: " + $m, $id));
+end
+
+
+rule "Log warn faild login, same source"
+    when
+        $l: Log($id: id, logType == LogType.WARN, message.contains("failed login"), $s: source, $a: agent)
+        $alarms: ArrayList() from collect( Alarm())
+        $n: Number(intValue > 4) from accumulate(
+            $log : Log(
+            $lId: id,
+            logType == LogType.WARN,
+            message.contains("failed login"),
+            source == $s)
+            over window:time(30m),
+            init (int count = 0;),
+            action (
+                int c = 0;
+                for(Object o : $alarms) {
+                    Alarm a = (Alarm) o;
+                    if (a.getLogId() == $lId && a.getReason().contains("same source")) {
+                        c += 1;
+                        break;
+                    }
+                }
+                if (c == 0) {
+                    count += 1;
+                }
+            ),
+            result (count)
+        )
+        not (Alarm(logId == $id))
+    then
+        insert(new Alarm(null, new Date(), "Warn failed logins from same source - agent: " + $a + ", source: " + $s, $id));
+end
