@@ -7,9 +7,9 @@ import { Routes, RouterModule } from '@angular/router';
 import { NotFoundComponent } from './components/error-pages/not-found/not-found.component';
 import { HomeComponent } from './components/home/home.component';
 import { ShowLogsComponent } from './components/shared/show-logs/show-logs.component';
-import { OperatorAuthorizationGuard } from './guards/operator-authorization.guard';
 import { LogsSearchComponent } from './components/shared/logs-search/logs-search.component';
 import { ShowAlarmsComponent } from './components/shared/show-alarms/show-alarms.component';
+import { OperatorAndAdimnAuthorizationGuard } from './guards/operator-admin-authorization.guard';
 
 // !!! Guards !!!
 // canActivate: [OperatorAuthorizationGuard],
@@ -24,17 +24,17 @@ const routes: Routes = [
   {
     path: SHOW_LOGS_PATH,
     component: ShowLogsComponent,
-    canActivate: [AdminAuthorizationGuard, OperatorAuthorizationGuard]
+    canActivate: [OperatorAndAdimnAuthorizationGuard]
   },
   {
     path: SEARCH_LOGS_PATH,
     component: LogsSearchComponent,
-    canActivate: [AdminAuthorizationGuard, OperatorAuthorizationGuard]
+    canActivate: [OperatorAndAdimnAuthorizationGuard]
   },
   {
     path: SHOW_ALARMS_PATH,
     component: ShowAlarmsComponent,
-    canActivate: [AdminAuthorizationGuard, OperatorAuthorizationGuard]
+    canActivate: [OperatorAndAdimnAuthorizationGuard]
   },
   {
     path: NOT_FOUND,

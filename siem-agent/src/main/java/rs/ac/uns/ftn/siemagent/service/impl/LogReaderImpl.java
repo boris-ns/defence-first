@@ -10,7 +10,6 @@ import rs.ac.uns.ftn.siemagent.service.LogReader;
 import rs.ac.uns.ftn.siemagent.service.LogService;
 import rs.ac.uns.ftn.siemagent.utils.DateUtil;
 
-import javax.xml.crypto.Data;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
