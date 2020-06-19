@@ -8,10 +8,10 @@ import rs.ac.uns.ftn.siemcentar.model.Alarm;
 import java.util.Date;
 //declare any global variables here
 
-rule "Your First Rule"
+rule "Log error"
     when
-        $log: Log(processed == false, logType == LogType.ERROR)
+        $log: Log(processed == false, logType == LogType.ERROR, $s: source, $a: agent, $m: message)
     then
         modify($log){setProcessed(true)}
-        insert(new Alarm(null, new Date(), "Log tipa error"));
+        insert(new Alarm(null, new Date(), "Error - agent: " + $a + ", source: " + $s + ", message: " + $m ));
 end

@@ -1,0 +1,17 @@
+////created on: Jun 19, 2020
+//package defencefirst.rules;
+//
+////list any import classes here.
+//import rs.ac.uns.ftn.siemcentar.model.Log;
+//import rs.ac.uns.ftn.siemcentar.model.LogType;
+//import rs.ac.uns.ftn.siemcentar.model.Alarm;
+//import java.util.Date;
+////declare any global variables here
+//
+//rule "Log error"
+//    when
+//        $log: Log(processed == false, logType == LogType.ERROR, $s: source, $a: agent, $m: message)
+//    then
+//        modify($log){setProcessed(true)}
+//        insert(new Alarm(null, new Date(), "Error - agent: " + $a + ", source: " + $s + ", message: " $m ));
+//end

@@ -10,6 +10,7 @@ import rs.ac.uns.ftn.siemagent.service.LogReader;
 import rs.ac.uns.ftn.siemagent.service.LogService;
 import rs.ac.uns.ftn.siemagent.utils.DateUtil;
 
+import javax.xml.crypto.Data;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
@@ -41,31 +42,37 @@ public class LogReaderImpl implements LogReader {
 
     @Override
     public void readLogs() throws IOException, InterruptedException {
+        Date threshold = new Date();
         if (logReaderMode.equals("batch")) {
             while (true) {
-                this.readLogFromSimulator();
+                threshold = this.readLogFromSimulator(threshold);
                 System.out.println(new Date() + " (Batch interval) Done reading logs");
                 Thread.sleep(batchInterval * 60 * 1000);
             }
         } else if (logReaderMode.equals("rt")) {
             while (true) {
-                this.readLogFromSimulator();
+                threshold = this.readLogFromSimulator(threshold);
                 System.out.println(new Date() + " (Real time) Done reading logs");
                 Thread.sleep(2000);
             }
         }
     }
 
-    private void readLogFromSimulator() throws IOException {
-        Date threshold = new Date(System.currentTimeMillis() - batchInterval * 60 * 1000);
+    private Date readLogFromSimulator(Date threshold) throws IOException {
+        System.out.println(threshold);
         ArrayList<Log> logs = new ArrayList<>();
         ReversedLinesFileReader reader = new ReversedLinesFileReader(new File(simulatorLogPath));
-
+        Date newThreshold = new Date();
         try {
             String line = reader.readLine();
-
+            boolean setNewThreshold = false;
             while (line != null) {
                 Log log = this.parseLogFromSimulator(line);
+
+                if (!setNewThreshold) {
+                    newThreshold = log.getDate();
+                    setNewThreshold = true;
+                }
 
                 if (!log.getDate().after(threshold)) {
                     break;
@@ -83,7 +90,9 @@ public class LogReaderImpl implements LogReader {
         }
 
         Collections.reverse(logs);
+        System.out.println(logs.size());
         logService.sendLogs(logs);
+        return newThreshold;
     }
 
     private Log parseLogFromSimulator(String line) {
