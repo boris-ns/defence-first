@@ -20,14 +20,18 @@ public class Alarm {
     private Long id;
     private Date date;
     private String reason;
+    private String agent;
+    private String source;
 
     public Alarm() {
     }
 
-    public Alarm(Long id, Date date, String reason) {
+    public Alarm(Long id, Date date, String reason, String agent, String source) {
         this.id = id;
         this.date = date;
         this.reason = reason;
+        this.agent = agent;
+        this.source = source;
     }
 
     public Long getId() {
@@ -53,4 +57,21 @@ public class Alarm {
     public void setReason(String reason) {
         this.reason = reason;
     }
+
+    public String getAgent() {
+        return agent;
+    }
+
+    public void setAgent(String agent) {
+        this.agent = agent;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
 }

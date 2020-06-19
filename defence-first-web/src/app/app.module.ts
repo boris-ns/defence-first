@@ -17,6 +17,7 @@ import { MenuComponent } from './components/menu/menu.component';
 import { ShowLogsComponent } from './components/shared/show-logs/show-logs.component';
 import { LogsSearchComponent } from './components/shared/logs-search/logs-search.component';
 import { ShowAlarmsComponent } from './components/shared/show-alarms/show-alarms.component';
+import { ReportsComponent } from './components/shared/reports/reports.component';
 
 
 @NgModule({
@@ -28,7 +29,8 @@ import { ShowAlarmsComponent } from './components/shared/show-alarms/show-alarms
     MenuComponent,
     ShowLogsComponent,
     LogsSearchComponent,
-    ShowAlarmsComponent
+    ShowAlarmsComponent,
+    ReportsComponent
   ],
   imports: [
     BrowserModule,
