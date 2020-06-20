@@ -1,7 +1,8 @@
+import { ReportsComponent } from './components/shared/reports/reports.component';
 import { AdminAuthorizationGuard } from './guards/admin-authorization.guard';
 import { NotAuthorizedComponent } from './components/error-pages/not-authorized/not-authorized.component';
 import { NOT_FOUND, NOT_AUTHORIZED, HOME_PATH, CERTIFICATES_PATH, SHOW_LOGS_PATH, SEARCH_LOGS_PATH,
-   SHOW_ALARMS_PATH } from './config/router-paths';
+   SHOW_ALARMS_PATH, REPORTS_PATH} from './config/router-paths';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { NotFoundComponent } from './components/error-pages/not-found/not-found.component';
@@ -34,6 +35,11 @@ const routes: Routes = [
   {
     path: SHOW_ALARMS_PATH,
     component: ShowAlarmsComponent,
+    canActivate: [OperatorAndAdimnAuthorizationGuard]
+  },
+  {
+    path: REPORTS_PATH,
+    component: ReportsComponent,
     canActivate: [OperatorAndAdimnAuthorizationGuard]
   },
   {

@@ -13,5 +13,5 @@ rule "Log error"
         $log: Log($id: id, logType == LogType.ERROR, $s: source, $a: agent, $m: message)
         not (Alarm(logId == $id))
     then
-        insert(new Alarm(null, new Date(), "Error in log - agent: " + $a + ", source: " + $s + ", message: " + $m , $id));
+        insert(new Alarm(null, new Date(), "Error in log - agent: " + $a + ", source: " + $s + ", message: " + $m , $id, $a, $s));
 end

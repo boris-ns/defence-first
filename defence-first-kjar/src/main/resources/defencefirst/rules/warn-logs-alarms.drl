@@ -39,7 +39,7 @@ rule "Log warn faild login, same username"
         not (Alarm(logId == $id))
     then
         insert(new Alarm(null, new Date(), "Warn failed login with same username - agent: " + $a + ", source: " + $s +
-        ", message: " + $m, $id));
+        ", message: " + $m, $id, $a, $s));
 end
 
 
@@ -72,5 +72,5 @@ rule "Log warn faild login, same source"
         )
         not (Alarm(logId == $id))
     then
-        insert(new Alarm(null, new Date(), "Warn failed logins from same source - agent: " + $a + ", source: " + $s, $id));
+        insert(new Alarm(null, new Date(), "Warn failed logins from same source - agent: " + $a + ", source: " + $s, $id, $a, $s));
 end
