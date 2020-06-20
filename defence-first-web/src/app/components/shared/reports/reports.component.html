@@ -28,13 +28,27 @@
             <li>Total number of alarms: {{ report.numOfAlarms }}</li>
         </ul>
 
-        Sources:
+        <!-- Sources:
         <ul>
             <li *ngFor="let source of report.sources">
                 {{source.source}} -- Number of logs: {{source.numOfLogs}} -- Number of alarms: {{source.numOfAlarms}}
             </li>
-        </ul>
+        </ul> -->
 
+        <div>
+            <div style="display: block">
+              <canvas baseChart
+                      [datasets]="datasets[0]"
+                      [labels]="labels[0]"
+                      [options]="{
+                        scaleShowVerticalLines: false,
+                        responsive: true
+                      }"
+                      [legend]="true"
+                      [chartType]="'bar'">
+              </canvas>
+            </div>
+          </div>
         <!-- Ovo je prikaz 'sources'-a tabelarno, ali sam ostavio listu jer u tebeli 
         mi ne izgleda lepo -->
         <!-- <table mat-table [dataSource]="report.sources" class="mat-elevation-z8">
