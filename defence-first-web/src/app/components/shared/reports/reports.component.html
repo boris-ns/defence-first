@@ -1,1 +1,43 @@
-<p>reports works!</p>
+<div class="container">
+    <h1>Reports</h1>
+
+    <div *ngFor="let report of reports.reports">
+        <h3>Agent: {{ report.agent }}</h3>
+
+        <ul>
+            <li>Total number of logs: {{ report.numOfLogs }}</li>
+            <li>Total number of alarms: {{ report.numOfAlarms }}</li>
+        </ul>
+
+        Sources:
+        <ul>
+            <li *ngFor="let source of report.sources">
+                {{source.source}} -- Number of logs: {{source.numOfLogs}} -- Number of alarms: {{source.numOfAlarms}}
+            </li>
+        </ul>
+
+        <!-- Ovo je prikaz 'sources'-a tabelarno, ali sam ostavio listu jer u tebeli 
+        mi ne izgleda lepo -->
+        <!-- <table mat-table [dataSource]="report.sources" class="mat-elevation-z8">
+            <ng-container matColumnDef="source">
+              <th mat-header-cell *matHeaderCellDef> Source name </th>
+              <td mat-cell *matCellDef="let element"> {{element.source}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="numOfLogs">
+                <th mat-header-cell *matHeaderCellDef> Number of logs </th>
+                <td mat-cell *matCellDef="let element"> {{element.numOfLogs}} </td>
+            </ng-container>
+        
+            <ng-container matColumnDef="numOfAlarms">
+                <th mat-header-cell *matHeaderCellDef> Number of alarms </th>
+                <td mat-cell *matCellDef="let element"> {{element.numOfAlarms}} </td>
+            </ng-container>
+        
+            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="header"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table> -->
+
+        <hr />
+    </div>
+</div>

@@ -5,7 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.siemcentar.dto.request.ReportRequestDTO;
+import rs.ac.uns.ftn.siemcentar.dto.response.AgentReportDTO;
 import rs.ac.uns.ftn.siemcentar.dto.response.ReportsDTO;
+import rs.ac.uns.ftn.siemcentar.dto.response.SourceReportDTO;
 import rs.ac.uns.ftn.siemcentar.model.Log;
 import rs.ac.uns.ftn.siemcentar.repository.AlarmRepository;
 import rs.ac.uns.ftn.siemcentar.repository.LogRepository;
@@ -32,25 +34,33 @@ public class ReportsServiceImpl implements ReportsService {
     @Override
     public ReportsDTO createReports(ReportRequestDTO requestDto) {
         List<String> agents = this.getAgents();
+        List<AgentReportDTO> agentReports = new ArrayList<>();
 
-        for (String s : agents) {
-            System.out.println(s + " " + logRepository.countLogsByAgentName(s));
-            System.out.println("\talarms " + s + " " + alarmRepository.countByAgentName(s));
+        for (String agent : agents) {
+            Long agentNumOfLogs = logRepository.countLogsByAgentName(agent);
+            Long agentNumOfAlarms = alarmRepository.countByAgentName(agent);
 
-            List<Log> sources = logRepository.findByAgentName(s);
+            List<SourceReportDTO> sourcesReports = new ArrayList<>();
 
-            List<String> sourcesDistinct = sources.stream()
-                    .map(log -> log.getSource()).distinct()
-                    .collect(Collectors.toList());
-            System.out.println(sourcesDistinct.size());
+//            System.out.println(agent + " " + logRepository.countLogsByAgentName(agent));
+//            System.out.println("\talarms " + agent + " " + alarmRepository.countByAgentName(agent));
 
-            for (String source : sourcesDistinct) {
-                System.out.println("ZA " + source + " " + logRepository.countLogsBySourceAndAgent(source, s));
-                System.out.println("ZA ALARM " + source + " " + alarmRepository.countBySourceAndAgent(source, s));
+            List<String> sources = this.getSourcesForAgent(agent);
+
+            for (String source : sources) {
+                Long sourceNumOfLogs = logRepository.countLogsBySourceAndAgent(source, agent);
+                Long sourceNumOfAlarms = alarmRepository.countBySourceAndAgent(source, agent);
+                SourceReportDTO sourceReportDTO = new SourceReportDTO(source, sourceNumOfLogs, sourceNumOfAlarms);
+                sourcesReports.add(sourceReportDTO);
+//                System.out.println("ZA " + source + " " + logRepository.countLogsBySourceAndAgent(source, agent));
+//                System.out.println("ZA ALARM " + source + " " + alarmRepository.countBySourceAndAgent(source, agent));
             }
+
+            AgentReportDTO agentReportDTO = new AgentReportDTO(agent, agentNumOfLogs, agentNumOfAlarms, sourcesReports);
+            agentReports.add(agentReportDTO);
         }
 
-        return null;
+        return new ReportsDTO(agentReports);
     }
 
     private List<String> getAgents() {
@@ -70,29 +80,13 @@ public class ReportsServiceImpl implements ReportsService {
     }
 
     private List<String> getSourcesForAgent(String agentName) {
-        List<String> sources = new ArrayList();
+        List<Log> sources = logRepository.findByAgentName(agentName);
 
-        MongoCursor cursor = mongoTemplate
-                .getCollection("Log")
+        List<String> sourcesDistinct = sources.stream()
+                .map(log -> log.getSource()).distinct()
+                .collect(Collectors.toList());
 
-                .distinct("agent", String.class)
-                .iterator();
-
-        while (cursor.hasNext()) {
-            String sourceName = (String) cursor.next();
-            sources.add(sourceName);
-        }
-
-        return sources;
+        return sourcesDistinct;
     }
 
-    private int getNumOfLogsForAgent(String agentName) {
-
-        return 0;
-    }
-
-    private int getNumOfAlarmsForAgent(String agentName) {
-
-        return 0;
-    }
 }
