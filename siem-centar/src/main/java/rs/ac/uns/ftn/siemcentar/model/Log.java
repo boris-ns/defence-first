@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.siemcentar.model;
 
+import org.kie.api.definition.type.Role;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -8,6 +9,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Document(collection = "Log")
+@Role(Role.Type.EVENT)
 public class Log implements Serializable {
 
     @Transient
@@ -20,7 +22,6 @@ public class Log implements Serializable {
     private String message;
     private String source;
     private String agent;
-    private boolean processed;
 
     public Log() {
     }
@@ -32,7 +33,6 @@ public class Log implements Serializable {
         this.message = message;
         this.source = source;
         this.agent = agent;
-        this.processed = false;
     }
 
     @Override
@@ -43,7 +43,6 @@ public class Log implements Serializable {
                 ", logType=" + logType +
                 ", message='" + message + '\'' +
                 ", source='" + source + '\'' +
-                ", processed=" + processed + '\'' +
                 '}';
     }
 
@@ -91,11 +90,4 @@ public class Log implements Serializable {
 
     public void setAgent(String agent) { this.agent = agent; }
 
-    public boolean isProcessed() {
-        return processed;
-    }
-
-    public void setProcessed(boolean processed) {
-        this.processed = processed;
-    }
 }

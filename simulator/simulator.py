@@ -27,11 +27,11 @@ attack_log_messages = [
     "ERROR - attack poruka 3",
     "ERROR - attack poruka 4",
     "ERROR - attack poruka 5",
-    "WARN - attack poruka 1",
-    "WARN - attack poruka 2",
+    "WARN - failed login, username: username",
+    "WARN - failed login, username: username",
     "WARN - attack poruka 3",
     "WARN - attack poruka 4",
-    "WARN - attack poruka 5",
+    "WARN - failed login, username: username2",
 ]
 
 class State:
