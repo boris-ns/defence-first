@@ -3,14 +3,14 @@ export interface ReportsDTO {
 }
 
 interface AgentReport {
-    agent: String;
+    agent: string;
     numOfLogs: number;
     numOfAlarms: number;
     sources: SourceReport[];
 }
 
-interface SourceReport {
-    source: String;
+export interface SourceReport {
+    source: string;
     numOfLogs: number;
     numOfAlarms: number;
 }

@@ -1,5 +1,5 @@
 import { createArrayFromDate } from 'src/app/utils/date-utils';
-import { ReportsDTO } from './../../../models/reports.model';
+import { ReportsDTO, SourceReport } from './../../../models/reports.model';
 import { ReportRequestDTO } from './../../../models/report-request.model';
 import { ReportsService } from './../../../services/siem-centar/reports.service';
 import { Component, OnInit } from '@angular/core';
@@ -16,12 +16,14 @@ export class ReportsComponent implements OnInit {
 
   startDate: string;
   endDate: string;
+  labels = [];
+  datasets = [];
 
-  constructor(private reportsService: ReportsService) { 
+  constructor(private reportsService: ReportsService) {
   }
 
   ngOnInit() {
-    this.getAllReports();    
+    this.getAllReports();
   }
 
   private getAllReports() {
@@ -30,7 +32,6 @@ export class ReportsComponent implements OnInit {
       endDate: [],
       showAll: true
     };
-    
     this.getReports(request);
   }
 
@@ -47,6 +48,7 @@ export class ReportsComponent implements OnInit {
   private getReports(request: ReportRequestDTO) {
     this.reportsService.getReports(request).subscribe((data: ReportsDTO) => {
       this.reports = data;
+      this.initChart();
     }, error => {
       // TODO: dodati toastr
       console.log(error.error.message);
@@ -57,5 +59,24 @@ export class ReportsComponent implements OnInit {
     this.getAllReports();
     this.startDate = null;
     this.endDate = null;
+  }
+
+  initChart() {
+    for (const agent of this.reports.reports) {
+      const label = [];
+      const logs = [];
+      const alarms = [];
+      for (const source of agent.sources) {
+        label.push(source.source);
+        logs.push(source.numOfLogs);
+        alarms.push(source.numOfAlarms);
+      }
+      this.labels.push(label);
+      this.datasets.push([
+        { data: logs, label: 'Logs'},
+        { data: alarms, label: 'Alarms'}
+      ]);
+    }
+
   }
 }

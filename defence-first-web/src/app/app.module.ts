@@ -18,6 +18,7 @@ import { ShowLogsComponent } from './components/shared/show-logs/show-logs.compo
 import { LogsSearchComponent } from './components/shared/logs-search/logs-search.component';
 import { ShowAlarmsComponent } from './components/shared/show-alarms/show-alarms.component';
 import { ReportsComponent } from './components/shared/reports/reports.component';
+import { ChartsModule } from 'ng2-charts';
 
 
 @NgModule({
@@ -40,7 +41,8 @@ import { ReportsComponent } from './components/shared/reports/reports.component'
     ReactiveFormsModule,
     KeycloakAngularModule,
     BrowserAnimationsModule,
-    MaterialModule
+    MaterialModule,
+    ChartsModule
   ],
   providers: [
     {

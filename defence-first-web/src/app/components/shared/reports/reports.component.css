@@ -1,3 +1,8 @@
-.filter-form mat-form-field, div {
-    margin: 5px;
+.filter-form, div {
+    margin: 0.5%;
+}
+
+mat-form-field, button {
+    margin: 0.25%;
+    width: 24.5%;
 }
