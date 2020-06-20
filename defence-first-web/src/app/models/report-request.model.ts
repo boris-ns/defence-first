@@ -1,4 +1,5 @@
 export interface ReportRequestDTO {
-    startDateTime: number;
-    endDateTime: number;
+    startDate: number[];
+    endDate: number[];
+    showAll: boolean;
 }

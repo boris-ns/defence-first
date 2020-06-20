@@ -12,11 +12,9 @@ import rs.ac.uns.ftn.siemcentar.model.Log;
 import rs.ac.uns.ftn.siemcentar.repository.AlarmRepository;
 import rs.ac.uns.ftn.siemcentar.repository.LogRepository;
 import rs.ac.uns.ftn.siemcentar.service.ReportsService;
+import rs.ac.uns.ftn.siemcentar.utils.DateUtils;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,27 +31,46 @@ public class ReportsServiceImpl implements ReportsService {
 
     @Override
     public ReportsDTO createReports(ReportRequestDTO requestDto) {
+        Date startDate = null;
+        Date endDate = null;
+
+        if (!requestDto.isShowAll()) {
+            startDate = DateUtils.dateFrom(requestDto.getStartDate());
+            endDate = DateUtils.dateFrom(requestDto.getEndDate());
+        }
+
         List<String> agents = this.getAgents();
         List<AgentReportDTO> agentReports = new ArrayList<>();
 
         for (String agent : agents) {
-            Long agentNumOfLogs = logRepository.countLogsByAgentName(agent);
-            Long agentNumOfAlarms = alarmRepository.countByAgentName(agent);
+            Long agentNumOfLogs = 0L;
+            Long agentNumOfAlarms = 0L;
+
+            if (requestDto.isShowAll()) {
+                agentNumOfLogs = logRepository.countLogsByAgentName(agent);
+                agentNumOfAlarms = alarmRepository.countByAgentName(agent);
+            } else {
+                agentNumOfLogs = logRepository.countLogsByAgentNameAndDates(agent, startDate, endDate);
+                agentNumOfAlarms = alarmRepository.countByAgentNameAndDates(agent, startDate, endDate);
+            }
 
             List<SourceReportDTO> sourcesReports = new ArrayList<>();
-
-//            System.out.println(agent + " " + logRepository.countLogsByAgentName(agent));
-//            System.out.println("\talarms " + agent + " " + alarmRepository.countByAgentName(agent));
-
             List<String> sources = this.getSourcesForAgent(agent);
 
             for (String source : sources) {
-                Long sourceNumOfLogs = logRepository.countLogsBySourceAndAgent(source, agent);
-                Long sourceNumOfAlarms = alarmRepository.countBySourceAndAgent(source, agent);
+                Long sourceNumOfLogs = 0L;
+                Long sourceNumOfAlarms = 0L;
+
+                if (requestDto.isShowAll()) {
+                    sourceNumOfLogs = logRepository.countLogsBySourceAndAgent(source, agent);
+                    sourceNumOfAlarms = alarmRepository.countBySourceAndAgent(source, agent);
+                } else {
+                    sourceNumOfLogs = logRepository.countLogsBySourceAndAgentAndDates(source, agent, startDate, endDate);
+                    sourceNumOfAlarms = alarmRepository.countBySourceAndAgentAndDates(source, agent, startDate, endDate);
+                }
+
                 SourceReportDTO sourceReportDTO = new SourceReportDTO(source, sourceNumOfLogs, sourceNumOfAlarms);
                 sourcesReports.add(sourceReportDTO);
-//                System.out.println("ZA " + source + " " + logRepository.countLogsBySourceAndAgent(source, agent));
-//                System.out.println("ZA ALARM " + source + " " + alarmRepository.countBySourceAndAgent(source, agent));
             }
 
             AgentReportDTO agentReportDTO = new AgentReportDTO(agent, agentNumOfLogs, agentNumOfAlarms, sourcesReports);

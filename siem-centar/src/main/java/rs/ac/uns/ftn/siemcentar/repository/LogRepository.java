@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 import rs.ac.uns.ftn.siemcentar.model.Log;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -19,9 +20,15 @@ public interface LogRepository extends MongoRepository<Log, Long> {
     @Query(value = "{'agent': ?0}", count = true)
     Long countLogsByAgentName(String agentName);
 
+    @Query(value = "{'agent': ?0, 'date': { $gte: ?1, $lte: ?2 }}", count = true)
+    Long countLogsByAgentNameAndDates(String agentName, Date start, Date end);
+
     @Query(value = "{'agent': ?0}")
     List<Log> findByAgentName(String agentName);
 
     @Query(value = "{'source': ?0, 'agent': ?1}", count = true)
     Long countLogsBySourceAndAgent(String source, String agent);
+
+    @Query(value = "{'source': ?0, 'agent': ?1, 'date': { $gte: ?2, $lte: ?3 }}", count = true)
+    Long countLogsBySourceAndAgentAndDates(String source, String agent, Date start, Date end);
 }

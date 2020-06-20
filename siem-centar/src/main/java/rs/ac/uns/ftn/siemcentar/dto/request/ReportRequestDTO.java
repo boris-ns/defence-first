@@ -5,27 +5,37 @@ import javax.validation.constraints.NotNull;
 public class ReportRequestDTO {
 
     @NotNull(message = "Start datetime is required")
-    private Long startDateTime;
+    private int[] startDate;
 
     @NotNull(message = "End datetime is required")
-    private Long endDateTime;
+    private int[] endDate;
+
+    private boolean showAll;
 
     public ReportRequestDTO() {
     }
 
-    public Long getStartDateTime() {
-        return startDateTime;
+    public boolean isShowAll() {
+        return showAll;
     }
 
-    public void setStartDateTime(Long startDateTime) {
-        this.startDateTime = startDateTime;
+    public void setShowAll(boolean showAll) {
+        this.showAll = showAll;
     }
 
-    public Long getEndDateTime() {
-        return endDateTime;
+    public int[] getStartDate() {
+        return startDate;
     }
 
-    public void setEndDateTime(Long endDateTime) {
-        this.endDateTime = endDateTime;
+    public void setStartDate(int[] startDate) {
+        this.startDate = startDate;
+    }
+
+    public int[] getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(int[] endDate) {
+        this.endDate = endDate;
     }
 }
