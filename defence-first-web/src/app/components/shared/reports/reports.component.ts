@@ -36,8 +36,8 @@ export class ReportsComponent implements OnInit {
 
   onClickSearch() {
     const request: ReportRequestDTO = {
-      startDate: createArrayFromDate(this.startDate),
-      endDate: createArrayFromDate(this.endDate),
+      startDate: (this.startDate != null) ? createArrayFromDate(this.startDate) : null,
+      endDate: (this.endDate != null) ? createArrayFromDate(this.endDate) : null,
       showAll: false
     };
 
@@ -49,7 +49,7 @@ export class ReportsComponent implements OnInit {
       this.reports = data;
     }, error => {
       // TODO: dodati toastr
-      console.log(error);
+      console.log(error.error.message);
     });
   }
 
