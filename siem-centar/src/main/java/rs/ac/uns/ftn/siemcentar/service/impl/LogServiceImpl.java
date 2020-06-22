@@ -26,8 +26,8 @@ public class LogServiceImpl implements LogService {
     @Autowired
     private LogRepository logRepository;
 
-    @Autowired
-    private WebSocketProducer socketProducer;
+//    @Autowired
+//    private WebSocketProducer socketProducer;
 
     @Autowired
     private AlarmService alarmService;
@@ -35,7 +35,7 @@ public class LogServiceImpl implements LogService {
     @Override
     public void saveLogs(List<Log> logs) {
         logRepository.saveAll(logs);
-        logs.forEach(log -> socketProducer.sendLog(log));
+//        logs.forEach(log -> socketProducer.sendLog(log));
 
         alarmService.processLogs(logs);
     }

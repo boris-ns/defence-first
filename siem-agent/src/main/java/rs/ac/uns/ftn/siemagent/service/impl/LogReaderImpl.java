@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.siemagent.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,12 +17,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
 
 @Service
 public class LogReaderImpl implements LogReader {
@@ -60,34 +56,31 @@ public class LogReaderImpl implements LogReader {
 
         String sysName = System.getProperty("os.name");
         Boolean readLinuxLogs = sysName.equalsIgnoreCase("Linux");
+        Boolean readWindowsLogs = sysName.contains("Windows");
 
+
+        // Date threshold = new GregorianCalendar(2020, Calendar.JUNE, 22).getTime();
         Date threshold = new Date();
-        if (logReaderMode.equals("batch")) {
-            while (true) {
-                if(readLinuxLogs) {
-//                    threshold = this.readLogFromLinux(threshold);
-                }
-                if(readSimulator) {
-                    threshold = this.readLogFromSimulator(threshold);
-                }
-                if(readKeyCloakLogs) {
-                    threshold = this.readLogFromKeyCloak(threshold, readLinuxLogs);
-                }
-
+        if (!logReaderMode.equals("batch") && !logReaderMode.equals("rt")) {
+            return;
+        }
+        while (true) {
+            if(readLinuxLogs) {
+                threshold = this.readLogFromLinux(threshold);
+            }
+            if (readWindowsLogs) {
+                threshold = this.readLogFromWindows(threshold);
+            }
+            if(readSimulator) {
+                threshold = this.readLogFromSimulator(threshold);
+            }
+            if(readKeyCloakLogs) {
+                threshold = this.readLogFromKeyCloak(threshold, readLinuxLogs);
+            }
+            if (logReaderMode.equals("batch")) {
                 System.out.println(new Date() + " (Batch interval) Done reading logs");
                 Thread.sleep(batchInterval * 60 * 1000);
-            }
-        } else if (logReaderMode.equals("rt")) {
-            while (true) {
-                if(readLinuxLogs) {
-                    threshold = this.readLogFromLinux(threshold);
-                }
-                if(readSimulator) {
-                    threshold = this.readLogFromSimulator(threshold);
-                }
-                if(readKeyCloakLogs) {
-                    threshold = this.readLogFromKeyCloak(threshold, readLinuxLogs);
-                }
+            } else if (logReaderMode.equals("rt")) {
                 System.out.println(new Date() + " (Real time) Done reading logs");
                 Thread.sleep(2000);
             }
@@ -209,6 +202,51 @@ public class LogReaderImpl implements LogReader {
         return newThreshold;
     }
 
+    @Override
+    public Date readLogFromWindows(Date threshold) throws Exception {
+        //String command = "powershell.exe  your command";
+        //Getting the version
+        SimpleDateFormat format = new SimpleDateFormat("M/d/yyyy HH:mm:ss");
+
+        System.out.println(format.format(threshold));
+        String command = "powershell.exe  Get-EventLog -LogName Application -After '" + format.format(threshold) +
+                "' | ConvertTo-Json";
+        // Executing the command
+        Process powerShellProcess = Runtime.getRuntime().exec(command);
+        // Getting the results
+        powerShellProcess.getOutputStream().close();
+        String line;
+        BufferedReader stdout = new BufferedReader(new InputStreamReader(
+                powerShellProcess.getInputStream()));
+        String json = "";
+        while ((line = stdout.readLine()) != null) {
+            json += line;
+        }
+        stdout.close();
+
+        if (json == "") {
+            return threshold;
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        LinkedHashMap[] data = mapper.readValue(json, LinkedHashMap[].class);
+
+        ArrayList<Log> logs = new ArrayList<>();
+        boolean setThreshold = false;
+        for (LinkedHashMap lhm: data) {
+            Log log = parseLogFromWindows(lhm);
+            if (!setThreshold){
+                threshold = log.getDate();
+                setThreshold = true;
+            }
+            logs.add(log);
+        }
+
+        Collections.reverse(logs);
+        logService.sendLogs(logs);
+        return threshold;
+    }
+
     private Log parseLogFromKeyCloak(String s) throws Exception {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String[] allData = s.split(",");
@@ -290,6 +328,35 @@ public class LogReaderImpl implements LogReader {
         String source = tokens[1];
         LogType type = LogType.valueOf(tokens[2]);
         String message = tokens[3];
+
+        return new Log(null, date, type, message, source, agent);
+    }
+
+    private Log parseLogFromWindows(LinkedHashMap<String, Object> data) {
+        String d = (String) data.get("TimeGenerated");
+        int t = (int) data.get("EntryType");
+        String message = (String) data.get("Message");
+        String source = (String) data.get("Source");
+        LogType type;
+// ovima kojima je dodeljena vrednost je tako za success nisam sigurna ima jos jedno polje isto ne znam koja je vrednost
+        switch (t) {
+            case 1:
+                type = LogType.ERROR;
+                break;
+            case 2:
+                type = LogType.WARN;
+                break;
+            case 4:
+                type = LogType.INFO;
+                break;
+            default:
+                type = LogType.SUCCESS;
+                break;
+        }
+
+        d = d.substring(d.indexOf("(") + 1);
+        d = d.substring(0, d.indexOf(")"));
+        Date date = new Date(Long.parseLong(d));
 
         return new Log(null, date, type, message, source, agent);
     }
