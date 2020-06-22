@@ -175,28 +175,15 @@ public class LogReaderImpl implements LogReader {
     @Override
     public Date readLogFromKeyCloak(Date threshold, Boolean readLinuxLogs) throws Exception {
         ArrayList<Log> logs = new ArrayList<>();
-        ArrayList<String> commands = new ArrayList<>();
-        if (readLinuxLogs) {
-            commands.add("tac");
-            commands.add("server.log");
-        }
-        else{
-            //@TODO: dodati komande za Windows da se procita taj fajl
-        }
-
         String baseDir = System.getProperty("user.home");
-        baseDir += keyCloakBasePath;
-
-        ProcessBuilder processBuilder = new ProcessBuilder(commands);
-        processBuilder.directory(new File(baseDir));
-        Process process = processBuilder.start();
+        baseDir += keyCloakBasePath ;
+        baseDir += "server.log";
+        ReversedLinesFileReader reader = new ReversedLinesFileReader(new File(baseDir));
         Date newThreshold;
-        // for reading the ouput from stream
-        BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String s = null;
+
         boolean setNewThreshold = false;
-        while ((s = stdInput.readLine()) != null)
-        {
+        String s = reader.readLine();
+        while (s != null) {
             Log log = this.parseLogFromKeyCloak(s);
             if (log.getDate().before(threshold)) {
                 break;
@@ -205,6 +192,7 @@ public class LogReaderImpl implements LogReader {
                 System.out.println(s);
                 logs.add(log);
             }
+            s = reader.readLine();
         }
 
         if(logs.size() > 0) {
