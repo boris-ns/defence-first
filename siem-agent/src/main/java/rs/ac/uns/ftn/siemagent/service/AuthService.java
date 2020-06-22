@@ -6,4 +6,5 @@ public interface AuthService {
 
     TokenDTO login();
     TokenDTO refreshToken(String refreshToken);
+    Boolean isTokenValid(String token);
 }

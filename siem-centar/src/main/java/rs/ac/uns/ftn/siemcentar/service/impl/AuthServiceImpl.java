@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.siemcentar.service.impl;
 
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import rs.ac.uns.ftn.siemcentar.dto.response.TokenDTO;
 import rs.ac.uns.ftn.siemcentar.service.AuthService;
+
+import java.time.Instant;
+import java.util.Calendar;
+import java.util.Date;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -64,5 +69,32 @@ public class AuthServiceImpl implements AuthService {
         }
 
         return response.getBody();
+    }
+
+    @Override
+    public Boolean isTokenValid(String token) {
+        Boolean retVal = false;
+        int indxStartBody = token.indexOf(".");
+        int indxEndBody = token.indexOf(".", indxStartBody+1);
+        Base64 base64 = new Base64(true);
+        String decodedBody = new String(base64.decode(token.substring(indxStartBody, indxEndBody+1)));
+
+        int startIndx = decodedBody.indexOf("exp");
+        int endIndx = decodedBody.indexOf(",", startIndx);
+        String expDate = decodedBody.substring(startIndx, endIndx);
+
+        String date = expDate.split(":")[1];
+        Instant instant = Instant.ofEpochSecond(Long.parseLong(date));
+        Date d = Date.from(instant);
+
+        Calendar c = Calendar.getInstance();
+        c.setTime(d);
+        c.add(Calendar.MINUTE, -1);
+        d = c.getTime();
+
+        if(d.after(new Date())) {
+            retVal = true;
+        }
+        return retVal;
     }
 }

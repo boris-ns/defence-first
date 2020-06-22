@@ -1,5 +1,7 @@
 package rs.ac.uns.ftn.siemcentar.configuration;
 
+import org.keycloak.representations.JsonWebToken;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestExecution;
@@ -24,6 +26,13 @@ public class RestTemplateInterceptor implements ClientHttpRequestInterceptor {
     @Override
     public ClientHttpResponse intercept(HttpRequest httpRequest, byte[] bytes,
                                         ClientHttpRequestExecution clientHttpRequestExecution) throws IOException {
+
+
+        boolean validToken = authService.isTokenValid(this.jwt);
+        if(!validToken) {
+            TokenDTO tokenDTO = this.authService.login();
+            this.jwt = tokenDTO.getAccesss_token();
+        }
 
         if (!httpRequest.getHeaders().containsKey("Authorization")) {
             httpRequest.getHeaders().add("Authorization", "Bearer " + this.jwt);
