@@ -65,7 +65,7 @@ public class LogReaderImpl implements LogReader {
         if (logReaderMode.equals("batch")) {
             while (true) {
                 if(readLinuxLogs) {
-//                    threshold = this.readLogFromLinux(threshold);
+                    threshold = this.readLogFromLinux(threshold);
                 }
                 if(readSimulator) {
                     threshold = this.readLogFromSimulator(threshold);
