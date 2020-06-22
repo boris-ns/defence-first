@@ -58,8 +58,9 @@ public class LogReaderImpl implements LogReader {
         Boolean readLinuxLogs = sysName.equalsIgnoreCase("Linux");
         Boolean readWindowsLogs = sysName.contains("Windows");
 
-        Date threshold = new GregorianCalendar(2020, Calendar.JUNE, 22).getTime();
 
+        // Date threshold = new GregorianCalendar(2020, Calendar.JUNE, 22).getTime();
+        Date threshold = new Date();
         if (!logReaderMode.equals("batch") && !logReaderMode.equals("rt")) {
             return;
         }
@@ -167,28 +168,15 @@ public class LogReaderImpl implements LogReader {
     @Override
     public Date readLogFromKeyCloak(Date threshold, Boolean readLinuxLogs) throws Exception {
         ArrayList<Log> logs = new ArrayList<>();
-        ArrayList<String> commands = new ArrayList<>();
-        if (readLinuxLogs) {
-            commands.add("tac");
-            commands.add("server.log");
-        }
-        else{
-            //@TODO: dodati komande za Windows da se procita taj fajl
-        }
-
         String baseDir = System.getProperty("user.home");
-        baseDir += keyCloakBasePath;
-
-        ProcessBuilder processBuilder = new ProcessBuilder(commands);
-        processBuilder.directory(new File(baseDir));
-        Process process = processBuilder.start();
+        baseDir += keyCloakBasePath ;
+        baseDir += "server.log";
+        ReversedLinesFileReader reader = new ReversedLinesFileReader(new File(baseDir));
         Date newThreshold;
-        // for reading the ouput from stream
-        BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String s = null;
+
         boolean setNewThreshold = false;
-        while ((s = stdInput.readLine()) != null)
-        {
+        String s = reader.readLine();
+        while (s != null) {
             Log log = this.parseLogFromKeyCloak(s);
             if (log.getDate().before(threshold)) {
                 break;
@@ -197,6 +185,7 @@ public class LogReaderImpl implements LogReader {
                 System.out.println(s);
                 logs.add(log);
             }
+            s = reader.readLine();
         }
 
         if(logs.size() > 0) {
@@ -284,7 +273,10 @@ public class LogReaderImpl implements LogReader {
 
         String message = String.join(" ", allData);
         if(allData[1].contains("type=LOGIN_ERROR")) {
-                message = "LOGIN_ERROR";
+                int usernameIndxStart = message.indexOf("username=");
+                int usernameIndxEnd = message.indexOf(" ", usernameIndxStart);
+                String username = message.substring(usernameIndxStart, usernameIndxEnd+1);
+                message = "failed login," + username;
         }
 
         Log l = new Log(null, simpleDateFormat.parse(date), type, message, source, agent);
