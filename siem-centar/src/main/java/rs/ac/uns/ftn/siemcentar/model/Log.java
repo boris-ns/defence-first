@@ -23,7 +23,11 @@ public class Log implements Serializable {
     private String source;
     private String agent;
 
+    @Transient
+    private Boolean processed;
+
     public Log() {
+        this.processed = false;
     }
 
     public Log(Long id, Date date, LogType logType, String message, String source, String agent) {
@@ -33,6 +37,7 @@ public class Log implements Serializable {
         this.message = message;
         this.source = source;
         this.agent = agent;
+        this.processed = false;
     }
 
     @Override
@@ -90,4 +95,11 @@ public class Log implements Serializable {
 
     public void setAgent(String agent) { this.agent = agent; }
 
+    public Boolean getProcessed() {
+        return processed;
+    }
+
+    public void setProcessed(Boolean processed) {
+        this.processed = processed;
+    }
 }

@@ -74,3 +74,53 @@ rule "Log warn faild login, same source"
     then
         insert(new Alarm(null, new Date(), "Warn failed logins from same source - agent: " + $a + ", source: " + $s, $id, $a, $s));
 end
+
+
+
+rule "Log WARN 3 or more successive faild logins on same machine"
+    when
+        $l1 : Log($id1: id, 
+                processed == false,
+                logType == LogType.WARN, 
+                message.equals("AUTHENTICATION FAILURE ON MACHINE"), $s1: source, $a1: agent)
+                
+        $l2 : Log($id2: id, $s2: source, $a2: agent, 
+                processed == false,
+                id != $id1,
+                agent == $a1,
+                (this after[0s, 10s] $l1), 
+                logType == LogType.WARN,
+                message.equals("AUTHENTICATION FAILURE ON MACHINE"))
+        $l3 : Log($id3: id, $s3: source, $a3: agent,
+                processed == false, 
+                id != $id1, id != $id2,
+                agent == $a2,
+                (this after[0s, 10s] $l2), 
+                logType == LogType.WARN,
+                message.equals("AUTHENTICATION FAILURE ON MACHINE"))
+
+
+
+
+    then
+        System.out.println("pravilo neko se lose loguje na masinu vise puta u poslednjih 10 min");
+        modify($l1){setProcessed(true);}
+        modify($l2){setProcessed(true);}
+        modify($l3){setProcessed(true);}
+        insert(new Alarm(null, new Date(), "Warn failed 3 logins on same Machine in few second from soruce agent: " + $a1 + ", source: " + $s1, $id1, $a1, $s1));
+end
+
+rule "Log WARN  multiple successive faild logins on same machine in one second"
+    when
+        $l1 : Log($id1: id, 
+            processed == false,
+            logType == LogType.WARN,
+            message.equals("MULTIPLE SUCCESSIVE AUTHENTICATION FAILURE ON MACHINE in ONE SECOND"), $s1: source, $a1: agent)
+        not (Alarm(logId == $id1))
+
+    then
+        modify($l1){setProcessed(true);}
+        System.out.println("pravilo neko se lose loguje na masinu vise puta u sekundi");
+        insert(new Alarm(null, new Date(), "Warn failed mupltiple logins on same Machine in one second from soruce agent: " + $a1 + ", source: " + $s1, $id1, $a1, $s1));
+end
+
