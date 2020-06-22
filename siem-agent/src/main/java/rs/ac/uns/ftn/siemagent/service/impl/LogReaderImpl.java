@@ -65,7 +65,7 @@ public class LogReaderImpl implements LogReader {
         if (logReaderMode.equals("batch")) {
             while (true) {
                 if(readLinuxLogs) {
-                    threshold = this.readLogFromLinux(threshold);
+//                    threshold = this.readLogFromLinux(threshold);
                 }
                 if(readSimulator) {
                     threshold = this.readLogFromSimulator(threshold);
@@ -247,7 +247,10 @@ public class LogReaderImpl implements LogReader {
 
         String message = String.join(" ", allData);
         if(allData[1].contains("type=LOGIN_ERROR")) {
-                message = "LOGIN_ERROR";
+                int usernameIndxStart = message.indexOf("username=");
+                int usernameIndxEnd = message.indexOf(" ", usernameIndxStart);
+                String username = message.substring(usernameIndxStart, usernameIndxEnd+1);
+                message = "failed login," + username;
         }
 
         Log l = new Log(null, simpleDateFormat.parse(date), type, message, source, agent);
