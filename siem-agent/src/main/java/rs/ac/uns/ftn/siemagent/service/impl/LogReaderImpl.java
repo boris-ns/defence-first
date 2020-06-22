@@ -10,12 +10,18 @@ import rs.ac.uns.ftn.siemagent.service.LogReader;
 import rs.ac.uns.ftn.siemagent.service.LogService;
 import rs.ac.uns.ftn.siemagent.utils.DateUtil;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class LogReaderImpl implements LogReader {
@@ -35,22 +41,53 @@ public class LogReaderImpl implements LogReader {
     @Value("${agent.name}")
     private String agent;
 
+    @Value("${read.keycloak.logs}")
+    private Boolean readKeyCloakLogs;
+
+    @Value("${read.simulator.logs}")
+    private Boolean readSimulator;
+
+    @Value("${keycloak.base.path}")
+    private String keyCloakBasePath;
+
+
     @Autowired
     private LogService logService;
 
 
     @Override
-    public void readLogs() throws IOException, InterruptedException {
+    public void readLogs() throws Exception {
+
+        String sysName = System.getProperty("os.name");
+        Boolean readLinuxLogs = sysName.equalsIgnoreCase("Linux");
+
         Date threshold = new Date();
         if (logReaderMode.equals("batch")) {
             while (true) {
-                threshold = this.readLogFromSimulator(threshold);
+                if(readLinuxLogs) {
+                    threshold = this.readLogFromLinux(threshold);
+                }
+                if(readSimulator) {
+                    threshold = this.readLogFromSimulator(threshold);
+                }
+                if(readKeyCloakLogs) {
+                    threshold = this.readLogFromKeyCloak(threshold, readLinuxLogs);
+                }
+
                 System.out.println(new Date() + " (Batch interval) Done reading logs");
                 Thread.sleep(batchInterval * 60 * 1000);
             }
         } else if (logReaderMode.equals("rt")) {
             while (true) {
-                threshold = this.readLogFromSimulator(threshold);
+                if(readLinuxLogs) {
+                    threshold = this.readLogFromLinux(threshold);
+                }
+                if(readSimulator) {
+                    threshold = this.readLogFromSimulator(threshold);
+                }
+                if(readKeyCloakLogs) {
+                    threshold = this.readLogFromKeyCloak(threshold, readLinuxLogs);
+                }
                 System.out.println(new Date() + " (Real time) Done reading logs");
                 Thread.sleep(2000);
             }
@@ -93,6 +130,160 @@ public class LogReaderImpl implements LogReader {
         logService.sendLogs(logs);
         return newThreshold;
     }
+
+
+    @Override
+    public Date readLogFromLinux(Date threshold) throws Exception {
+        ArrayList<Log> logs = new ArrayList<>();
+        ArrayList<String> commands = new ArrayList<>();
+        commands.add("tac");
+        commands.add("../../var/log/auth.log");
+        ProcessBuilder processBuilder = new ProcessBuilder(commands);
+        processBuilder.directory(new File(System.getProperty("user.home")));
+        Process process = processBuilder.start();
+        Date newThreshold;
+        // for reading the ouput from stream
+        BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String s = null;
+        boolean setNewThreshold = false;
+        while ((s = stdInput.readLine()) != null)
+        {
+            Log log = this.parseLogFromLinux(s);
+            if (log.getDate().before(threshold)) {
+                break;
+            }
+            if (log.getMessage().matches(simulatorLogFilter)) {
+                System.out.println(s);
+                logs.add(log);
+            }
+        }
+
+        if(logs.size() > 0) {
+            Calendar c = Calendar.getInstance();
+            c.setTime(logs.get(0).getDate());
+            c.add(Calendar.SECOND, 1);
+            newThreshold = c.getTime();
+            Collections.reverse(logs);
+            logService.sendLogs(logs);
+        }
+        else{
+            newThreshold = threshold;
+        }
+        return newThreshold;
+    }
+
+    @Override
+    public Date readLogFromKeyCloak(Date threshold, Boolean readLinuxLogs) throws Exception {
+        ArrayList<Log> logs = new ArrayList<>();
+        ArrayList<String> commands = new ArrayList<>();
+        if (readLinuxLogs) {
+            commands.add("tac");
+            commands.add("server.log");
+        }
+        else{
+            //@TODO: dodati komande za Windows da se procita taj fajl
+        }
+
+        String baseDir = System.getProperty("user.home");
+        baseDir += keyCloakBasePath;
+
+        ProcessBuilder processBuilder = new ProcessBuilder(commands);
+        processBuilder.directory(new File(baseDir));
+        Process process = processBuilder.start();
+        Date newThreshold;
+        // for reading the ouput from stream
+        BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String s = null;
+        boolean setNewThreshold = false;
+        while ((s = stdInput.readLine()) != null)
+        {
+            Log log = this.parseLogFromKeyCloak(s);
+            if (log.getDate().before(threshold)) {
+                break;
+            }
+            if (log.getMessage().matches(simulatorLogFilter)) {
+                System.out.println(s);
+                logs.add(log);
+            }
+        }
+
+        if(logs.size() > 0) {
+            Calendar c = Calendar.getInstance();
+            c.setTime(logs.get(0).getDate());
+            c.add(Calendar.SECOND, 1);
+            newThreshold = c.getTime();
+            Collections.reverse(logs);
+            logService.sendLogs(logs);
+        }
+        else{
+            newThreshold = threshold;
+        }
+        return newThreshold;
+    }
+
+    private Log parseLogFromKeyCloak(String s) throws Exception {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String[] allData = s.split(",");
+        String date  = allData[0];
+
+        int startIndxSource = allData[1].indexOf("[");
+        int endIndxSource = allData[1].indexOf(")");
+        String source = allData[1].substring(startIndxSource, endIndxSource+1);
+
+        String logType = allData[1].split(" ")[1];
+
+        LogType type;
+        switch (logType) {
+            case "WARN":
+                type = LogType.WARN;
+                break;
+            case "ERROR":
+                type = LogType.ERROR;
+                break;
+            default:
+                type = LogType.INFO;
+                break;
+        }
+
+        String message = String.join(" ", allData);
+        if(allData[1].contains("type=LOGIN_ERROR")) {
+                message = "LOGIN_ERROR";
+        }
+
+        Log l = new Log(null, simpleDateFormat.parse(date), type, message, source, agent);
+        return l;
+
+    }
+
+    private Log parseLogFromLinux(String s) throws Exception{
+        String date = s.substring(0, 15);
+        String data[] = s.substring(16).split(": ");
+        String source = data[0];
+        String message = data[data.length-1];
+        LogType type = LogType.INFO;
+
+        //@TODO: hocete WARN ili ERROR?
+        if( message.contains("authentication failure") && !data[1].contains("message repeated")) {
+            type = LogType.WARN;
+            message = "AUTHENTICATION FAILURE ON MACHINE";
+        }
+
+        if( message.contains("authentication failure") && data[1].contains("message repeated")) {
+            type = LogType.WARN;
+            message = "MULTIPLE SUCCESSIVE AUTHENTICATION FAILURE ON MACHINE in ONE SECOND";
+        }
+
+
+        Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMMM dd HH:mm:ss");
+        c.setTime(simpleDateFormat.parse(date));
+        c.set(Calendar.YEAR, year);
+
+        Log l = new Log(null, c.getTime(), type, message, source, agent);
+        return l;
+    }
+
 
     private Log parseLogFromSimulator(String line) {
         String[] tokens = line.split(" - ");
