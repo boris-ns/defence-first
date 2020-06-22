@@ -263,9 +263,16 @@ public class LogReaderImpl implements LogReader {
         LogType type = LogType.INFO;
 
         //@TODO: hocete WARN ili ERROR?
-        if( message.contains("authentication failure")) {
+        if( message.contains("authentication failure") && !data[1].contains("message repeated")) {
             type = LogType.WARN;
+            message = "AUTHENTICATION FAILURE ON MACHINE";
         }
+
+        if( message.contains("authentication failure") && data[1].contains("message repeated")) {
+            type = LogType.WARN;
+            message = "MULTIPLE SUCCESSIVE AUTHENTICATION FAILURE ON MACHINE in ONE SECOND";
+        }
+
 
         Calendar c = Calendar.getInstance();
         int year = c.get(Calendar.YEAR);
