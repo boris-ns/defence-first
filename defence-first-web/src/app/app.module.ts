@@ -19,6 +19,7 @@ import { LogsSearchComponent } from './components/shared/logs-search/logs-search
 import { ShowAlarmsComponent } from './components/shared/show-alarms/show-alarms.component';
 import { ReportsComponent } from './components/shared/reports/reports.component';
 import { ChartsModule } from 'ng2-charts';
+import { AddRulesComponent } from './components/shared/add-rules/add-rules.component';
 
 
 @NgModule({
@@ -31,7 +32,8 @@ import { ChartsModule } from 'ng2-charts';
     ShowLogsComponent,
     LogsSearchComponent,
     ShowAlarmsComponent,
-    ReportsComponent
+    ReportsComponent,
+    AddRulesComponent
   ],
   imports: [
     BrowserModule,
