@@ -23,7 +23,7 @@ public class RestTemplateConfiguration {
         RestTemplate restTemplate = new RestTemplate();
         TokenDTO token = authService.login();
 
-        restTemplate.getInterceptors().add(new RestTemplateInterceptor(authService, token.getAccesss_token()));
+        restTemplate.getInterceptors().add(new RestTemplateInterceptor(authService, token));
         restTemplate.setRequestFactory(requestFactory);
 
         return restTemplate;
