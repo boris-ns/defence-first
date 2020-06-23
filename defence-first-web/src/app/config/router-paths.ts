@@ -10,6 +10,7 @@ export const REPORTS_PATH = 'reports';
 export const CERTIFICATES_PATH = 'certificates';
 export const ADD_PATH = 'add';
 export const REQUEST_PATH = 'request';
+export const ADD_RULES_PATH = 'add-rules';
 
 // Error pages
 export const NOT_FOUND = 'not-found';
