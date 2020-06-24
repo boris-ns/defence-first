@@ -1,5 +1,6 @@
 import { RulesService } from './../../../services/siem-centar/rules.service';
 import { Component, OnInit } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-add-rules',
@@ -10,7 +11,9 @@ export class AddRulesComponent implements OnInit {
 
   file: File;
 
-  constructor(private ruleService: RulesService) { 
+  constructor(
+    private ruleService: RulesService,
+    private toastr: ToastrService) {
   }
 
   ngOnInit() {
@@ -22,11 +25,7 @@ export class AddRulesComponent implements OnInit {
 
   onUpload() {
     this.ruleService.addRule(this.file).subscribe(data => {
-        console.log("added rule");
-        // TODO: dodati toastr
-      }, error => {
-        // TODO: dodati toastr
-        console.log(error.message);
+        this.toastr.success('Added rule');
       }
     );
   }

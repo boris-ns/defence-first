@@ -34,16 +34,12 @@ export class CertificatesComponent implements OnInit {
   onClickRevoke(certificate: SimpleCertificate) {
     this.pkiService.revokeCertificate(certificate.serialNumber).subscribe(data => {
       this.getCertificates();
-    }, error => {
-      console.log(error);
     });
   }
 
   onClickReplace(certificate: SimpleCertificate) {
     this.pkiService.replaceCertificate(certificate.serialNumber).subscribe(data => {
       this.getCertificates();
-    }, error => {
-      console.log(error);
     });
   }
 

@@ -1,8 +1,9 @@
 import { createArrayFromDate } from 'src/app/utils/date-utils';
-import { ReportsDTO, SourceReport } from './../../../models/reports.model';
-import { ReportRequestDTO } from './../../../models/report-request.model';
-import { ReportsService } from './../../../services/siem-centar/reports.service';
+import { ReportsDTO, SourceReport } from '../../models/reports.model';
+import { ReportRequestDTO } from '../../models/report-request.model';
+import { ReportsService } from '../../services/siem-centar/reports.service';
 import { Component, OnInit } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-reports',
@@ -12,14 +13,18 @@ import { Component, OnInit } from '@angular/core';
 export class ReportsComponent implements OnInit {
 
   reports: ReportsDTO = {reports: []};
-  // displayedColumns: string[] = ['source', 'numOfLogs', 'numOfAlarms'];
 
   startDate: string;
   endDate: string;
   labels = [];
   datasets = [];
+  colors = [
+    { backgroundColor: 'lightblue' },
+    { backgroundColor: 'lightcoral' }
+  ];
 
-  constructor(private reportsService: ReportsService) {
+  constructor(
+    private reportsService: ReportsService) {
   }
 
   ngOnInit() {
@@ -49,9 +54,6 @@ export class ReportsComponent implements OnInit {
     this.reportsService.getReports(request).subscribe((data: ReportsDTO) => {
       this.reports = data;
       this.initChart();
-    }, error => {
-      // TODO: dodati toastr
-      console.log(error.error.message);
     });
   }
 

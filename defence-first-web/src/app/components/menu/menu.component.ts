@@ -1,4 +1,4 @@
-import { SHOW_LOGS_PATH, SEARCH_LOGS_PATH, SHOW_ALARMS_PATH, REPORTS_PATH, ADD_RULES_PATH } from './../../config/router-paths';
+import { SHOW_LOGS_PATH, SEARCH_LOGS_PATH, SHOW_ALARMS_PATH, REPORTS_PATH, ADD_RULES_PATH, SIEM_PATH } from './../../config/router-paths';
 import { Component, OnInit } from '@angular/core';
 import { KeycloakService } from 'keycloak-angular';
 import { AuthService } from 'src/app/services/auth.service';
@@ -38,19 +38,19 @@ export class MenuComponent implements OnInit {
   }
 
   showLogs() {
-    this.router.navigate([SHOW_LOGS_PATH]);
+    this.router.navigate([SIEM_PATH, SHOW_LOGS_PATH]);
   }
 
   searchLogs() {
-    this.router.navigate([SEARCH_LOGS_PATH]);
+    this.router.navigate([SIEM_PATH, SEARCH_LOGS_PATH]);
   }
 
   showAlarms() {
-    this.router.navigate([SHOW_ALARMS_PATH]);
+    this.router.navigate([SIEM_PATH, SHOW_ALARMS_PATH]);
   }
 
   showReports() {
-    this.router.navigate([REPORTS_PATH]);
+    this.router.navigate([SIEM_PATH, REPORTS_PATH]);
   }
 
   addRules() {

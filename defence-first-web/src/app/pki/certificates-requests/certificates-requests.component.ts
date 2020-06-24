@@ -30,16 +30,12 @@ export class CertificatesRequestsComponent implements OnInit {
   approveRequest(request: CertificateRequest) {
     this.pkiService.approveCertificateRequest(request.id).subscribe(data => {
       this.getAllRequests();
-    }, error => {
-      console.log(error);
     });
   }
 
   declineRequest(request: CertificateRequest) {
     this.pkiService.declineCertificateRequest(request.id).subscribe(data => {
       this.getAllRequests();
-    }, error => {
-      console.log(error);
     });
   }
 }
