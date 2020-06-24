@@ -4,9 +4,10 @@ import org.drools.template.ObjectDataCompiler;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import rs.ac.uns.ftn.siemcentar.constants.KieConstants;
-import rs.ac.uns.ftn.siemcentar.controller.RulesController;
 import rs.ac.uns.ftn.siemcentar.dto.request.templates.TypeMessageTemplateDTO;
 import rs.ac.uns.ftn.siemcentar.model.template.TypeMessageTemplate;
+import rs.ac.uns.ftn.siemcentar.dto.request.templates.TypeOccursTemplateDTO;
+import rs.ac.uns.ftn.siemcentar.model.template.TypeOccursTemplate;
 import rs.ac.uns.ftn.siemcentar.service.RulesService;
 import rs.ac.uns.ftn.siemcentar.utils.FileUtils;
 import rs.ac.uns.ftn.siemcentar.utils.KieUtils;
@@ -32,6 +33,25 @@ public class RulesServiceImpl implements RulesService {
         List<TypeMessageTemplate> data = new ArrayList<>();
         TypeMessageTemplate template = new TypeMessageTemplate(
                 templateDto.getType(), templateDto.getMessageRegex(), templateDto.getAlarmMessage()
+        );
+        data.add(template);
+
+        ObjectDataCompiler compiler = new ObjectDataCompiler();
+        String drl = compiler.compile(data, templateFile);
+
+        System.out.print(drl);
+        FileUtils.writeToKjarFile(drl);
+        KieUtils.installKjar();
+    }
+
+    @Override
+    public void createTypeOccursTemplateRule(TypeOccursTemplateDTO templateDto) throws Exception {
+        InputStream templateFile = RulesServiceImpl.class
+                .getResourceAsStream(KieConstants.TYPE_OCCURS_TEMPLATE_PATH);
+
+        List<TypeOccursTemplate> data = new ArrayList<>();
+        TypeOccursTemplate template = new TypeOccursTemplate(
+                templateDto.getType(), templateDto.getOccurs(), templateDto.getAlarmMessage(), templateDto.getTime()
         );
         data.add(template);
 

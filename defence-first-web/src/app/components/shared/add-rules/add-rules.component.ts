@@ -1,3 +1,4 @@
+import { TypeOccursTemplate } from './../../../models/type-occurs.model';
 import { TypeMessageTemplate } from './../../../models/type-message-template.model';
 import { RulesService } from './../../../services/siem-centar/rules.service';
 import { Component, OnInit } from '@angular/core';
@@ -13,6 +14,7 @@ export class AddRulesComponent implements OnInit {
   file: File;
 
   typeMessageTemplate: TypeMessageTemplate = {type: 'INFO', messageRegex: '', alarmMessage: ''};
+  typeOccursTemplate: TypeOccursTemplate = {type: 'INFO', occurs: 1, alarmMessage: '', time: 1};
 
   constructor(
     private ruleService: RulesService,
@@ -40,6 +42,19 @@ export class AddRulesComponent implements OnInit {
     }
 
     this.ruleService.addTypeMessageRule(this.typeMessageTemplate).subscribe(data => {
+      this.toastr.success('Rule successfully created!');
+    }, error => {
+      this.toastr.error(error.error.message);
+    });
+  }
+
+  onClickCreateTypeOccursRule() {
+    if (this.typeOccursTemplate.alarmMessage === '') {
+      this.toastr.warning('All fields must be filled');
+      return;
+    }
+
+    this.ruleService.addTypeOccursRule(this.typeOccursTemplate).subscribe(data => {
       this.toastr.success('Rule successfully created!');
     }, error => {
       this.toastr.error(error.error.message);

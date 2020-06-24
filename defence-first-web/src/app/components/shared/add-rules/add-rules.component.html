@@ -9,7 +9,7 @@
 
     <h3>Log type - message (regex) rule</h3>
 
-    When log type
+    When log type 
 
     <mat-form-field>
         <mat-label>Type</mat-label>
@@ -34,5 +34,43 @@
     </mat-form-field>
 
     <button mat-raised-button color="primary" (click)="onClickCreateTypeMessageRule()">Create</button>
+
+    <hr />
+
+    <h3>Log type occured X times over Y minutes</h3>
+
+    When log type 
+    
+    <mat-form-field>
+        <mat-label>Type</mat-label>
+        <mat-select [(ngModel)]="typeOccursTemplate.type">
+          <mat-option value="SUCCESS">SUCCESS</mat-option>
+          <mat-option value="INFO">INFO</mat-option>
+          <mat-option value="WARN">WARN</mat-option>
+          <mat-option value="ERROR">ERROR</mat-option>
+        </mat-select>
+    </mat-form-field>
+    
+    occurs
+
+    <mat-form-field class="example-full-width">
+        <input matInput type="number" min="1" [(ngModel)]="typeOccursTemplate.occurs">
+    </mat-form-field>
+
+    in
+
+    <mat-form-field class="example-full-width">
+        <input matInput type="number" min="1" [(ngModel)]="typeOccursTemplate.time">
+    </mat-form-field>
+
+    minutes show alarm with this message 
+
+    <mat-form-field class="example-full-width">
+        <input matInput type="text" [(ngModel)]="typeOccursTemplate.alarmMessage" placeholder="your alarm message">
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" (click)="onClickCreateTypeOccursRule()">Create</button>
+
+    <hr />
 
 </div>

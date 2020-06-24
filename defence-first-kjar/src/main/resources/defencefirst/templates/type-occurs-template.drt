@@ -1,0 +1,34 @@
+template header
+type
+count
+time
+alarmMessage
+
+package defencefirst.templates;
+
+import rs.ac.uns.ftn.siemcentar.model.Log;
+import rs.ac.uns.ftn.siemcentar.model.LogType;
+import rs.ac.uns.ftn.siemcentar.model.Alarm;
+import java.util.Date;
+
+template "type-occurs-template"
+
+// @TODO: Pravilo ce se aktivirati za svaki Log koji se zadovoljava dati uslov
+// ako si stavio da se na 5 error tipova u proteklih 5min aktivira alarm
+// on ce se aktivirati 5x umesto 1x
+rule "Activate alarm on Log type @{type} occured @{count} times over @{time} minutes"
+    when
+        $l: Log($id: id, logType == LogType.@{type}, 
+                $s: source, $a: agent, $m: message
+        )
+
+        Number(intValue >= @{count}) from accumulate(
+            $log: Log(logType == LogType.@{type}) over window:time( @{time}m ),
+            count($log)
+        )
+    then
+        insert(new Alarm(null, new Date(), "Log type occured X times - agent: " + $a + ", source: " + $s + ", message: " + "@{alarmMessage}" , -1L, $a, $s));
+        System.out.println("[DROOLS] Type-Occurs template alarm activated");
+end
+
+end template
