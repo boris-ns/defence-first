@@ -1,5 +1,5 @@
-import { LogService } from './../../../services/siem-centar/log.service';
-import { LogFilterDTO } from './../../../models/log-filter.model';
+import { LogService } from '../../services/siem-centar/log.service';
+import { LogFilterDTO } from '../../models/log-filter.model';
 import { Component, OnInit } from '@angular/core';
 import { Log } from 'src/app/models/log.model';
 import { createArrayFromDate } from 'src/app/utils/date-utils';

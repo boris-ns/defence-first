@@ -14,11 +14,6 @@ import { NotFoundComponent } from './components/error-pages/not-found/not-found.
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from './material/material.module';
 import { MenuComponent } from './components/menu/menu.component';
-import { ShowLogsComponent } from './components/shared/show-logs/show-logs.component';
-import { LogsSearchComponent } from './components/shared/logs-search/logs-search.component';
-import { ShowAlarmsComponent } from './components/shared/show-alarms/show-alarms.component';
-import { ReportsComponent } from './components/shared/reports/reports.component';
-import { ChartsModule } from 'ng2-charts';
 import { AddRulesComponent } from './components/shared/add-rules/add-rules.component';
 import { ToastrModule } from 'ngx-toastr';
 import { ErrorDialogService } from './services/error-dialog-service/error-dialog.service';
@@ -32,10 +27,6 @@ import { Router } from '@angular/router';
     NotAuthorizedComponent,
     NotFoundComponent,
     MenuComponent,
-    ShowLogsComponent,
-    LogsSearchComponent,
-    ShowAlarmsComponent,
-    ReportsComponent,
     AddRulesComponent
   ],
   imports: [
@@ -45,9 +36,7 @@ import { Router } from '@angular/router';
     FormsModule,
     ReactiveFormsModule,
     KeycloakAngularModule,
-    BrowserAnimationsModule,
     MaterialModule,
-    ChartsModule,
     BrowserAnimationsModule,
     ToastrModule.forRoot({
       timeOut: 10000,

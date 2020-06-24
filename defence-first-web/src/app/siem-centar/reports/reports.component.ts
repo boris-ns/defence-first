@@ -1,7 +1,7 @@
 import { createArrayFromDate } from 'src/app/utils/date-utils';
-import { ReportsDTO, SourceReport } from './../../../models/reports.model';
-import { ReportRequestDTO } from './../../../models/report-request.model';
-import { ReportsService } from './../../../services/siem-centar/reports.service';
+import { ReportsDTO, SourceReport } from '../../models/reports.model';
+import { ReportRequestDTO } from '../../models/report-request.model';
+import { ReportsService } from '../../services/siem-centar/reports.service';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
@@ -18,6 +18,10 @@ export class ReportsComponent implements OnInit {
   endDate: string;
   labels = [];
   datasets = [];
+  colors = [
+    { backgroundColor: 'lightblue' },
+    { backgroundColor: 'lightcoral' }
+  ];
 
   constructor(
     private reportsService: ReportsService) {
