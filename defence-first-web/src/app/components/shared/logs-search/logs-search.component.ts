@@ -3,6 +3,7 @@ import { LogFilterDTO } from './../../../models/log-filter.model';
 import { Component, OnInit } from '@angular/core';
 import { Log } from 'src/app/models/log.model';
 import { createArrayFromDate } from 'src/app/utils/date-utils';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-logs-search',
@@ -17,7 +18,9 @@ export class LogsSearchComponent implements OnInit {
   startDate: string;
   endDate: string;
 
-  constructor(private logService: LogService) {
+  constructor(
+    private logService: LogService,
+    private toastr: ToastrService) {
   }
 
   ngOnInit() {
@@ -33,17 +36,14 @@ export class LogsSearchComponent implements OnInit {
     }
 
     if (this.startDate && this.endDate && (new Date(this.startDate).getTime() > (new Date(this.endDate).getTime()))) {
-      console.log('Startdate je posle enddate');
-      // @TODO: dodati toastr
+      this.toastr.error('Startdate is after enddate');
       return;
     }
 
     this.logService.filterLogs(this.filter).subscribe((data: Log[]) => {
       this.searchedLogs = data;
-    }, error => {
-      // @TODO: dodati toastr
-      console.log(error);
-    });
+    }
+    );
   }
 
   onClickClear() {

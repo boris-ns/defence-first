@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { KeycloakService, KeycloakAngularModule } from 'keycloak-angular';
 import { keycloakInitializer } from './utils/app-init';
@@ -20,7 +20,10 @@ import { ShowAlarmsComponent } from './components/shared/show-alarms/show-alarms
 import { ReportsComponent } from './components/shared/reports/reports.component';
 import { ChartsModule } from 'ng2-charts';
 import { AddRulesComponent } from './components/shared/add-rules/add-rules.component';
-
+import { ToastrModule } from 'ngx-toastr';
+import { ErrorDialogService } from './services/error-dialog-service/error-dialog.service';
+import { ErrorHandlingInterceptor } from './interceptors/error.interceptor';
+import { Router } from '@angular/router';
 
 @NgModule({
   declarations: [
@@ -44,7 +47,13 @@ import { AddRulesComponent } from './components/shared/add-rules/add-rules.compo
     KeycloakAngularModule,
     BrowserAnimationsModule,
     MaterialModule,
-    ChartsModule
+    ChartsModule,
+    BrowserAnimationsModule,
+    ToastrModule.forRoot({
+      timeOut: 10000,
+      positionClass: 'toast-bottom-right',
+      preventDuplicates: true,
+    }),
   ],
   providers: [
     {
@@ -53,6 +62,16 @@ import { AddRulesComponent } from './components/shared/add-rules/add-rules.compo
       multi: true,
       deps: [KeycloakService]
     },
+    ErrorDialogService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ErrorHandlingInterceptor,
+      multi: true,
+      deps: [ErrorDialogService, Router]
+    }
+  ],
+  exports: [
+    ToastrModule
   ],
   bootstrap: [AppComponent]
 })

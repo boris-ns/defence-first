@@ -29,9 +29,6 @@ export class ShowLogsComponent implements OnInit {
   private getLogs() {
     this.logService.getAllLogs().subscribe((data: Log[]) => {
       this.data = data;
-    }, error => {
-      // @TODO: dodati toastr
-      console.log(error);
     });
   }
 
