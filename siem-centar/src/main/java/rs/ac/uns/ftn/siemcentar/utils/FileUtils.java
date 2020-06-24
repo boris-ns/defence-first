@@ -34,4 +34,13 @@ public class FileUtils {
             out.println(fileStr);
         }
     }
+
+    public static void writeToKjarFile(String data) throws Exception {
+        String fileName = "new_rules_" + new Date().getTime();
+        File f = new File(KieConstants.BASE_PATH_NEW_RULES + fileName + KieConstants.DRL_FILE_EXTENSION);
+        f.createNewFile();
+        try (PrintWriter out = new PrintWriter(f)) {
+            out.println(data);
+        }
+    }
 }

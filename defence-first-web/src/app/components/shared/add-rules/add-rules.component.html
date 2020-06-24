@@ -1,8 +1,38 @@
 <div class="container">
-    <h2>Add rules</h2>
+    <h2>Add rules from file</h2>
 
     Choose .drl file:
     <input type="file" (change)="onFileSelected($event)"/>
     <button mat-raised-button color="accent" (click)="onUpload()">Add</button>
+
+    <h2>Create rules from template</h2>
+
+    <h3>Log type - message (regex) rule</h3>
+
+    When log type
+
+    <mat-form-field>
+        <mat-label>Type</mat-label>
+        <mat-select [(ngModel)]="typeMessageTemplate.type">
+          <mat-option value="SUCCESS">SUCCESS</mat-option>
+          <mat-option value="INFO">INFO</mat-option>
+          <mat-option value="WARN">WARN</mat-option>
+          <mat-option value="ERROR">ERROR</mat-option>
+        </mat-select>
+    </mat-form-field>
+    
+    occurs with message (regex) 
+
+    <mat-form-field class="example-full-width">
+        <input matInput type="text" [(ngModel)]="typeMessageTemplate.messageRegex" placeholder="regex message">
+    </mat-form-field>
+
+    activate alarm with this message: 
+
+    <mat-form-field class="example-full-width">
+        <input matInput type="text" [(ngModel)]="typeMessageTemplate.alarmMessage" placeholder="your alarm message">
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" (click)="onClickCreateTypeMessageRule()">Create</button>
 
 </div>

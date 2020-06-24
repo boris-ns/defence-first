@@ -1,3 +1,4 @@
+import { TypeMessageTemplate } from './../../../models/type-message-template.model';
 import { RulesService } from './../../../services/siem-centar/rules.service';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
@@ -10,6 +11,8 @@ import { ToastrService } from 'ngx-toastr';
 export class AddRulesComponent implements OnInit {
 
   file: File;
+
+  typeMessageTemplate: TypeMessageTemplate = {type: 'INFO', messageRegex: '', alarmMessage: ''};
 
   constructor(
     private ruleService: RulesService,
@@ -28,5 +31,18 @@ export class AddRulesComponent implements OnInit {
         this.toastr.success('Added rule');
       }
     );
+  }
+
+  onClickCreateTypeMessageRule() {
+    if (this.typeMessageTemplate.messageRegex === '' || this.typeMessageTemplate.alarmMessage === '') {
+      this.toastr.warning('All fields must be filled');
+      return;
+    }
+
+    this.ruleService.addTypeMessageRule(this.typeMessageTemplate).subscribe(data => {
+      this.toastr.success('Rule successfully created!');
+    }, error => {
+      this.toastr.error(error.error.message);
+    });
   }
 }

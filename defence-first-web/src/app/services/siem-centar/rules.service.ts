@@ -1,3 +1,4 @@
+import { TypeMessageTemplate } from './../../models/type-message-template.model';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
@@ -17,5 +18,9 @@ export class RulesService {
     const fd = new FormData();
     fd.append('file', data);
     return this.http.post(this.url, fd);
+  }
+
+  addTypeMessageRule(rule: TypeMessageTemplate) {
+    return this.http.post(`${this.url}/type-message`, rule);
   }
 }
