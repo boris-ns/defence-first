@@ -24,9 +24,6 @@ export class ShowAlarmsComponent implements OnInit {
       (data: Alarm[]) => {
         data.sort((a: Alarm, b: Alarm) => b.id - a.id);
         this.data = data;
-      }, error => {
-        // @TODO: dodati toastr
-        console.log(error);
       }
     );
   }

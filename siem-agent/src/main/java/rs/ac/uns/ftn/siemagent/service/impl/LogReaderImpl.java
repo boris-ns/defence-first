@@ -88,7 +88,6 @@ public class LogReaderImpl implements LogReader {
     }
 
     private Date readLogFromSimulator(Date threshold) throws IOException {
-        System.out.println(threshold);
         ArrayList<Log> logs = new ArrayList<>();
         ReversedLinesFileReader reader = new ReversedLinesFileReader(new File(simulatorLogPath));
         Date newThreshold = new Date();
@@ -207,8 +206,6 @@ public class LogReaderImpl implements LogReader {
         //String command = "powershell.exe  your command";
         //Getting the version
         SimpleDateFormat format = new SimpleDateFormat("M/d/yyyy HH:mm:ss");
-
-        System.out.println(format.format(threshold));
         String command = "powershell.exe  Get-EventLog -LogName Application -After '" + format.format(threshold) +
                 "' | ConvertTo-Json";
         // Executing the command

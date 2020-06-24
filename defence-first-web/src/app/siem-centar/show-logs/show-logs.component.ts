@@ -1,6 +1,6 @@
-import { LogFilterDTO } from './../../../models/log-filter.model';
-import { Log } from './../../../models/log.model';
-import { LogService } from './../../../services/siem-centar/log.service';
+import { LogFilterDTO } from '../../models/log-filter.model';
+import { Log } from '../../models/log.model';
+import { LogService } from '../../services/siem-centar/log.service';
 import { Component, OnInit } from '@angular/core';
 import * as Stomp from 'stompjs';
 import * as SockJS from 'sockjs-client';
@@ -29,9 +29,6 @@ export class ShowLogsComponent implements OnInit {
   private getLogs() {
     this.logService.getAllLogs().subscribe((data: Log[]) => {
       this.data = data;
-    }, error => {
-      // @TODO: dodati toastr
-      console.log(error);
     });
   }
 

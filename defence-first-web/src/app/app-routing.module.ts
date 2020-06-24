@@ -1,21 +1,17 @@
-import { ReportsComponent } from './components/shared/reports/reports.component';
+import { AddRulesComponent } from './components/shared/add-rules/add-rules.component';
+import { ReportsComponent } from './siem-centar/reports/reports.component';
 import { AdminAuthorizationGuard } from './guards/admin-authorization.guard';
 import { NotAuthorizedComponent } from './components/error-pages/not-authorized/not-authorized.component';
 import { NOT_FOUND, NOT_AUTHORIZED, HOME_PATH, CERTIFICATES_PATH, SHOW_LOGS_PATH, SEARCH_LOGS_PATH,
-   SHOW_ALARMS_PATH, REPORTS_PATH} from './config/router-paths';
+   SHOW_ALARMS_PATH, REPORTS_PATH, ADD_RULES_PATH, SIEM_PATH} from './config/router-paths';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { NotFoundComponent } from './components/error-pages/not-found/not-found.component';
 import { HomeComponent } from './components/home/home.component';
-import { ShowLogsComponent } from './components/shared/show-logs/show-logs.component';
-import { LogsSearchComponent } from './components/shared/logs-search/logs-search.component';
-import { ShowAlarmsComponent } from './components/shared/show-alarms/show-alarms.component';
+import { ShowLogsComponent } from './siem-centar/show-logs/show-logs.component';
+import { LogsSearchComponent } from './siem-centar/logs-search/logs-search.component';
+import { ShowAlarmsComponent } from './siem-centar/show-alarms/show-alarms.component';
 import { OperatorAndAdimnAuthorizationGuard } from './guards/operator-admin-authorization.guard';
-
-// !!! Guards !!!
-// canActivate: [OperatorAuthorizationGuard],
-// dodati ovo u objekat za putanju ako zelis da samo Operator ima pristup toj stranici
-// drugi guard koji postoji je AdminAuthorizationGuard
 
 const routes: Routes = [
   {
@@ -23,24 +19,9 @@ const routes: Routes = [
     component: HomeComponent
   },
   {
-    path: SHOW_LOGS_PATH,
-    component: ShowLogsComponent,
-    canActivate: [OperatorAndAdimnAuthorizationGuard]
-  },
-  {
-    path: SEARCH_LOGS_PATH,
-    component: LogsSearchComponent,
-    canActivate: [OperatorAndAdimnAuthorizationGuard]
-  },
-  {
-    path: SHOW_ALARMS_PATH,
-    component: ShowAlarmsComponent,
-    canActivate: [OperatorAndAdimnAuthorizationGuard]
-  },
-  {
-    path: REPORTS_PATH,
-    component: ReportsComponent,
-    canActivate: [OperatorAndAdimnAuthorizationGuard]
+    path: ADD_RULES_PATH,
+    component: AddRulesComponent,
+    canActivate: [AdminAuthorizationGuard]
   },
   {
     path: NOT_FOUND,
@@ -59,6 +40,11 @@ const routes: Routes = [
     path: CERTIFICATES_PATH,
     loadChildren: () => import('./pki/pki.module').then(m => m.PkiModule),
     canActivate: [AdminAuthorizationGuard]
+  },
+  {
+    path: SIEM_PATH,
+    loadChildren: () => import('./siem-centar/siem-centar.module').then(m => m.SiemCentarModule),
+    canActivate: [OperatorAndAdimnAuthorizationGuard]
   },
   // This must be last!
   {
