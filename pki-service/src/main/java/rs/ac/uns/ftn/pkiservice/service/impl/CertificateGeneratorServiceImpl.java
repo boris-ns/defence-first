@@ -71,26 +71,25 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
 //                certGen.addExtension(Extension.authorityInfoAccess, false, new AuthorityInformationAccess());
 //                certGen.addExtension(X509Extensions.AuthorityKeyIdentifier, false, new AuthorityKeyIdentifierStructure(caCert));
 //                certGen.addExtension(X509Extensions.SubjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(entityKey));
-//                certGen.addExtension(X509Extensions.BasicConstraints, true, new BasicConstraints(false));
-                certGen.addExtension(Extension.keyUsage, true,
+                certGen.addExtension(Extension.keyUsage, false,
                         new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyEncipherment));
-                certGen.addExtension(Extension.basicConstraints, true, new BasicConstraints(false));
+                certGen.addExtension(Extension.basicConstraints, false, new BasicConstraints(false));
 
 
                 KeyPurposeId[] keyPurposeIds = new KeyPurposeId[2];
                 keyPurposeIds[0] = KeyPurposeId.id_kp_clientAuth;
                 keyPurposeIds[1] = KeyPurposeId.id_kp_serverAuth;
 
-                certGen.addExtension(Extension.extendedKeyUsage , true,
+                certGen.addExtension(Extension.extendedKeyUsage , false,
                         new ExtendedKeyUsage(keyPurposeIds));
             }
             else if (type.equals(Constants.CERT_TYPE.SERVER_CERT))
             {
-                certGen.addExtension(Extension.basicConstraints, true, new BasicConstraints(false));
-                certGen.addExtension(Extension.extendedKeyUsage , true,
+                certGen.addExtension(Extension.basicConstraints, false, new BasicConstraints(false));
+                certGen.addExtension(Extension.extendedKeyUsage , false,
                         new ExtendedKeyUsage(KeyPurposeId.id_kp_serverAuth));
 
-                certGen.addExtension(Extension.keyUsage, true,
+                certGen.addExtension(Extension.keyUsage, false,
                         new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyEncipherment));
 
                 byte[] subjectKeyIdentifier = new JcaX509ExtensionUtils()
@@ -99,10 +98,10 @@ public class CertificateGeneratorServiceImpl implements CertificateGeneratorServ
                         new SubjectKeyIdentifier(subjectKeyIdentifier));
             }
             else {
-                certGen.addExtension(Extension.keyUsage, true,
+                certGen.addExtension(Extension.keyUsage, false,
                         new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyCertSign | KeyUsage.cRLSign));
 
-                certGen.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
+                certGen.addExtension(Extension.basicConstraints, false, new BasicConstraints(true));
 
 
                 byte[] subjectKeyIdentifier = new JcaX509ExtensionUtils()

@@ -36,6 +36,9 @@ public class SiemAgentApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		logReader.readLogs();
 
+
+		System.out.println("mogu da se pokrenem lepo");
+
 		// simulacija slanja logova
 //		simulation();
 

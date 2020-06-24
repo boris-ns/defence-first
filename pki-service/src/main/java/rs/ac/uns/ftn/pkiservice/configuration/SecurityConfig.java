@@ -61,23 +61,26 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter
         return new CustomKeycloakSpringBootConfigResolver(properties);
     }
 
-//    @Bean
-//    public CorsFilter corsFilter() {
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        CorsConfiguration config = new CorsConfiguration();
-//        config.setAllowCredentials(true);
-//        config.addAllowedOrigin("*");
-//        config.addAllowedHeader("*");
-//        config.addAllowedMethod("*");
-//        config.setMaxAge(3600L);
-//        source.registerCorsConfiguration("/**", config);
-//        return new CorsFilter(source);
-//    }
+    @Bean
+    public CorsFilter corsFilter() {
+
+        System.out.print("jeeeee");
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        config.setMaxAge(3600L);
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
-        http//.cors().and()
+        http.cors().and()
                 .csrf().disable()
                 .authorizeRequests()
                 .anyRequest().authenticated().and()
