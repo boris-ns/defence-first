@@ -13,7 +13,7 @@ import { ToastrService } from 'ngx-toastr';
 export class LogsSearchComponent implements OnInit {
 
   searchedLogs: Log[] = [];
-  displayedColumns: string[] = ['id', 'type', 'date', 'source', 'agent', 'message'];
+  displayedColumns: string[] = ['id', 'type', 'severity', 'date', 'source', 'agent', 'message'];
   filter: LogFilterDTO = {};
   startDate: string;
   endDate: string;
