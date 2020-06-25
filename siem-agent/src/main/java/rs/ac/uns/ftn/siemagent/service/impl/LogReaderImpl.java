@@ -289,7 +289,7 @@ public class LogReaderImpl implements LogReader {
             }
         }
 
-        Log l = new Log(null, simpleDateFormat.parse(date), type, 5, message, source, agent, ip);
+        Log l = new Log(null, simpleDateFormat.parse(date), type, 5, messageToSend, source, agent, ip);
         return l;
     }
 
