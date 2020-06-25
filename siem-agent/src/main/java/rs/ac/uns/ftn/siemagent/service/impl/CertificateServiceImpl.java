@@ -26,7 +26,6 @@ import rs.ac.uns.ftn.siemagent.Constants.Constants;
 import rs.ac.uns.ftn.siemagent.config.AgentConfiguration;
 import rs.ac.uns.ftn.siemagent.config.CertificateBuilder;
 import rs.ac.uns.ftn.siemagent.repository.Keystore;
-import rs.ac.uns.ftn.siemagent.service.AuthService;
 import rs.ac.uns.ftn.siemagent.service.CertificateService;
 import rs.ac.uns.ftn.siemagent.service.KeyPairGeneratorService;
 
@@ -42,7 +41,6 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -67,6 +65,9 @@ public class CertificateServiceImpl implements CertificateService {
     @Value("${my.certificate.path}")
     private String pathToCertificate;
 
+    @Value("${ssl.path}")
+    private String sslPath;
+
     @Autowired
     private AgentConfiguration agentConfiguration;
 
@@ -75,9 +76,6 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Autowired
     private Keystore keystore;
-
-    @Autowired
-    private AuthService authService;
 
     @Autowired
     private CertificateBuilder certificateBuilder;
@@ -169,23 +167,18 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public String sendRequestForCertificate() throws Exception {
-        HttpHeaders headers = new HttpHeaders();
-
+    public void createRequestForCertificate() throws Exception {
         KeyPair pair = keyPairGeneratorService.generateKeyPair();
         PrivateKey privateKey = pair.getPrivate();
         String csr = this.buildCertificateRequest(pair, privateKey, false);
 
-        HttpEntity<String> entityReq = new HttpEntity<>(csr, headers);
-        ResponseEntity<String> certificate = null;
+        String fileName = "cert_request.csr";
+        String path = sslPath + "/" + fileName;
 
-        try {
-            certificate = restTemplate.exchange(createCertificateURL, HttpMethod.POST, entityReq, String.class);
-        } catch (HttpClientErrorException e) {
-            System.out.println("[ERROR] You are not allowed to make CSR request");
-            return null;
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
+            writer.write(csr);
+            writer.close();
         }
-        return certificate.getBody();
     }
 
     @Override

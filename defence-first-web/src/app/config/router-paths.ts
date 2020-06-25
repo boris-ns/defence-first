@@ -13,6 +13,10 @@ export const ADD_PATH = 'add';
 export const REQUEST_PATH = 'request';
 export const ADD_RULES_PATH = 'add-rules';
 
+// Agent
+export const AGENT_PATH = 'crs';
+export const DOWNLOAD_PATH = 'add';
+
 // Error pages
 export const NOT_FOUND = 'not-found';
 export const NOT_AUTHORIZED = 'not-authorized';

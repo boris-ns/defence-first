@@ -1,9 +1,11 @@
-import { SHOW_LOGS_PATH, SEARCH_LOGS_PATH, SHOW_ALARMS_PATH, REPORTS_PATH, ADD_RULES_PATH, SIEM_PATH } from './../../config/router-paths';
+import { SHOW_LOGS_PATH, SEARCH_LOGS_PATH, SHOW_ALARMS_PATH, REPORTS_PATH, ADD_RULES_PATH,
+  SIEM_PATH, AGENT_PATH, DOWNLOAD_PATH } from './../../config/router-paths';
 import { Component, OnInit } from '@angular/core';
 import { KeycloakService } from 'keycloak-angular';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 import { CERTIFICATES_PATH, ADD_PATH, REQUEST_PATH } from 'src/app/config/router-paths';
+import { DownloadComponent } from 'src/app/agent/download/download.component';
 
 @Component({
   selector: 'app-menu',
@@ -14,6 +16,7 @@ export class MenuComponent implements OnInit {
 
   admin: boolean;
   operator: boolean;
+  agent: boolean;
 
   constructor(private keycloakAngular: KeycloakService,
               private authService: AuthService,
@@ -23,6 +26,7 @@ export class MenuComponent implements OnInit {
   ngOnInit() {
     this.admin = this.authService.isUserAdmin();
     this.operator = this.authService.isUserOperator();
+    this.agent = this.authService.isUserAgent();
   }
 
   certificates() {
@@ -55,6 +59,14 @@ export class MenuComponent implements OnInit {
 
   addRules() {
     this.router.navigate([ADD_RULES_PATH]);
+  }
+
+  request() {
+    this.router.navigate([AGENT_PATH]);
+  }
+
+  download() {
+    this.router.navigate([AGENT_PATH, DOWNLOAD_PATH]);
   }
 
   logOut() {

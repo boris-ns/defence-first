@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -37,6 +37,16 @@ export class PkiServiceService {
     return this.http.put(`${this.urlCSR}/decline/${id}`, {});
   }
 
+  sendCSR(data: File) {
+    const fd = new FormData();
+    fd.append('file', data);
+    return this.http.post(this.urlCSR + '/generate', fd);
+  }
+
+  getCSR() {
+    return this.http.get(this.urlCSR + '/my_certs');
+  }
+
   checkCrlList( id: number) {
     return this.http.get(this.urlOCSP + '/' + id);
   }
@@ -50,7 +60,7 @@ export class PkiServiceService {
   }
 
   getCertificatByAlias(alias: string) {
-    return this.http.get(this.urlCertificates + '/alias/' + alias);
+    return this.http.get(this.urlCertificates + '/alias/' + alias, {responseType: 'text'});
   }
 
   revokeCertificate(serialNumber: number) {

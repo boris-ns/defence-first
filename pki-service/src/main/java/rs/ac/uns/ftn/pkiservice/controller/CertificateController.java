@@ -3,6 +3,7 @@ package rs.ac.uns.ftn.pkiservice.controller;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -37,28 +40,23 @@ public class CertificateController {
     @Autowired
     private CertificateService certificateService;
 
+    @Value("${generated.certifacates.directory}")
+    private String certDirectory;
+
     @GetMapping(path = "/all")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<List<SimpleCertificateDTO>> findAll(HttpServletRequest req) {
-
-
-        System.out.print(req);
-
         Map<Constants.CERT_TYPE, List<X509Certificate>> certifictes = certificateService.findAll();
         Map<String, Boolean> revoked = certificateService.findAllRevoked();
         List<SimpleCertificateDTO> result = new ArrayList<>();
         for (Constants.CERT_TYPE key : certifictes.keySet()) {
             for (X509Certificate cert : certifictes.get(key)) {
-
-                System.out.println(cert.getSerialNumber());
                 if(revoked.containsKey(cert.getSerialNumber())) {
                     result.add(new SimpleCertificateDTO(cert, revoked.get(cert.getSerialNumber().toString()), key));
                 }
                 else {
                     result.add(new SimpleCertificateDTO(cert, false, key));
                 }
-
-
             }
         }
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -76,12 +74,14 @@ public class CertificateController {
 
     @GetMapping(path = "/alias/{alias}")
     public ResponseEntity<String> findByAlias(@PathVariable String alias) throws IOException {
-        X509Certificate certificate = certificateService.findCertificateByAlias(alias);
-        StringWriter sw = new StringWriter();
-        JcaPEMWriter pm = new JcaPEMWriter(sw);
-        pm.writeObject(certificate);
-        pm.close();
-        return new ResponseEntity<>(sw.toString(), HttpStatus.OK);
+        String filePath = certDirectory + "/cert_" + alias + ".crt";
+        String content = new String ( Files.readAllBytes( Paths.get(filePath) ) );
+//        X509Certificate certificate = certificateService.findCertificateByAlias(alias);
+//        StringWriter sw = new StringWriter();
+//        JcaPEMWriter pm = new JcaPEMWriter(sw);
+//        pm.writeObject(certificate);
+//        pm.close();
+        return new ResponseEntity<>(content, HttpStatus.OK);
     }
 
     @PostMapping(path = "/generate/intermediate", consumes = MediaType.APPLICATION_JSON_VALUE)
