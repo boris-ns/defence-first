@@ -23,7 +23,7 @@ normal_log_messages = [
     "DEBUG - Debug message 3",
     "OTHER - Other message 1",
     "OTHER - Other message 2",
-    "OTHER - Other message 3"
+    "OTHER - Other message 3",
     "SUCCESSFUL_LOGIN - username: username4",
     "SUCCESSFUL_LOGIN - username: username5",
     "SUCCESSFUL_LOGIN - username: username6"

@@ -29,9 +29,4 @@ export class ShowLogsComponent implements OnInit {
       this.data = data;
     });
   }
-
-  checkClass(row: any) {
-    console.log(row);
-    return '';
-  }
 }
