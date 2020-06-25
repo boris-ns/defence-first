@@ -17,7 +17,13 @@ normal_log_messages = [
     "SUCCESS - normal poruka 3",
     "SUCCESS - normal poruka 4",
     "SUCCESS - normal poruka 5",
-    "INFO - 1234567890"
+    "INFO - 1234567890",
+    "DEBUG - Debug message 1",
+    "DEBUG - Debug message 2",
+    "DEBUG - Debug message 3",
+    "OTHER - Other message 1",
+    "OTHER - Other message 2",
+    "OTHER - Other message 3"
 ]
 
 # TODO: Napisati smislenije poruke
@@ -49,7 +55,7 @@ class NormalState(State):
 
         for i in range(randrange(10)):
             msg = normal_log_messages[randrange(len(normal_log_messages))]
-            msg = str(datetime.now()) + " - " + LOG_SOURCE + " - " + msg
+            msg = str(datetime.now()) + " - " + LOG_SOURCE + " - " + msg + " - " + str(i % 7 + 1)
             print(msg)
             write_to_log_file(msg)
 
@@ -61,7 +67,7 @@ class AttackState(State):
 
         for i in range(randrange(10)):
             msg = attack_log_messages[randrange(len(attack_log_messages))]
-            msg = str(datetime.now()) + " - " + LOG_SOURCE + " - " + msg
+            msg = str(datetime.now()) + " - " + LOG_SOURCE + " - " + msg + " - " + str(i % 7 + 1)
             print(msg)
             write_to_log_file(msg)
 

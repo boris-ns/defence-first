@@ -9,22 +9,27 @@ public class Log implements Serializable {
     private Long id;
     private Date date;
     private LogType logType;
+    private int severity;
     private String message;
     private String source;
     private String agent;
+
     private boolean processed;
     private String signature;
+    private String ip;
 
     public Log() {this.processed =false;}
 
-    public Log(Long id, Date date, LogType logType, String message, String source, String agent) {
+    public Log(Long id, Date date, LogType logType, int severity, String message, String source, String agent, String ip) {
         this.id = id;
         this.date = date;
         this.logType = logType;
+        this.severity = severity;
         this.message = message;
         this.source = source;
         this.agent = agent;
         this.processed =false;
+        this.ip = ip;
     }
 
     @Override
@@ -74,4 +79,8 @@ public class Log implements Serializable {
     public boolean isProcessed() {
         return processed;
     }
+    public String getIp() {
+        return ip;
+    }
+    public int getSeverity() { return severity; }
 }
