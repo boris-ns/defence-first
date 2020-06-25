@@ -43,12 +43,23 @@ public class SSLContextConfiguration {
     private OCSPService ocspService;
 
 
-    @Bean(name = "myContext")
-    public SSLContext getCustomSSLContext() throws Exception{
+    @Bean(name = "myContextOCSP")
+    public SSLContext getCustomSSLContextWithOCSP() throws Exception{
 
         SSLContext sslContext = SSLContexts.custom()
                 .loadTrustMaterial(
-                        keystore, new MyTrustStrategy(trustStore, ocspService))
+                        keystore, new MyTrustStrategy(trustStore, ocspService, true))
+                .loadKeyMaterial(keystore, keyStorePassword.toCharArray()).build();
+
+        return sslContext;
+    }
+
+    @Bean(name = "myContextNoOCSP")
+    public SSLContext getCustomSSLContextNoOCSP() throws Exception{
+
+        SSLContext sslContext = SSLContexts.custom()
+                .loadTrustMaterial(
+                        keystore, new MyTrustStrategy(trustStore, ocspService, false))
                 .loadKeyMaterial(keystore, keyStorePassword.toCharArray()).build();
 
         return sslContext;

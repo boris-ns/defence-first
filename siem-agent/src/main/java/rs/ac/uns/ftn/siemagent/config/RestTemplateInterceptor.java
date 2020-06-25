@@ -18,9 +18,12 @@ public class RestTemplateInterceptor implements ClientHttpRequestInterceptor {
     private Date expiresIn;
     private Date expiresInRefresh;
 
-    public RestTemplateInterceptor(AuthService authService, TokenDTO token) {
+    public RestTemplateInterceptor(AuthService authService) {
         this.authService = authService;
-        setData(token);
+        this.jwt = "";
+        this.jwtRefresh = "";
+        this.expiresIn = new Date();
+        this.expiresInRefresh = new Date();
     }
 
     @Override

@@ -15,7 +15,7 @@ public class RestTemplateConfiguration {
     @Autowired
     private AuthService authService;
 
-    @Autowired @Qualifier("httFactory")
+    @Autowired @Qualifier("httFactoryOCSP")
     private HttpComponentsClientHttpRequestFactory requestFactory;
 
     @Bean
