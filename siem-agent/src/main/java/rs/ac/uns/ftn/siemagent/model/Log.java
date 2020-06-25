@@ -32,17 +32,20 @@ public class Log implements Serializable {
         this.ip = ip;
     }
 
-    @Override
-    public String toString() {
-        return "Log{" +
-                "id=" + id +
-                ", date=" + date +
-                ", logType=" + logType +
-                ", message='" + message + '\'' +
-                ", source='" + source + '\'' +
-                ", agent='" + agent + '\'' +
-                '}';
-    }
+        @Override
+        public String toString() {
+            return "Log{" +
+                    "id=" + id +
+                    ", date=" + date +
+                    ", logType=" + logType +
+                    ", message='" + message + '\'' +
+                    ", source='" + source + '\'' +
+                    ", agent='" + agent + '\'' +
+                    ", severity='" + severity + '\''+
+                    ", ip='" + ip + '\'' +
+                    ", processed='" + processed + '\'' +
+                    '}';
+        }
 
     public Long getId() {
         return id;

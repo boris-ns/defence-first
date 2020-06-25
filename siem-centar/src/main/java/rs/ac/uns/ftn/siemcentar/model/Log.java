@@ -48,6 +48,7 @@ public class Log implements Serializable {
         this.processed = false;
     }
 
+    @Override
     public String toString() {
         return "Log{" +
                 "id=" + id +
@@ -56,6 +57,9 @@ public class Log implements Serializable {
                 ", message='" + message + '\'' +
                 ", source='" + source + '\'' +
                 ", agent='" + agent + '\'' +
+                ", severity='" + severity + '\''+
+                ", ip='" + ip + '\'' +
+                ", processed='" + processed + '\'' +
                 '}';
     }
 
