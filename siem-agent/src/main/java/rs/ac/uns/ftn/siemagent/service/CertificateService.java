@@ -25,7 +25,7 @@ public interface CertificateService {
 
     String sendReplaceCertificateRequest() throws Exception;
 
-    String sendRequestForCertificate() throws Exception;
+    void createRequestForCertificate() throws Exception;
 
     void installCertificateFromFile() throws CertificateException, Exception;
 

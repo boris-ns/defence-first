@@ -1,1 +1,7 @@
-<p>crs works!</p>
+<div class="container">
+    <h1>Send certificate request</h1>
+
+    Choose .crs file:
+    <input type="file" accept=".csr" (change)="onFileSelected($event)"/>
+    <button mat-raised-button color="primary" (click)="onUpload()">Send</button>
+</div>

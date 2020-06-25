@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { CrsComponent } from './crs/crs.component';
 import { DownloadComponent } from './download/download.component';
 import { AgentRoutingModule } from './agent-routing.module';
+import { MaterialModule } from '../material/material.module';
 
 
 
@@ -12,7 +13,8 @@ import { AgentRoutingModule } from './agent-routing.module';
     DownloadComponent],
   imports: [
     CommonModule,
-    AgentRoutingModule
+    AgentRoutingModule,
+    MaterialModule
   ]
 })
 export class AgentModule { }

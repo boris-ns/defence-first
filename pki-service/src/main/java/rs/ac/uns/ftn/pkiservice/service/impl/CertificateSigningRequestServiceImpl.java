@@ -86,18 +86,18 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
     }
 
     @Override
-    public void addRequest(String csr) throws PKCSException, IOException, OperatorCreationException {
+    public void addRequest(String csr, String username) throws PKCSException, IOException, OperatorCreationException {
         PKCS10CertificationRequest certReq = isValidSigned(csr, false);
         Map<String, String> attributes = this.parseCsrAttributes(certReq);
-        CertificateSigningRequest request = new CertificateSigningRequest(csr, certReq.getSubject().toString(), attributes.get("issuerId"));
+        CertificateSigningRequest request = new CertificateSigningRequest(csr, certReq.getSubject().toString(), attributes.get("issuerId"), username);
         csrRepository.save(request);
     }
 
     @Override
-    public void addRenewRequest(String csr) throws PKCSException, IOException, OperatorCreationException {
+    public void addRenewRequest(String csr, String username) throws PKCSException, IOException, OperatorCreationException {
         PKCS10CertificationRequest certReq = isValidSigned(csr, true);
         Map<String, String> attributes = this.parseCsrAttributes(certReq);
-        CertificateSigningRequest request = new CertificateSigningRequest(csr, certReq.getSubject().toString(), attributes.get("issuerId"));
+        CertificateSigningRequest request = new CertificateSigningRequest(csr, certReq.getSubject().toString(), attributes.get("issuerId"), username);
         request.setStatus(CSRStatus.WAITING_RENEWAL);
         csrRepository.save(request);
     }
@@ -156,6 +156,11 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
     }
 
     @Override
+    public CertificateSigningRequest getCertsRequest(String name) {
+        return csrRepository.findByUsername(name);
+    }
+
+    @Override
     public void changeStatus(Long id, CSRStatus toStatus) throws Exception {
         CertificateSigningRequest csr = csrRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("CSR with id " + id + " doesn't exist"));
@@ -166,10 +171,13 @@ public class CertificateSigningRequestServiceImpl implements CertificateSigningR
 
         CSRStatus prevState = csr.getStatus();
         csr.setStatus(toStatus);
-        csrRepository.save(csr);
 
         if (toStatus.equals(CSRStatus.APPROVED)) {
-            saveCertificateRequest(csr.getCsr(), prevState == CSRStatus.WAITING_RENEWAL);
+            X509Certificate certificate = saveCertificateRequest(csr.getCsr(), prevState == CSRStatus.WAITING_RENEWAL);
+            String sn = certificate.getSerialNumber().toString();
+            csr.setSerialNumber(sn);
         }
+
+        csrRepository.save(csr);
     }
 }
