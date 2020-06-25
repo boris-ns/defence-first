@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import rs.ac.uns.ftn.siemcentar.constants.IpBlacklist;
 import rs.ac.uns.ftn.siemcentar.dto.request.LogFilterDTO;
 import rs.ac.uns.ftn.siemcentar.dto.response.LogDTO;
 import rs.ac.uns.ftn.siemcentar.mapper.LogMapper;
@@ -37,6 +38,13 @@ public class LogController {
             System.out.println(l);
             Log log = mapper.readValue(l, Log.class);
             log.setId(databaseSequenceService.generateSequence(Log.SEQUENCE_NAME));
+
+            if (IpBlacklist.BLACKLIST.contains(log.getIp())) {
+                log.setIpBlacklisted(true);
+            } else {
+                log.setIpBlacklisted(false);
+            }
+
             logList.add(log);
         }
 

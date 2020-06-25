@@ -167,10 +167,7 @@ public class LogReaderImpl implements LogReader {
     @Override
     public Date readLogFromKeyCloak(Date threshold, Boolean readLinuxLogs) throws Exception {
         ArrayList<Log> logs = new ArrayList<>();
-        String baseDir = System.getProperty("user.home");
-        baseDir += keyCloakBasePath ;
-        baseDir += "server.log";
-        ReversedLinesFileReader reader = new ReversedLinesFileReader(new File(baseDir));
+        ReversedLinesFileReader reader = new ReversedLinesFileReader(new File(keyCloakBasePath));
         Date newThreshold;
 
         boolean setNewThreshold = false;
@@ -269,16 +266,31 @@ public class LogReaderImpl implements LogReader {
         }
 
         String message = String.join(" ", allData);
+        String messageToSend = "";
+        String ip = "0.0.0.0";
+
         if(allData[1].contains("type=LOGIN_ERROR")) {
-                int usernameIndxStart = message.indexOf("username=");
-                int usernameIndxEnd = message.indexOf(" ", usernameIndxStart);
-                String username = message.substring(usernameIndxStart, usernameIndxEnd+1);
-                message = "failed login," + username;
+            type = LogType.UNSUCCESSFUL_LOGIN;
+            int usernameIndxStart = message.indexOf("username=");
+            int usernameIndxEnd = message.indexOf(" ", usernameIndxStart);
+
+            String username = "none";
+            if (usernameIndxStart != -1) {
+                username = message.substring(usernameIndxStart, usernameIndxEnd + 1);
+            }
+
+            messageToSend = "failed login," + username;
+
+            int ipIndxStart = message.indexOf("ipAddress=");
+            int ipIndxEnd = message.indexOf(" ", ipIndxStart);
+
+            if (ipIndxStart != -1) {
+                ip = message.substring(ipIndxStart + 10, ipIndxEnd);
+            }
         }
 
-        Log l = new Log(null, simpleDateFormat.parse(date), type, message, source, agent);
+        Log l = new Log(null, simpleDateFormat.parse(date), type, messageToSend, source, agent, ip);
         return l;
-
     }
 
     private Log parseLogFromLinux(String s) throws Exception{
@@ -306,7 +318,7 @@ public class LogReaderImpl implements LogReader {
         c.setTime(simpleDateFormat.parse(date));
         c.set(Calendar.YEAR, year);
 
-        Log l = new Log(null, c.getTime(), type, message, source, agent);
+        Log l = new Log(null, c.getTime(), type, message, source, agent, "0.0.0.0");
         return l;
     }
 
@@ -326,7 +338,7 @@ public class LogReaderImpl implements LogReader {
         LogType type = LogType.valueOf(tokens[2]);
         String message = tokens[3];
 
-        return new Log(null, date, type, message, source, agent);
+        return new Log(null, date, type, message, source, agent, "0.0.0.0");
     }
 
     private Log parseLogFromWindows(LinkedHashMap<String, Object> data) {
@@ -355,6 +367,6 @@ public class LogReaderImpl implements LogReader {
         d = d.substring(0, d.indexOf(")"));
         Date date = new Date(Long.parseLong(d));
 
-        return new Log(null, date, type, message, source, agent);
+        return new Log(null, date, type, message, source, agent, "0.0.0.0");
     }
 }
