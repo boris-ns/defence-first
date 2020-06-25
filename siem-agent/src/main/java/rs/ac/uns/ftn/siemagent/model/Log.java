@@ -13,10 +13,11 @@ public class Log implements Serializable {
     private String message;
     private String source;
     private String agent;
+    private String ip;
 
     public Log() {}
 
-    public Log(Long id, Date date, LogType logType, int severity, String message, String source, String agent) {
+    public Log(Long id, Date date, LogType logType, int severity, String message, String source, String agent, String ip) {
         this.id = id;
         this.date = date;
         this.logType = logType;
@@ -24,6 +25,7 @@ public class Log implements Serializable {
         this.message = message;
         this.source = source;
         this.agent = agent;
+        this.ip = ip;
     }
 
     @Override
@@ -62,5 +64,8 @@ public class Log implements Serializable {
         return agent;
     }
 
+    public String getIp() {
+        return ip;
+    }
     public int getSeverity() { return severity; }
 }

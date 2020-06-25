@@ -125,3 +125,19 @@ rule "Log WARN  multiple successive faild logins on same machine in one second"
         insert(new Alarm(null, new Date(), "Warn failed mupltiple logins on same Machine in one second from soruce agent: " + $a1 + ", source: " + $s1, $id1, $a1, $s1, AlarmType.OTHER));
 end
 
+
+rule "Login from malicious IP address"
+    when
+        $log: Log($id: id, logType == LogType.UNSUCCESSFUL_LOGIN, 
+            $m: message, 
+            $s: source, 
+            $a: agent,
+            message.contains("failed login"),
+            $ip: ip,
+            ipBlacklisted == true
+        )
+        not (Alarm(logId == $id))
+    then
+        insert(new Alarm(null, new Date(), "Login from blacklisted IP " + $ip + " from soruce agent: " + $a + ", source: " + $s, $id, $a, $s, AlarmType.OTHER));
+        System.out.println("[DROOLS] Login from malicous IP adress");
+end
