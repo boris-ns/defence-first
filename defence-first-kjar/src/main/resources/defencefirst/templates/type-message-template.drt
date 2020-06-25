@@ -8,6 +8,7 @@ package defencefirst.templates;
 import rs.ac.uns.ftn.siemcentar.model.Log;
 import rs.ac.uns.ftn.siemcentar.model.LogType;
 import rs.ac.uns.ftn.siemcentar.model.Alarm;
+import rs.ac.uns.ftn.siemcentar.model.AlarmType;
 import java.util.Date;
 
 template "type-message-template"
@@ -17,7 +18,7 @@ rule "Activate alarm on Log type and message regex - @{type} - @{messageRegex} -
         $log: Log($id: id, logType == LogType.@{type}, $s: source, $a: agent, $m: message matches "@{messageRegex}")
         not (Alarm(logId == $id))
     then
-        insert(new Alarm(null, new Date(), "Error in log - agent: " + $a + ", source: " + $s + ", message: " + "@{alarmMessage}" , $id, $a, $s));
+        insert(new Alarm(null, new Date(), "Error in log - agent: " + $a + ", source: " + $s + ", message: " + "@{alarmMessage}" , $id, $a, $s, AlarmType.OTHER));
         System.out.println("[DROOLS] Type-message template alarm activated");
 end
 

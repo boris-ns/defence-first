@@ -5,6 +5,7 @@ package defencefirst.rules;
 import rs.ac.uns.ftn.siemcentar.model.Log;
 import rs.ac.uns.ftn.siemcentar.model.LogType;
 import rs.ac.uns.ftn.siemcentar.model.Alarm;
+import rs.ac.uns.ftn.siemcentar.model.AlarmType;
 import java.util.Date;
 //declare any global variables here
 
@@ -13,5 +14,5 @@ rule "Log error"
         $log: Log($id: id, logType == LogType.ERROR, $s: source, $a: agent, $m: message)
         not (Alarm(logId == $id))
     then
-        insert(new Alarm(null, new Date(), "Error in log - agent: " + $a + ", source: " + $s + ", message: " + $m , $id, $a, $s));
+        insert(new Alarm(null, new Date(), "Error in log - agent: " + $a + ", source: " + $s + ", message: " + $m , $id, $a, $s, AlarmType.OTHER));
 end
