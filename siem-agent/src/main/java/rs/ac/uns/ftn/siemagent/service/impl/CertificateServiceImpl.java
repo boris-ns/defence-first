@@ -118,7 +118,16 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public String buildCertificateRequest(KeyPair certKeyPair, PrivateKey signCerPrivateKey, Boolean renewal) throws Exception {
 
+
+        String myCertId = "";
+        X509Certificate certificate = (X509Certificate) keystore.getKeyStore().getCertificate(Constants.CERTIFICATE_ALIAS);
+        if(certificate!=null) {
+            myCertId = certificate.getSerialNumber().toString();
+        }
+
+
         X500Principal principal = buildSertificateSubjetPrincipal();
+
 
         PKCS10CertificationRequestBuilder p10Builder =
                 new JcaPKCS10CertificationRequestBuilder(principal, certKeyPair.getPublic());
@@ -130,7 +139,7 @@ public class CertificateServiceImpl implements CertificateService {
         // da prosledimo koji je SerialNumber o
         GeneralNames subjectAltName = null;
         GeneralName issuerSNName = new GeneralName(GeneralName.dNSName, issuerSerialNumber);
-        GeneralName myCertSerialNumber = new GeneralName(GeneralName.uniformResourceIdentifier, "1586545031627");
+        GeneralName myCertSerialNumber = new GeneralName(GeneralName.uniformResourceIdentifier, "1593008519115");
 
         if(renewal) {
             subjectAltName = new GeneralNames(new GeneralName[]{issuerSNName, myCertSerialNumber});
@@ -187,19 +196,6 @@ public class CertificateServiceImpl implements CertificateService {
         HashMap<String, String> params = new HashMap<>();
         X500Principal a = new X500Principal(name, params);
         return a;
-        //@TODO: ako bude trebalo nesto od ovih polja VEZANIH ZA SUBJEKTA, podaci iz app.properties
-
-//
-//        builder.addRDN(BCStyle.CN, "Goran Sladic");
-//        builder.addRDN(BCStyle.SURNAME, "Sladic");
-//        builder.addRDN(BCStyle.GIVENNAME, "Goran");
-//        builder.addRDN(BCStyle.O, "UNS-FTN");
-//        builder.addRDN(BCStyle.OU, "Katedra za informatiku");
-//        builder.addRDN(BCStyle.C, "RS");
-//        builder.addRDN(BCStyle.E, "sladicg@uns.ac.rs");
-//        // @TODO: UID ovo da bude MAC adresa ili tako nesto?
-//        builder.addRDN(BCStyle.UID, "123456");
-//        return name;
     }
 
     @Override
@@ -236,36 +232,24 @@ public class CertificateServiceImpl implements CertificateService {
         PEMParser pemParser = new PEMParser(new StringReader(certificate.getBody()));
         X509CertificateHolder certificateHolder = (X509CertificateHolder) pemParser.readObject();
 
-//        CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
-//        InputStream in = new ByteArrayInputStream(certificate.getBody());
-//        X509Certificate cert = (X509Certificate) certFactory.generateCertificate(in);
-//        return cert;
-
         JcaX509CertificateConverter certConverter = new JcaX509CertificateConverter();
         certConverter = certConverter.setProvider("BC");
         return certConverter.getCertificate(certificateHolder);
     }
 
     @Override
-    public String sendReplaceCertificateRequest() throws Exception {
-        HttpHeaders headers = new HttpHeaders();
+    public void createReplaceCertificateRequest() throws Exception {
 
         KeyPair pair = keyPairGeneratorService.generateKeyPair();
-        //UZIMA SE STARI KLJUC JER PKI ima stari public pa moze da proveri validnost tako..
         PrivateKey privateKey = keystore.readPrivateKey(Constants.KEY_PAIR_ALIAS, keyStorePassword);
         String csr = this.buildCertificateRequest(pair, privateKey, true);
 
-        HttpEntity<String> entityReq = new HttpEntity<>(csr, headers);
-        ResponseEntity<Void> certificate = null;
+        String fileName = "cert_request_renewal.csr";
+        String path = sslPath + "/" + fileName;
 
-        try {
-            certificate = restTemplate.exchange(renewCertificate, HttpMethod.POST, entityReq, Void.class);
-        } catch (HttpClientErrorException e) {
-            System.out.println(e.fillInStackTrace());
-            System.out.println("[ERROR] You are not allowed to make CSR request");
-            return null;
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
+            writer.write(csr);
         }
-        return null;
     }
 
     public X509Certificate createSertificateForKeyPair(KeyPair keyPair) throws Exception{

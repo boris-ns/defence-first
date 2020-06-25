@@ -23,7 +23,7 @@ public interface CertificateService {
 
     X509Certificate getCertificateBySerialNumber(String serialNumber) throws Exception;
 
-    String sendReplaceCertificateRequest() throws Exception;
+    void createReplaceCertificateRequest() throws Exception;
 
     void createRequestForCertificate() throws Exception;
 

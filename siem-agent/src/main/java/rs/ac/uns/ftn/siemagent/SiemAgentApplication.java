@@ -36,21 +36,11 @@ public class SiemAgentApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		logReader.readLogs();
 
+//		certificateService.createReplaceCertificateRequest();
 //		certificateService.createRequestForCertificate();
 //		certificateService.installCertificateFromFile();
 
 
-////		//@TODO moguce da spojimo u jednu metodu al ovakav proces treba da bude...
-//		X509Certificate certificate = certificateService.getCertificateBySerialNumber("1586552702410", token);
-//		OCSPReq request = ocspService.generateOCSPRequest(certificate, token);
-//		OCSPResp response = ocspService.sendOCSPRequest(request, token);
-//		boolean val = ocspService.processOCSPResponse(request,response, token);
-//		System.out.println(val);
-
-
-//		X509Certificate certificate = certificateService.findMyCertificate();
-//		certificateService.sendRequestForCertificate(token);
-//		certificateService.sendReplaceCertificateRequest(token);
 	}
 
 
