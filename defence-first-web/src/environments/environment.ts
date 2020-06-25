@@ -6,7 +6,8 @@
 import { KeycloakConfig } from 'keycloak-angular';
 
 const keycloakConfig: KeycloakConfig = {
-  url: 'http://localhost:8080/auth',
+  // url: 'http://localhost:8080/auth',
+  url: 'https://localhost:8443/auth',
   realm: 'DefenceFirst',
   clientId: 'defencefirst-web'
 };

@@ -18,12 +18,14 @@ public class MyTrustStrategy implements TrustStrategy {
     private KeyStore trustStore;
 
     private OCSPService ocspService;
+    private boolean doOCSP;
 
     public MyTrustStrategy(){}
 
-    public  MyTrustStrategy(KeyStore keyStore, OCSPService ocspService) {
+    public  MyTrustStrategy(KeyStore keyStore, OCSPService ocspService, boolean doOCSP) {
         this.trustStore = keyStore;
         this.ocspService = ocspService;
+        this.doOCSP = doOCSP;
     }
 
     @Override
@@ -55,6 +57,7 @@ public class MyTrustStrategy implements TrustStrategy {
             {
                 return true;
             }
+            if(!this.doOCSP){return true;}
             else{
                 try {
                     OCSPReq request = ocspService.generateOCSPRequest(chain);

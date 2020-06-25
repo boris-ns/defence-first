@@ -15,15 +15,13 @@ public class RestTemplateConfiguration {
     @Autowired
     private AuthService authService;
 
-    @Autowired @Qualifier("httFactory")
+    @Autowired @Qualifier("httFactoryOCSP")
     private HttpComponentsClientHttpRequestFactory requestFactory;
 
     @Bean
     public RestTemplate getRestTemplate() {
         RestTemplate restTemplate = new RestTemplate();
-        TokenDTO token = authService.login();
-        restTemplate.getInterceptors().add(new RestTemplateInterceptor(authService, token));
-
+        restTemplate.getInterceptors().add(new RestTemplateInterceptor(authService));
         restTemplate.setRequestFactory(requestFactory);
         return restTemplate;
     }

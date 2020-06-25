@@ -162,7 +162,7 @@ public class CertificateServiceImpl implements CertificateService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.saveKeyPair(certKeyPair, renewal);
+//        this.saveKeyPair(certKeyPair, renewal);
         return stringWriter.toString();
     }
 
@@ -173,7 +173,6 @@ public class CertificateServiceImpl implements CertificateService {
         KeyPair pair = keyPairGeneratorService.generateKeyPair();
         PrivateKey privateKey = pair.getPrivate();
         String csr = this.buildCertificateRequest(pair, privateKey, false);
-
         HttpEntity<String> entityReq = new HttpEntity<>(csr, headers);
         ResponseEntity<String> certificate = null;
 

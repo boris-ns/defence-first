@@ -10,6 +10,7 @@ package defencefirst.templates;
 import rs.ac.uns.ftn.siemcentar.model.Log;
 import rs.ac.uns.ftn.siemcentar.model.LogType;
 import rs.ac.uns.ftn.siemcentar.model.Alarm;
+import rs.ac.uns.ftn.siemcentar.model.AlarmType;
 import java.util.Date;
 
 template "type-occurs-template"
@@ -26,7 +27,7 @@ rule "Activate alarm on Log type @{type} occured @{count} times over @{time} min
         )
         not(Alarm(date.before(new Date(System.currentTimeMillis() + 5000L)), reason.startsWith("Log type occured X times - agent: ")))
     then
-        insert(new Alarm(null, new Date(), "Log type occured X times - agent: " + $a + ", source: " + $s + ", message: " + "@{alarmMessage}" , -1L, $a, $s));
+        insert(new Alarm(null, new Date(), "Log type occured X times - agent: " + $a + ", source: " + $s + ", message: " + "@{alarmMessage}" , -1L, $a, $s, AlarmType.OTHER));
         System.out.println("[DROOLS] Type-Occurs-Message template alarm activated");
 end
 
