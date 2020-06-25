@@ -43,6 +43,12 @@ export class PkiServiceService {
     return this.http.post(this.urlCSR + '/generate', fd);
   }
 
+  renewalCSR(data: File) {
+    const fd = new FormData();
+    fd.append('file', data);
+    return this.http.post(this.urlCSR + '/renewal', fd);
+  }
+
   getCSR() {
     return this.http.get(this.urlCSR + '/my_certs');
   }

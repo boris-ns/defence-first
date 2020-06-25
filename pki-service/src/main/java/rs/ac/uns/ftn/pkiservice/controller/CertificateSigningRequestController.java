@@ -57,16 +57,17 @@ public class CertificateSigningRequestController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping(path = "/renewal", consumes = MediaType.TEXT_PLAIN_VALUE)
+    @PostMapping(path = "/renewal", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('agent')")
-    public ResponseEntity renewAgentCertRequest(@RequestBody String csr, Principal principal) throws IOException, OperatorCreationException, PKCSException {
+    public ResponseEntity renewAgentCertRequest(@RequestParam(("file")) MultipartFile q, Principal principal) throws Exception {
+        String csr = FileUtil.readFile(q);
         csrService.addRenewRequest(csr, principal.getName());
         return ResponseEntity.ok().build();
     }
 
     @GetMapping(path = "/my_certs")
     @PreAuthorize("hasRole('agent')")
-    public ResponseEntity<CrsDTO> generate(Principal principal) {
+    public ResponseEntity<CrsDTO> myCerts(Principal principal) {
         CertificateSigningRequest certificateSigningRequest = csrService.getCertsRequest(principal.getName());
         if( certificateSigningRequest == null) {
             return new ResponseEntity<>(null, HttpStatus.OK);
