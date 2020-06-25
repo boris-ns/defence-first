@@ -27,9 +27,9 @@ public class Log implements Serializable {
     private String message;
     private String source;
     private String agent;
-    private String signature;
     private String ip;
     private Boolean ipBlacklisted;
+    private String signature;
 
     @Transient
     private Boolean processed;
@@ -48,7 +48,6 @@ public class Log implements Serializable {
         this.processed = false;
     }
 
-    @Override
     public String toString() {
         return "Log{" +
                 "id=" + id +
@@ -56,6 +55,7 @@ public class Log implements Serializable {
                 ", logType=" + logType +
                 ", message='" + message + '\'' +
                 ", source='" + source + '\'' +
+                ", agent='" + agent + '\'' +
                 '}';
     }
 
@@ -109,14 +109,6 @@ public class Log implements Serializable {
         this.processed = processed;
     }
 
-    public void setSignature(String signature) {
-        this.signature = signature;
-    }
-
-    public String getSignature() {
-        return signature;
-    }
-
     public String getIp() {
         return ip;
     }
@@ -135,4 +127,12 @@ public class Log implements Serializable {
     public int getSeverity() { return severity; }
 
     public void setSeverity(int severity) { this.severity = severity; }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
 }

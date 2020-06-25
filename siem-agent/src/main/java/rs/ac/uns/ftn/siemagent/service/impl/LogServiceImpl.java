@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import rs.ac.uns.ftn.siemagent.model.Log;
 import rs.ac.uns.ftn.siemagent.service.*;
 import java.io.*;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 

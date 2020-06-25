@@ -36,6 +36,7 @@ public class LogServiceImpl implements LogService {
     @Override
     public void saveLogs(List<Log> logs){
         logRepository.saveAll(logs);
+
         alarmService.processLogs(logs);
     }
 
@@ -86,8 +87,9 @@ public class LogServiceImpl implements LogService {
     }
 
 
-    private void verifyLogSignature(Log l, String logStr, PublicKey publicKey) throws Exception {
+    private void verifyLogSignature(Log l, PublicKey publicKey) throws Exception {
 
+        String logStr = l.toString();
         String recivedSignature = l.getSignature();
         Signature signature = Signature.getInstance("SHA256withRSA");
         signature.initVerify(publicKey);
@@ -105,9 +107,8 @@ public class LogServiceImpl implements LogService {
 
     @Override
     public void verifyLogsSigns(ArrayList<Log> logs, PublicKey publicKey) throws Exception{
-        ArrayList<String> logStrs = convertToStrArray(logs);
         for(int i=0; i < logs.size(); i++) {
-            verifyLogSignature(logs.get(i), logStrs.get(i) ,publicKey);
+            verifyLogSignature(logs.get(i), publicKey);
         }
     }
 
@@ -115,10 +116,7 @@ public class LogServiceImpl implements LogService {
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         ArrayList<String> stringLogs = new ArrayList<>();
         for( Log l : logs) {
-            String recivedSign = l.getSignature();
-            l.setSignature("");
             stringLogs.add(ow.writeValueAsString(l));
-            l.setSignature(recivedSign);
         }
         return stringLogs;
     }
