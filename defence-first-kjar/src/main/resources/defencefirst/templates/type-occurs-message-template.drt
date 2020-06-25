@@ -1,0 +1,33 @@
+template header
+type
+count
+time
+messageRegex
+alarmMessage
+
+package defencefirst.templates;
+
+import rs.ac.uns.ftn.siemcentar.model.Log;
+import rs.ac.uns.ftn.siemcentar.model.LogType;
+import rs.ac.uns.ftn.siemcentar.model.Alarm;
+import java.util.Date;
+
+template "type-occurs-template"
+
+rule "Activate alarm on Log type @{type} occured @{count} times over @{time} minutes with message @{messageRegex}"
+    when
+        $l: Log($id: id, logType == LogType.@{type}, 
+                $s: source, $a: agent, $m: message matches "@{messageRegex}"
+        )
+
+        Number(intValue >= @{count}) from accumulate(
+            $log: Log(logType == LogType.@{type}, message matches "@{messageRegex}") over window:time( @{time}m ),
+            count($log)
+        )
+        not(Alarm(date.before(new Date(System.currentTimeMillis() + 5000L)), reason.startsWith("Log type occured X times - agent: ")))
+    then
+        insert(new Alarm(null, new Date(), "Log type occured X times - agent: " + $a + ", source: " + $s + ", message: " + "@{alarmMessage}" , -1L, $a, $s));
+        System.out.println("[DROOLS] Type-Occurs-Message template alarm activated");
+end
+
+end template

@@ -1,8 +1,128 @@
 <div class="container">
-    <h2>Add rules</h2>
+    <h1>Add rules from file</h1>
 
     Choose .drl file:
     <input type="file" (change)="onFileSelected($event)"/>
     <button mat-raised-button color="accent" (click)="onUpload()">Add</button>
+
+    <h1>Create rules from template</h1>
+
+    <h3>Log type - message (regex) rule</h3>
+
+    When log type 
+
+    <mat-form-field>
+        <mat-label>Type</mat-label>
+        <mat-select [(ngModel)]="typeMessageTemplate.type">
+          <mat-option value="SUCCESS">SUCCESS</mat-option>
+          <mat-option value="INFO">INFO</mat-option>
+          <mat-option value="WARN">WARN</mat-option>
+          <mat-option value="ERROR">ERROR</mat-option>
+          <mat-option value="DEBUG">DEBUG</mat-option>
+          <mat-option value="OTHER">OTHER</mat-option>
+          <mat-option value="SUCCESSFUL_LOGIN">SUCCESSFUL_LOGIN</mat-option>
+          <mat-option value="UNSUCCESSFUL_LOGIN">UNSUCCESSFUL_LOGIN</mat-option>
+        </mat-select>
+    </mat-form-field>
+    
+    occurs with message (regex) 
+
+    <mat-form-field class="example-full-width">
+        <input matInput type="text" [(ngModel)]="typeMessageTemplate.messageRegex" placeholder="regex message">
+    </mat-form-field>
+
+    activate alarm with this message: 
+
+    <mat-form-field class="example-full-width">
+        <input matInput type="text" [(ngModel)]="typeMessageTemplate.alarmMessage" placeholder="your alarm message">
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" (click)="onClickCreateTypeMessageRule()">Create</button>
+
+    <hr />
+
+    <h3>Log type occured X times over Y minutes</h3>
+
+    When log type 
+    
+    <mat-form-field>
+        <mat-label>Type</mat-label>
+        <mat-select [(ngModel)]="typeOccursTemplate.type">
+          <mat-option value="SUCCESS">SUCCESS</mat-option>
+          <mat-option value="INFO">INFO</mat-option>
+          <mat-option value="WARN">WARN</mat-option>
+          <mat-option value="ERROR">ERROR</mat-option>
+          <mat-option value="DEBUG">DEBUG</mat-option>
+          <mat-option value="OTHER">OTHER</mat-option>
+          <mat-option value="SUCCESSFUL_LOGIN">SUCCESSFUL_LOGIN</mat-option>
+          <mat-option value="UNSUCCESSFUL_LOGIN">UNSUCCESSFUL_LOGIN</mat-option>
+        </mat-select>
+    </mat-form-field>
+    
+    occurs
+
+    <mat-form-field class="example-full-width">
+        <input matInput type="number" min="1" [(ngModel)]="typeOccursTemplate.occurs">
+    </mat-form-field>
+
+    in
+
+    <mat-form-field class="example-full-width">
+        <input matInput type="number" min="1" [(ngModel)]="typeOccursTemplate.time">
+    </mat-form-field>
+
+    minutes show alarm with this message 
+
+    <mat-form-field class="example-full-width">
+        <input matInput type="text" [(ngModel)]="typeOccursTemplate.alarmMessage" placeholder="your alarm message">
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" (click)="onClickCreateTypeOccursRule()">Create</button>
+
+    <hr />
+
+    <h3>Log type occured X times over Y minutes with message regex Z</h3>
+
+    When log type 
+    
+    <mat-form-field>
+        <mat-label>Type</mat-label>
+        <mat-select [(ngModel)]="typeOccursMessageTemplate.type">
+          <mat-option value="SUCCESS">SUCCESS</mat-option>
+          <mat-option value="INFO">INFO</mat-option>
+          <mat-option value="WARN">WARN</mat-option>
+          <mat-option value="ERROR">ERROR</mat-option>
+          <mat-option value="DEBUG">DEBUG</mat-option>
+          <mat-option value="OTHER">OTHER</mat-option>
+          <mat-option value="SUCCESSFUL_LOGIN">SUCCESSFUL_LOGIN</mat-option>
+          <mat-option value="UNSUCCESSFUL_LOGIN">UNSUCCESSFUL_LOGIN</mat-option>
+        </mat-select>
+    </mat-form-field>
+    
+    occurs
+
+    <mat-form-field class="example-full-width">
+        <input matInput type="number" min="1" [(ngModel)]="typeOccursMessageTemplate.occurs">
+    </mat-form-field>
+
+    in
+
+    <mat-form-field class="example-full-width">
+        <input matInput type="number" min="1" [(ngModel)]="typeOccursMessageTemplate.time">
+    </mat-form-field>
+
+    minutes with message (regex) 
+    
+    <mat-form-field class="example-full-width">
+        <input matInput type="text" [(ngModel)]="typeOccursMessageTemplate.messageRegex">
+    </mat-form-field>
+    
+    show alarm with this message 
+
+    <mat-form-field class="example-full-width">
+        <input matInput type="text" [(ngModel)]="typeOccursMessageTemplate.alarmMessage" placeholder="your alarm message">
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" (click)="onClickCreateTypeOccursMessageRule()">Create</button>
 
 </div>

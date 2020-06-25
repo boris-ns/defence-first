@@ -23,17 +23,19 @@ public class Alarm {
     private String agent;
     private String source;
     private Long logId;
+    private AlarmType type;
 
     public Alarm() {
     }
 
-    public Alarm(Long id, Date date, String reason, Long logId, String agent, String source) {
+    public Alarm(Long id, Date date, String reason, Long logId, String agent, String source, AlarmType type) {
         this.id = id;
         this.date = date;
         this.reason = reason;
         this.logId = logId;
         this.agent = agent;
         this.source = source;
+        this.type = type;
     }
 
     public Long getId() {
@@ -79,4 +81,12 @@ public class Alarm {
     public Long getLogId() { return logId; }
 
     public void setLogId(Long logId) { this.logId = logId; }
+
+    public AlarmType getType() {
+        return type;
+    }
+
+    public void setType(AlarmType type) {
+        this.type = type;
+    }
 }
