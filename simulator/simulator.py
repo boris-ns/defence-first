@@ -49,7 +49,7 @@ class NormalState(State):
 
         for i in range(randrange(10)):
             msg = normal_log_messages[randrange(len(normal_log_messages))]
-            msg = str(datetime.now()) + " - " + LOG_SOURCE + " - " + msg
+            msg = str(datetime.now()) + " - " + LOG_SOURCE + " - " + msg + " - " + str(i % 7 + 1)
             print(msg)
             write_to_log_file(msg)
 
@@ -61,7 +61,7 @@ class AttackState(State):
 
         for i in range(randrange(10)):
             msg = attack_log_messages[randrange(len(attack_log_messages))]
-            msg = str(datetime.now()) + " - " + LOG_SOURCE + " - " + msg
+            msg = str(datetime.now()) + " - " + LOG_SOURCE + " - " + msg + " - " + str(i % 7 + 1)
             print(msg)
             write_to_log_file(msg)
 

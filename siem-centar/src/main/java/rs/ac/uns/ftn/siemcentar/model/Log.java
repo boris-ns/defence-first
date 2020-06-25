@@ -5,6 +5,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -19,6 +21,9 @@ public class Log implements Serializable {
     private Long id;
     private Date date;
     private LogType logType;
+    @Min(1)
+    @Max(7)
+    private int severity;
     private String message;
     private String source;
     private String agent;
@@ -32,7 +37,7 @@ public class Log implements Serializable {
         this.processed = false;
     }
 
-    public Log(Long id, Date date, LogType logType, String message, String source, String agent) {
+    public Log(Long id, Date date, LogType logType, int severity, String message, String source, String agent) {
         this.id = id;
         this.date = date;
         this.logType = logType;
@@ -89,9 +94,7 @@ public class Log implements Serializable {
         return source;
     }
 
-    public void setSource(String source) {
-        this.source = source;
-    }
+    public void setSource(String source) { this.source = source; }
 
     public String getAgent() { return agent; }
 
@@ -120,4 +123,7 @@ public class Log implements Serializable {
     public void setIpBlacklisted(Boolean ipBlacklisted) {
         this.ipBlacklisted = ipBlacklisted;
     }
+    public int getSeverity() { return severity; }
+
+    public void setSeverity(int severity) { this.severity = severity; }
 }

@@ -12,7 +12,7 @@ export class RulesService {
 
   private url: string;
 
-  constructor(private http: HttpClient) { 
+  constructor(private http: HttpClient) {
     this.url = environment.SIEMCentarConfig.url + '/rules';
   }
 

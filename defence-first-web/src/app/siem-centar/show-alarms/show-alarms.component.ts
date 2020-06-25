@@ -10,7 +10,7 @@ import { Alarm } from 'src/app/models/alarm.modle';
 export class ShowAlarmsComponent implements OnInit {
 
   data: Alarm[];
-  displayedColumns: string[] = ['id', 'date', 'reason'];
+  displayedColumns: string[] = ['id', 'date', 'alarmType', 'reason'];
 
   constructor(private alarmService: AlarmService) {
   }
