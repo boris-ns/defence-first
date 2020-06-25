@@ -21,29 +21,22 @@ public class HttpComponentsClientHttpRequestFactoryConfig {
 
 
     @Autowired
-    @Qualifier("myContext")
-    private SSLContext sslContext;
+    @Qualifier("myContextOCSP")
+    private SSLContext sslContextOCSP;
 
-    @Bean(name = "httFactory")
-    public HttpComponentsClientHttpRequestFactory getHttpComponentsClientHttpRequestFactory() {
+
+    @Autowired
+    @Qualifier("myContextNoOCSP")
+    private SSLContext sslContextNoOCSP;
+
+
+    @Bean(name = "httFactoryOCSP")
+    public HttpComponentsClientHttpRequestFactory getHttpComponentsClientHttpRequestFactoryOCSP() {
 
         HttpComponentsClientHttpRequestFactory requestFactory = null;
         try {
-
-            // NoopHostnameVerifier.INSTANCE da nista ne validira ---> ovo ako stavis onda klijent ne proverava
-                // servera nego ga pusti...
-            // izlgeda moze loadTrustMaterial sa neta da se uvuce
-
-            // on ga prihvati i kada nema nista u keyStore-u tj kada nema sertifikat od ovog
-                // neam pojma...
-            // MORA STRATEGIJA DA SE NAMESTI DA VERUJE SMAO ONIMA KOJI SU U KEYSTORU
-            // ili onima koje proveri...
-//            SSLContext sslContext = SSLContexts.custom()
-//                    .loadTrustMaterial(null, new MyTrustStrategy(keystore, ocspService))
-//                    .loadKeyMaterial(keystore, keyStorePassword.toCharArray()).build();
-
             SSLConnectionSocketFactory socketFactory =
-                    new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE
+                    new SSLConnectionSocketFactory(sslContextOCSP, NoopHostnameVerifier.INSTANCE
 //                            SSLConnectionSocketFactory.getDefaultHostnameVerifier()
                     );
 
@@ -62,4 +55,29 @@ public class HttpComponentsClientHttpRequestFactoryConfig {
         }
     }
 
+
+    @Bean(name = "httFactoryNoOCSP")
+    public HttpComponentsClientHttpRequestFactory getHttpComponentsClientHttpRequestFactoryNoOCSP() {
+
+        HttpComponentsClientHttpRequestFactory requestFactory = null;
+        try {
+            SSLConnectionSocketFactory socketFactory =
+                    new SSLConnectionSocketFactory(sslContextNoOCSP, NoopHostnameVerifier.INSTANCE
+//                            SSLConnectionSocketFactory.getDefaultHostnameVerifier()
+                    );
+
+            CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory)
+                    .setMaxConnTotal(Integer.valueOf(5)).setMaxConnPerRoute(Integer.valueOf(5)).build();
+
+            requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
+            requestFactory.setReadTimeout(Integer.valueOf(1000000000));
+            requestFactory.setConnectTimeout(Integer.valueOf(1000000000));
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        finally {
+            return requestFactory;
+        }
+    }
 }

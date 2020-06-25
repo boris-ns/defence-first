@@ -18,6 +18,7 @@ import rs.ac.uns.ftn.pkiservice.mapper.NameMapper;
 import rs.ac.uns.ftn.pkiservice.service.CertificateService;
 
 import javax.security.auth.x500.X500PrivateCredential;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -38,7 +39,11 @@ public class CertificateController {
 
     @GetMapping(path = "/all")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<List<SimpleCertificateDTO>> findAll() {
+    public ResponseEntity<List<SimpleCertificateDTO>> findAll(HttpServletRequest req) {
+
+
+        System.out.print(req);
+
         Map<Constants.CERT_TYPE, List<X509Certificate>> certifictes = certificateService.findAll();
         Map<String, Boolean> revoked = certificateService.findAllRevoked();
         List<SimpleCertificateDTO> result = new ArrayList<>();

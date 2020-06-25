@@ -15,12 +15,14 @@ public class MyTrustStrategy implements TrustStrategy {
 
     private KeyStore trustStore;
     private OCSPService ocspService;
+    private Boolean doOcsp;
 
     public MyTrustStrategy(){}
 
-    public  MyTrustStrategy(KeyStore keyStore, OCSPService ocspService) {
+    public  MyTrustStrategy(KeyStore keyStore, OCSPService ocspService, boolean doOcsp) {
         this.trustStore = keyStore;
         this.ocspService = ocspService;
+        this.doOcsp = doOcsp;
     }
     @Override
     public boolean isTrusted(X509Certificate[] chain, String authType) {
@@ -50,6 +52,8 @@ public class MyTrustStrategy implements TrustStrategy {
             {
                 return true;
             }
+            if (!this.doOcsp){return true;}
+
             else{
                 try {
                     OCSPReq request = ocspService.generateOCSPRequest(chain);

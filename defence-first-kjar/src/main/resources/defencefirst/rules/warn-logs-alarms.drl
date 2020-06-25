@@ -73,7 +73,7 @@ rule "Log warn faild login, same source"
         )
         not (Alarm(logId == $id))
     then
-        insert(new Alarm(null, new Date(), "Warn failed logins from same source - agent: " + $a + ", source: " + $s, $id, $a, $s,AlarmType.OTHER));
+        insert(new Alarm(null, new Date(), "Warn failed logins from same source - agent: " + $a + ", source: " + $s, $id, $a, $s, AlarmType.OTHER));
 end
 
 

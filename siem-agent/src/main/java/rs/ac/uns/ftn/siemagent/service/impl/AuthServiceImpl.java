@@ -1,7 +1,10 @@
 package rs.ac.uns.ftn.siemagent.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -23,6 +26,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Value("${uri.keycloak.login}")
     private String urlLogin;
+
+    @Autowired
+    @Qualifier("httFactoryNoOCSP")
+    private HttpComponentsClientHttpRequestFactory requestFactory;
 
     @Override
     public TokenDTO login() {
@@ -61,6 +68,7 @@ public class AuthServiceImpl implements AuthService {
 
     private TokenDTO sendRequest(MultiValueMap<String, String> map) {
         RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setRequestFactory(requestFactory);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);

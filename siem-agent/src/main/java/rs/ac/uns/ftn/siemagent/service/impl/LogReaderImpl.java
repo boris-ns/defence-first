@@ -43,7 +43,7 @@ public class LogReaderImpl implements LogReader {
     @Value("${read.simulator.logs}")
     private Boolean readSimulator;
 
-    @Value("${keycloak.base.path}")
+    @Value("${keyCloakBase.base.path}")
     private String keyCloakBasePath;
 
 
