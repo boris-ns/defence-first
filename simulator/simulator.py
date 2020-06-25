@@ -24,6 +24,9 @@ normal_log_messages = [
     "OTHER - Other message 1",
     "OTHER - Other message 2",
     "OTHER - Other message 3"
+    "SUCCESSFUL_LOGIN - username: username4",
+    "SUCCESSFUL_LOGIN - username: username5",
+    "SUCCESSFUL_LOGIN - username: username6"
 ]
 
 # TODO: Napisati smislenije poruke
@@ -33,11 +36,13 @@ attack_log_messages = [
     "ERROR - attack poruka 3",
     "ERROR - attack poruka 4",
     "ERROR - attack poruka 5",
-    "WARN - failed login, username: username",
-    "WARN - failed login, username: username",
+    "UNSUCCESSFUL_LOGIN - failed login, username: username",
+    "UNSUCCESSFUL_LOGIN - failed login, username: username",
+    "WARN - attack poruka 1",
+    "WARN - attack poruka 2",
     "WARN - attack poruka 3",
     "WARN - attack poruka 4",
-    "WARN - failed login, username: username2",
+    "UNSUCCESSFUL_LOGIN - failed login, username: username2",
 ]
 
 class State:
