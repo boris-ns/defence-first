@@ -7,6 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import rs.ac.uns.ftn.siemcentar.dto.request.templates.TypeMessageTemplateDTO;
+import rs.ac.uns.ftn.siemcentar.dto.request.templates.TypeOccursMessageTemplateDTO;
 import rs.ac.uns.ftn.siemcentar.dto.request.templates.TypeOccursTemplateDTO;
 import rs.ac.uns.ftn.siemcentar.service.RulesService;
 
@@ -37,6 +38,13 @@ public class RulesController {
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity createTypeOccursTemplate(@Valid @RequestBody TypeOccursTemplateDTO templateDto) throws Exception {
         rulesService.createTypeOccursTemplateRule(templateDto);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/type-occurs-message")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity createTypeOccursMessageTemplate(@Valid @RequestBody TypeOccursMessageTemplateDTO templateDto) throws Exception {
+        rulesService.createTypeOccursMessageTemplateRule(templateDto);
         return ResponseEntity.ok().build();
     }
 

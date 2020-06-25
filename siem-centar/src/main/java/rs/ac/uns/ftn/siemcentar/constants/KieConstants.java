@@ -11,5 +11,6 @@ public class KieConstants {
 
     public static String TYPE_MESSAGE_TEMPLATE_PATH = "/defencefirst/templates/type-message-template.drt";
     public static String TYPE_OCCURS_TEMPLATE_PATH = "/defencefirst/templates/type-occurs-template.drt";
+    public static String TYPE_OCCURS_MESSAGE_TEMPLATE_PATH = "/defencefirst/templates/type-occurs-message-template.drt";
 
 }

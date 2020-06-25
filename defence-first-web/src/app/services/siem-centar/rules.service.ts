@@ -1,3 +1,4 @@
+import { TypeOccursMessageTemplate } from './../../models/type-occurs-message-template.model';
 import { TypeOccursTemplate } from './../../models/type-occurs.model';
 import { TypeMessageTemplate } from './../../models/type-message-template.model';
 import { HttpClient } from '@angular/common/http';
@@ -29,4 +30,7 @@ export class RulesService {
     return this.http.post(`${this.url}/type-occurs`, rule);
   }
 
+  addTypeOccursMessageRule(rule: TypeOccursMessageTemplate) {
+    return this.http.post(`${this.url}/type-occurs-message`, rule);
+  }
 }

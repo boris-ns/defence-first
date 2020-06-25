@@ -18,6 +18,7 @@ rule "Activate alarm on Log type and message regex - @{type} - @{messageRegex} -
         not (Alarm(logId == $id))
     then
         insert(new Alarm(null, new Date(), "Error in log - agent: " + $a + ", source: " + $s + ", message: " + "@{alarmMessage}" , $id, $a, $s));
+        System.out.println("[DROOLS] Type-message template alarm activated");
 end
 
 end template
