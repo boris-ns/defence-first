@@ -27,6 +27,8 @@ public class Log implements Serializable {
     private String message;
     private String source;
     private String agent;
+    private String ip;
+    private Boolean ipBlacklisted;
 
     @Transient
     private Boolean processed;
@@ -106,6 +108,21 @@ public class Log implements Serializable {
         this.processed = processed;
     }
 
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public Boolean getIpBlacklisted() {
+        return ipBlacklisted;
+    }
+
+    public void setIpBlacklisted(Boolean ipBlacklisted) {
+        this.ipBlacklisted = ipBlacklisted;
+    }
     public int getSeverity() { return severity; }
 
     public void setSeverity(int severity) { this.severity = severity; }
