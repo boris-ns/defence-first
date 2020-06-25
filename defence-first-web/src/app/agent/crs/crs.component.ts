@@ -10,6 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 export class CrsComponent implements OnInit {
 
   file: File;
+  renewalFile: File;
 
   constructor(
     private pkiService: PkiServiceService,
@@ -28,6 +29,22 @@ export class CrsComponent implements OnInit {
       this.toastr.warning('Choose file');
     } else {
       this.pkiService.sendCSR(this.file).subscribe(
+        () => {
+          this.toastr.success('Sucessful sent');
+        }
+      );
+    }
+  }
+
+  onFileSelected2(event: any) {
+    this.renewalFile = event.target.files[0];
+  }
+
+  onUpload2() {
+    if (this.renewalFile === undefined) {
+      this.toastr.warning('Choose file');
+    } else {
+      this.pkiService.renewalCSR(this.renewalFile).subscribe(
         () => {
           this.toastr.success('Sucessful sent');
         }

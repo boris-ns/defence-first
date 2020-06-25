@@ -21,14 +21,14 @@ table {
     margin: 1%;
 }
 
-tr:not(.header):not(.WARN):not(.INFO):not(.ERROR):not(.SUCCESS):hover {
+tr:not(.header):not(.WARN):not(.INFO):not(.ERROR):not(.SUCCESS):not(.DEBUG):not(.SUCCESSFUL_LOGIN):not(.UNSUCCESSFUL_LOGIN):hover {
     background: #EEEEEE;
 }
 
-.INFO {
+.INFO, .DEBUG {
     background: #2196F3;
 }
-.INFO:hover {
+.INFO:hover, .DEBUG:hover {
     background: #BBDEFB;
 }
 
@@ -39,16 +39,16 @@ tr:not(.header):not(.WARN):not(.INFO):not(.ERROR):not(.SUCCESS):hover {
     background: #FFCCBC;
 }
 
-.ERROR {
+.ERROR, .UNSUCCESSFUL_LOGIN {
     background: #D50000;
 }
-.ERROR:hover {
+.ERROR:hover, .UNSUCCESSFUL_LOGIN:hover {
     background: #FF8A80;
 }
 
-.SUCCESS {
+.SUCCESS, .SUCCESSFUL_LOGIN {
     background: #4CAF50;
 }
-.SUCCESS:hover {
+.SUCCESS:hover, .SUCCESSFUL_LOGIN:hover {
     background: #C8E6C9;
 }
