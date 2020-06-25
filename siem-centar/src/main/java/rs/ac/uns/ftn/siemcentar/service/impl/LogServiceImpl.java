@@ -1,5 +1,10 @@
 package rs.ac.uns.ftn.siemcentar.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import org.apache.commons.lang3.SerializationUtils;
+import org.kie.api.runtime.KieSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.siemcentar.dto.request.LogFilterDTO;
@@ -12,6 +17,9 @@ import rs.ac.uns.ftn.siemcentar.service.LogService;
 
 import rs.ac.uns.ftn.siemcentar.utils.DateUtils;
 
+import java.io.IOException;
+import java.security.PublicKey;
+import java.security.Signature;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.List;
@@ -26,7 +34,7 @@ public class LogServiceImpl implements LogService {
     private AlarmService alarmService;
 
     @Override
-    public void saveLogs(List<Log> logs) {
+    public void saveLogs(List<Log> logs){
         logRepository.saveAll(logs);
 
         alarmService.processLogs(logs);
@@ -77,5 +85,42 @@ public class LogServiceImpl implements LogService {
 
         return logs;
     }
+
+
+    private void verifyLogSignature(Log l, PublicKey publicKey) throws Exception {
+
+        String logStr = l.toString();
+        String recivedSignature = l.getSignature();
+        Signature signature = Signature.getInstance("SHA256withRSA");
+        signature.initVerify(publicKey);
+        signature.update(logStr.getBytes());
+
+        byte[] recivedSignatureBytes = Base64.getDecoder().decode(recivedSignature);
+
+        boolean match = signature.verify(recivedSignatureBytes);
+
+        if(!match){
+            String message = "Invalid log signature for log: " + l.toString();
+            throw new ApiRequestException(message);
+        }
+    }
+
+    @Override
+    public void verifyLogsSigns(ArrayList<Log> logs, PublicKey publicKey) throws Exception{
+        for(int i=0; i < logs.size(); i++) {
+            verifyLogSignature(logs.get(i), publicKey);
+        }
+    }
+
+    private ArrayList<String> convertToStrArray(ArrayList<Log> logs) throws IOException {
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        ArrayList<String> stringLogs = new ArrayList<>();
+        for( Log l : logs) {
+            stringLogs.add(ow.writeValueAsString(l));
+        }
+        return stringLogs;
+    }
+
+
 
 }

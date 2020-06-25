@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import rs.ac.uns.ftn.siemagent.model.Log;
 import rs.ac.uns.ftn.siemagent.service.*;
 import java.io.*;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 
@@ -23,9 +24,15 @@ public class LogServiceImpl implements LogService {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private SignService signService;
+
+
     @Override
     public void sendLogs(ArrayList<Log> logs) {
+        if (logs.size() < 1){return;}
         try {
+            this.signLogs(logs);
             ArrayList<String> stringLogs = convertToStrArray(logs);
             HttpEntity<ArrayList<String>> entityReq = new HttpEntity(stringLogs);
             ResponseEntity<String> responseEntity = null;
@@ -39,6 +46,13 @@ public class LogServiceImpl implements LogService {
         }
         catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void signLogs(ArrayList<Log> logs) throws Exception{
+        for(int i=0; i< logs.size(); i++) {
+            signService.singLog(logs.get(i));
         }
     }
 
