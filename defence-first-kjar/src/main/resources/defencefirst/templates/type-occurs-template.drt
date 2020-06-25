@@ -13,9 +13,6 @@ import java.util.Date;
 
 template "type-occurs-template"
 
-// @TODO: Pravilo ce se aktivirati za svaki Log koji se zadovoljava dati uslov
-// ako si stavio da se na 5 error tipova u proteklih 5min aktivira alarm
-// on ce se aktivirati 5x umesto 1x
 rule "Activate alarm on Log type @{type} occured @{count} times over @{time} minutes"
     when
         $l: Log($id: id, logType == LogType.@{type}, 
@@ -26,6 +23,7 @@ rule "Activate alarm on Log type @{type} occured @{count} times over @{time} min
             $log: Log(logType == LogType.@{type}) over window:time( @{time}m ),
             count($log)
         )
+        not(Alarm(date.before(new Date(System.currentTimeMillis() + 5000L)), reason.startsWith("Log type occured X times - agent: ")))
     then
         insert(new Alarm(null, new Date(), "Log type occured X times - agent: " + $a + ", source: " + $s + ", message: " + "@{alarmMessage}" , -1L, $a, $s));
         System.out.println("[DROOLS] Type-Occurs template alarm activated");
