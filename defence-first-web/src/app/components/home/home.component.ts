@@ -19,10 +19,5 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     this.name = this.authService.getUsername();
-    this.siemCentarService.helloWorld().subscribe(
-      data => {
-        this.message = data;
-      }
-    );
   }
 }

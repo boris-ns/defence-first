@@ -14,8 +14,9 @@ public interface CertificateSigningRequestService {
 
     List<CertificateSigningRequest> findAllWaitingRequests();
     PKCS10CertificationRequest isValidSigned(String pemString, Boolean renew) throws PKCSException, IOException, OperatorCreationException;
-    void addRequest(String csr) throws PKCSException, IOException, OperatorCreationException;
-    void addRenewRequest(String csr) throws PKCSException, IOException, OperatorCreationException;
+    void addRequest(String csr, String username) throws PKCSException, IOException, OperatorCreationException;
+    void addRenewRequest(String csr, String username) throws PKCSException, IOException, OperatorCreationException;
     void changeStatus(Long id, CSRStatus toStatus) throws Exception;
     X509Certificate saveCertificateRequest(String csr, Boolean renewal) throws Exception;
+    CertificateSigningRequest getCertsRequest(String name);
 }

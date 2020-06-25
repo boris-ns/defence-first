@@ -9,3 +9,12 @@ standalone.sh -Dkeycloak.migration.action=import
 
 Dodavanje blacklist:
 ..\keycloak-9.0.2\standalone\data dodati folder password-blacklists
+
+HTTPS za keyclaok:
+..\keycloak-9.0.2\standalone\configuration dodati myKeystore.jks
+u istom tom folderu izmeniti standalone.xml fajl
+managmet->security-realms->security-realm name="ApplicationRealm"->server-identities
+deo unutar toga zameniti sa 
+<ssl>
+	<keystore path="myKeystore.jks" relative-to="jboss.server.config.dir" keystore-password="123456" alias="5" key-password="123456"/>
+</ssl>

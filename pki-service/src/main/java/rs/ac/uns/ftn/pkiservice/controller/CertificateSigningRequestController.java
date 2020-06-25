@@ -8,13 +8,17 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import rs.ac.uns.ftn.pkiservice.dto.response.CertificateSigningRequestDTO;
+import rs.ac.uns.ftn.pkiservice.dto.response.CrsDTO;
 import rs.ac.uns.ftn.pkiservice.mapper.CertificateSigningRequestsMapper;
 import rs.ac.uns.ftn.pkiservice.models.CertificateSigningRequest;
 import rs.ac.uns.ftn.pkiservice.models.enums.CSRStatus;
 import rs.ac.uns.ftn.pkiservice.service.CertificateSigningRequestService;
+import rs.ac.uns.ftn.pkiservice.util.FileUtil;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -45,18 +49,29 @@ public class CertificateSigningRequestController {
         return ResponseEntity.ok().build();
     }
 
-
-    @PostMapping(path = "/generate", consumes = MediaType.TEXT_PLAIN_VALUE)
+    @PostMapping(path = "/generate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('agent')")
-    public ResponseEntity generate(@RequestBody String csr) throws IOException, OperatorCreationException, PKCSException {
-        csrService.addRequest(csr);
+    public ResponseEntity generate(@RequestParam(("file")) MultipartFile q, Principal principal) throws Exception {
+        String csr = FileUtil.readFile(q);
+        csrService.addRequest(csr, principal.getName());
         return ResponseEntity.ok().build();
     }
 
     @PostMapping(path = "/renewal", consumes = MediaType.TEXT_PLAIN_VALUE)
     @PreAuthorize("hasRole('agent')")
-    public ResponseEntity renewAgentCertRequest(@RequestBody String csr) throws IOException, OperatorCreationException, PKCSException {
-        csrService.addRenewRequest(csr);
+    public ResponseEntity renewAgentCertRequest(@RequestBody String csr, Principal principal) throws IOException, OperatorCreationException, PKCSException {
+        csrService.addRenewRequest(csr, principal.getName());
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping(path = "/my_certs")
+    @PreAuthorize("hasRole('agent')")
+    public ResponseEntity<CrsDTO> generate(Principal principal) {
+        CertificateSigningRequest certificateSigningRequest = csrService.getCertsRequest(principal.getName());
+        if( certificateSigningRequest == null) {
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(new CrsDTO(certificateSigningRequest), HttpStatus.OK);
+    }
+
 }

@@ -25,14 +25,37 @@ public class CertificateSigningRequest {
     @Enumerated
     private CSRStatus status;
 
+    @Column(name = "username", nullable = false)
+    private String username;
+
+    @Column(name = "serial_number")
+    private String serialNumber;
+
     public CertificateSigningRequest() {
     }
 
-    public CertificateSigningRequest(String csr, String subjectName, String issuerName) {
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getSerialNumber() {
+        return serialNumber;
+    }
+
+    public void setSerialNumber(String serialNumber) {
+        this.serialNumber = serialNumber;
+    }
+
+    public CertificateSigningRequest(String csr, String subjectName, String issuerName, String username) {
         this.csr = csr;
         this.subjectName = subjectName;
         this.issuerName = issuerName;
         this.status = CSRStatus.WAITING;
+        this.username = username;
     }
 
     public Long getId() {

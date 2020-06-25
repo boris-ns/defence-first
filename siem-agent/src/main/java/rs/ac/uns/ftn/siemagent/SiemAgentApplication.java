@@ -34,12 +34,9 @@ public class SiemAgentApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		logReader.readLogs();
+//		logReader.readLogs();
 
-		// simulacija slanja logova
-//		simulation();
-
-//		certificateService.sendRequestForCertificate();
+		certificateService.createRequestForCertificate();
 //		certificateService.installCertificateFromFile();
 
 

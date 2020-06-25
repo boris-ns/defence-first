@@ -11,4 +11,6 @@ import java.util.List;
 public interface CertificateSigningRequestRepository extends JpaRepository<CertificateSigningRequest, Long> {
 
     List<CertificateSigningRequest> findByStatus(CSRStatus status);
+
+    CertificateSigningRequest findByUsername(String name);
 }
