@@ -63,9 +63,6 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter
 
     @Bean
     public CorsFilter corsFilter() {
-
-        System.out.print("jeeeee");
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
