@@ -10,6 +10,11 @@
         <td mat-cell *matCellDef="let element"> {{element.date | date: 'medium' }} </td>
     </ng-container>
 
+    <ng-container matColumnDef="alarmType">
+        <th mat-header-cell *matHeaderCellDef> Type</th>
+        <td mat-cell *matCellDef="let element"> {{element.alarmType}} </td>
+    </ng-container>
+
     <ng-container matColumnDef="reason">
         <th mat-header-cell *matHeaderCellDef> Reason </th>
         <td mat-cell *matCellDef="let element"> {{element.reason}} </td>

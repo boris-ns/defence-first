@@ -276,7 +276,7 @@ public class LogReaderImpl implements LogReader {
                 message = "failed login," + username;
         }
 
-        Log l = new Log(null, simpleDateFormat.parse(date), type, message, source, agent);
+        Log l = new Log(null, simpleDateFormat.parse(date), type, 5, message, source, agent);
         return l;
 
     }
@@ -306,7 +306,7 @@ public class LogReaderImpl implements LogReader {
         c.setTime(simpleDateFormat.parse(date));
         c.set(Calendar.YEAR, year);
 
-        Log l = new Log(null, c.getTime(), type, message, source, agent);
+        Log l = new Log(null, c.getTime(), type, 5, message, source, agent);
         return l;
     }
 
@@ -326,7 +326,7 @@ public class LogReaderImpl implements LogReader {
         LogType type = LogType.valueOf(tokens[2]);
         String message = tokens[3];
 
-        return new Log(null, date, type, message, source, agent);
+        return new Log(null, date, type, Integer.parseInt(tokens[4]), message, source, agent);
     }
 
     private Log parseLogFromWindows(LinkedHashMap<String, Object> data) {
@@ -355,6 +355,6 @@ public class LogReaderImpl implements LogReader {
         d = d.substring(0, d.indexOf(")"));
         Date date = new Date(Long.parseLong(d));
 
-        return new Log(null, date, type, message, source, agent);
+        return new Log(null, date, type, 5, message, source, agent);
     }
 }
