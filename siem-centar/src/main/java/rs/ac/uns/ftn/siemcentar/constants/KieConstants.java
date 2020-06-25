@@ -9,4 +9,8 @@ public class KieConstants {
     // Samo ovu putanju menjati u skladu gde vam je instaliran maven
     public static String MAVEN_HOME = "E:\\Instalirani_programi\\apache-maven-3.6.2\\";
 
+    public static String TYPE_MESSAGE_TEMPLATE_PATH = "/defencefirst/templates/type-message-template.drt";
+    public static String TYPE_OCCURS_TEMPLATE_PATH = "/defencefirst/templates/type-occurs-template.drt";
+    public static String TYPE_OCCURS_MESSAGE_TEMPLATE_PATH = "/defencefirst/templates/type-occurs-message-template.drt";
+
 }
