@@ -12,8 +12,10 @@ public class Log implements Serializable {
     private String message;
     private String source;
     private String agent;
+    private boolean processed;
+    private String signature;
 
-    public Log() {}
+    public Log() {this.processed =false;}
 
     public Log(Long id, Date date, LogType logType, String message, String source, String agent) {
         this.id = id;
@@ -22,6 +24,7 @@ public class Log implements Serializable {
         this.message = message;
         this.source = source;
         this.agent = agent;
+        this.processed =false;
     }
 
     @Override
@@ -58,5 +61,17 @@ public class Log implements Serializable {
 
     public String getAgent() {
         return agent;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
+
+    public boolean isProcessed() {
+        return processed;
     }
 }

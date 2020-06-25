@@ -49,46 +49,6 @@ public class AuthServiceImpl implements AuthService {
 
 
     @Override
-    public TokenDTO login2() {
-
-
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("secret", "a66b5002-a23c-4028-bd2d-f44995919ac1");
-
-
-
-        Configuration configuration = new Configuration();
-        configuration.setRealm("DefenceFirst");
-        configuration.setAuthServerUrl("http://localhost:8080/auth");
-        configuration.setResource("siem-centar");
-        configuration.setCredentials(map);
-//        configuration.setTruststore("src/main/resources/keystore/trustStore.jks");
-//        configuration.setTruststorePassword("superstrongpassword");
-//        configuration.setDisableTrustManager(true);
-
-        AuthzClient authzClient = AuthzClient.create(configuration);
-
-
-        AuthorizationRequest request = new AuthorizationRequest();
-        AuthorizationResponse response = authzClient.authorization().authorize(request);
-        String token = response.getToken();
-
-        TokenDTO tokenDTO = new TokenDTO();
-        tokenDTO.setAccess_token(response.getToken());
-        tokenDTO.setRefresh_token(response.getRefreshToken());
-        tokenDTO.setExpires_in(response.getExpiresIn());
-        tokenDTO.setRefresh_expires_in(response.getRefreshExpiresIn());
-
-        System.out.print(token);
-
-        return tokenDTO;
-
-
-
-    }
-
-
-    @Override
     public TokenDTO refreshToken(String refreshToken) {
         MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
         map.add("client_id", "agent");

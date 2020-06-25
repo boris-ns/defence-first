@@ -13,6 +13,10 @@ import rs.ac.uns.ftn.siemcentar.model.Log;
 import rs.ac.uns.ftn.siemcentar.service.CertificateService;
 import rs.ac.uns.ftn.siemcentar.service.DatabaseSequenceService;
 import rs.ac.uns.ftn.siemcentar.service.LogService;
+
+import javax.servlet.http.HttpServletRequest;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.util.*;
 
 @RestController
@@ -30,15 +34,25 @@ public class LogController {
 
     @PostMapping(path = "/send")
     @PreAuthorize("hasRole('agent')")
-    public  ResponseEntity<String> preMasterSecret(@RequestBody ArrayList<String> logs) throws Exception{
+    public  ResponseEntity<String> preMasterSecret(@RequestBody ArrayList<String> logs, HttpServletRequest request) throws Exception{
+
+        X509Certificate[] certs = (X509Certificate[])request.getAttribute("javax.servlet.request.X509Certificate");
+        PublicKey publicKey = certs[0].getPublicKey();
+
         List<Log> logList = new ArrayList<>();
         ObjectMapper mapper = new ObjectMapper();
         for(String l: logs) {
             System.out.println(l);
             Log log = mapper.readValue(l, Log.class);
-            log.setId(databaseSequenceService.generateSequence(Log.SEQUENCE_NAME));
             logList.add(log);
         }
+
+        this.logService.verifyLogsSigns((ArrayList<Log>)logList, publicKey);
+
+        for(Log log: logList) {
+            log.setId(databaseSequenceService.generateSequence(Log.SEQUENCE_NAME));
+        }
+
 
         this.logService.saveLogs(logList);
         return new ResponseEntity<>(HttpStatus.OK);

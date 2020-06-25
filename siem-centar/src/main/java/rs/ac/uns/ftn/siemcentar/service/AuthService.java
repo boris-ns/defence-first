@@ -8,8 +8,6 @@ public interface AuthService {
 
     TokenDTO login();
 
-    TokenDTO login2();
-
     TokenDTO refreshToken(String refreshToken);
 
     Date getTokenValid(Long seconds);

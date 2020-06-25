@@ -6,4 +6,6 @@ import java.util.ArrayList;
 public interface LogService {
 
     void sendLogs(ArrayList<Log> logs);
+
+    void signLogs(ArrayList<Log> logs) throws Exception;
 }

@@ -22,6 +22,7 @@ public class Log implements Serializable {
     private String message;
     private String source;
     private String agent;
+    private String signature;
 
     @Transient
     private Boolean processed;
@@ -101,5 +102,13 @@ public class Log implements Serializable {
 
     public void setProcessed(Boolean processed) {
         this.processed = processed;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
+
+    public String getSignature() {
+        return signature;
     }
 }
