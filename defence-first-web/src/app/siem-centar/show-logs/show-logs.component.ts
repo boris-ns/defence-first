@@ -2,8 +2,7 @@ import { LogFilterDTO } from '../../models/log-filter.model';
 import { Log } from '../../models/log.model';
 import { LogService } from '../../services/siem-centar/log.service';
 import { Component, OnInit } from '@angular/core';
-import * as Stomp from 'stompjs';
-import * as SockJS from 'sockjs-client';
+
 
 @Component({
   selector: 'app-show-logs',
@@ -19,7 +18,6 @@ export class ShowLogsComponent implements OnInit {
   stompClient: any;
 
   constructor(private logService: LogService) {
-    this.initializeWebSocketConnection();
   }
 
   ngOnInit() {
@@ -30,20 +28,6 @@ export class ShowLogsComponent implements OnInit {
     this.logService.getAllLogs().subscribe((data: Log[]) => {
       this.data = data;
     });
-  }
-
-  initializeWebSocketConnection() {
-    // const ws = new SockJS(this.serverUrl);
-    // this.stompClient = Stomp.over(ws);
-    // const that = this;
-    // this.stompClient.connect({}, () => {
-    //   that.stompClient.subscribe('/topic', (message) => {
-    //     console.log(message);
-    //     if (message.body) {
-    //       console.log(message.body);
-    //     }
-    //   });
-    // });
   }
 
   checkClass(row: any) {
