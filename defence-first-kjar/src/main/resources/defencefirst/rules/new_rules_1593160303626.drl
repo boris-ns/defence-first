@@ -1,0 +1,24 @@
+package defencefirst.templates;
+import rs.ac.uns.ftn.siemcentar.model.Log;
+import rs.ac.uns.ftn.siemcentar.model.LogType;
+import rs.ac.uns.ftn.siemcentar.model.Alarm;
+import rs.ac.uns.ftn.siemcentar.model.AlarmType;
+import java.util.Date;
+
+rule "Activate alarm on Log type WARN occured 10 times over 15 minutes"
+    when
+        $l: Log($id: id, logType == LogType.WARN, 
+                $s: source, $a: agent, $m: message
+        )
+        Number(intValue >= 10) from accumulate(
+            $log: Log(logType == LogType.WARN) over window:time( 15m ),
+            count($log)
+        )
+        not(Alarm(date.before(new Date(System.currentTimeMillis() + 5000L)), reason.startsWith("Log type occured X times - agent: ")))
+    then
+        insert(new Alarm(null, new Date(), "Log type occured X times - agent: " + $a + ", source: " + $s + ", message: " + "Novi Alarm" , -1L, $a, $s, AlarmType.OTHER));
+        System.out.println("[DROOLS] Type-Occurs template alarm activated");
+end
+
+
+

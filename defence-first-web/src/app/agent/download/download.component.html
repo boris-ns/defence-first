@@ -3,6 +3,7 @@
     <p *ngIf="csr == null">You dont have request</p>
     <p *ngIf="csr != null && csr.status != 'APPROVED'">Your request status is: {{csr.status}}</p>
     <p *ngIf="csr != null && csr.status == 'APPROVED'">
+        Serial number: {{csr.serialNumber}} <br>
         Your cert: <br>
         {{certificate}}
     </p>
