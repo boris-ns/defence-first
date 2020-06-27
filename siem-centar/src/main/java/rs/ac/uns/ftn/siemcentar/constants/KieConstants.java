@@ -7,7 +7,8 @@ public class KieConstants {
     public static String KJAR_POM_PATH = "../defence-first-kjar/pom.xml";
 
     // Samo ovu putanju menjati u skladu gde vam je instaliran maven
-    public static String MAVEN_HOME = "E:\\Instalirani_programi\\apache-maven-3.6.2\\";
+//    public static String MAVEN_HOME = "E:\\Instalirani_programi\\apache-maven-3.6.2\\";
+    public static final String MAVEN_HOME = "/usr/share/maven";
 
     public static String TYPE_MESSAGE_TEMPLATE_PATH = "/defencefirst/templates/type-message-template.drt";
     public static String TYPE_OCCURS_TEMPLATE_PATH = "/defencefirst/templates/type-occurs-template.drt";

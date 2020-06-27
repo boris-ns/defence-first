@@ -38,7 +38,7 @@ public class SiemAgentApplication implements CommandLineRunner {
 
 //		certificateService.createReplaceCertificateRequest();
 //		certificateService.createRequestForCertificate();
-//		certificateService.installCertificateFromFile();
+//		certificateService.installCertificateFromFile(true);
 
 
 	}

@@ -85,7 +85,7 @@ public class CertificateServiceImpl implements CertificateService {
     private RestTemplate restTemplate;
 
     @Override
-    public void installCertificateFromFile() throws Exception {
+    public void installCertificateFromFile(Boolean renewal) throws Exception {
         ArrayList<Certificate> certificates = new ArrayList<>();
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
         String retVal = readAllBytesJava7(pathToCertificate);
@@ -102,8 +102,13 @@ public class CertificateServiceImpl implements CertificateService {
         }
         CertPath certPath = cf.generateCertPath(certificates);
 
-
-        PrivateKey privateKey = keystore.readPrivateKey(Constants.KEY_PAIR_ALIAS, keyStorePassword);
+        PrivateKey privateKey = null;
+        if(renewal) {
+            privateKey = keystore.readPrivateKey(Constants.RENEWAL_KEY_PAIR_ALIAS, keyStorePassword);
+        }
+        else {
+            privateKey = keystore.readPrivateKey(Constants.KEY_PAIR_ALIAS, keyStorePassword);
+        }
         keystore.writeChain(Constants.CERTIFICATE_ALIAS, privateKey,
                 keyStorePassword.toCharArray(), certificatesArray);
 
@@ -139,7 +144,7 @@ public class CertificateServiceImpl implements CertificateService {
         // da prosledimo koji je SerialNumber o
         GeneralNames subjectAltName = null;
         GeneralName issuerSNName = new GeneralName(GeneralName.dNSName, issuerSerialNumber);
-        GeneralName myCertSerialNumber = new GeneralName(GeneralName.uniformResourceIdentifier, "1593008519115");
+        GeneralName myCertSerialNumber = new GeneralName(GeneralName.uniformResourceIdentifier, myCertId);
 
         if(renewal) {
             subjectAltName = new GeneralNames(new GeneralName[]{issuerSNName, myCertSerialNumber});

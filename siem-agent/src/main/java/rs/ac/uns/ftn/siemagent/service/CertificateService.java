@@ -27,7 +27,7 @@ public interface CertificateService {
 
     void createRequestForCertificate() throws Exception;
 
-    void installCertificateFromFile() throws CertificateException, Exception;
+    void installCertificateFromFile(Boolean renewal) throws CertificateException, Exception;
 
     X509Certificate findMyCertificate() throws Exception;
 
